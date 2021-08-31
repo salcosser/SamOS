@@ -47,6 +47,13 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
+            // date command
+            sc = new TSOS.ShellCommand(this.shellDate, "date", "- displays the current date and time.");
+            this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellAmI, "whereami", "-gives accurate information about a user's current position.");
+            this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellUfoTracker, "whereistheufo", "- opens a google maps tab of the current location of the UFO");
+            this.commandList[this.commandList.length] = sc;
             // Display the initial prompt.
             this.putPrompt();
         }
@@ -194,6 +201,46 @@ var TSOS;
                         _StdOut.putText("Help displays a list of (hopefully) valid commands.");
                         break;
                     // TODO: Make descriptive MANual page entries for the the rest of the shell commands here.
+                    case "ver":
+                        _StdOut.putText("Ver is used show the info about the current version.");
+                        break;
+                    case "shutdown":
+                        _StdOut.putText("Shuts down the virtual OS but leaves the underlying host / hardware simulation running.");
+                        break;
+                    case "cls":
+                        _StdOut.putText("Cls can be used to clear the screen and reset the cursor position.");
+                        break;
+                    case "man":
+                        _StdOut.putText("Usage: man <topic>");
+                        _StdOut.advanceLine();
+                        _StdOut.putText("used to show the useful info of a given command.");
+                        break;
+                    case "trace":
+                        _StdOut.putText("Usage: trace <on | off>");
+                        _StdOut.advanceLine();
+                        _StdOut.putText("used to turn on and off the OS trace.");
+                        break;
+                    case "rot13":
+                        _StdOut.putText("Usage: rot13 <string>");
+                        _StdOut.advanceLine();
+                        _StdOut.putText("obfuscates a string using rot13.");
+                        break;
+                    case "prompt":
+                        _StdOut.putText("Usage: prompt <string>");
+                        _StdOut.advanceLine();
+                        _StdOut.putText("sets a prompt.");
+                        break;
+                    case "date":
+                        _StdOut.putText("shows the current date and time.");
+                        break;
+                    case "whereami":
+                        _StdOut.putText("Gives positional information about the current user.");
+                        break;
+                    case "whereistheufo":
+                        _StdOut.putText("Uses cutting edge technology to locate the UFO of our most");
+                        _StdOut.advanceLine();
+                        _StdOut.putText("nearby interplanetary friends.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -243,6 +290,37 @@ var TSOS;
             else {
                 _StdOut.putText("Usage: prompt <string>  Please supply a string.");
             }
+        }
+        shellDate() {
+            var today = new Date();
+            var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            var daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            var date = daysOfWeek[today.getDay()] + " " + months[(today.getMonth())] + ' ' + today.getDate() + ", " + today.getFullYear();
+            var minutes = today.getMinutes() > 9 ? today.getMinutes() : "0" + today.getMinutes();
+            var seconds = today.getSeconds() > 9 ? today.getSeconds() : "0" + today.getSeconds();
+            var period = "AM";
+            var hours = today.getHours();
+            if (hours > 11) {
+                period = "PM";
+                if (hours > 12) {
+                    hours -= 12;
+                }
+            }
+            var time = hours + ":" + minutes + ":" + seconds + " " + period;
+            _StdOut.putText(`The current date and time is ${date} ${time}.`);
+        }
+        shellAmI() {
+            _StdOut.putText("Somewhere between where you were and where you are going to be.");
+        }
+        shellUfoTracker() {
+            _StdOut.putText("Locating...");
+            _StdOut.advanceLine();
+            _StdOut.putText("Please allow the popup to view the location of the UFO.");
+            var x = (Math.random() * 180) - 90;
+            var y = (Math.random() * 180) - 90;
+            _StdOut.advanceLine();
+            _StdOut.putText(`Found them hovering above the GPS coordinates ${x},${y}. `);
+            window.open(`https://www.google.com/maps/@${x},${y},6.62z`);
         }
     }
     TSOS.Shell = Shell;
