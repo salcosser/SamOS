@@ -45,6 +45,11 @@ var TSOS;
                 chr = String.fromCharCode(keyCode);
                 _KernelInputQueue.enqueue(chr);
             }
+            else if (keyCode == 8) {
+                console.log("pressed backspace");
+                chr = String.fromCharCode(8);
+                _KernelInputQueue.enqueue(chr);
+            }
         }
     }
     TSOS.DeviceDriverKeyboard = DeviceDriverKeyboard;

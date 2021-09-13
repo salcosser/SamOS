@@ -37,6 +37,12 @@ var TSOS;
                     // ... and reset our buffer.
                     this.buffer = "";
                 }
+                else if (chr === String.fromCharCode(8)) {
+                    //backspace
+                    this.buffer = this.buffer.substr(0, this.buffer.length - 1);
+                    this.backspace();
+                    console.log(this.buffer);
+                }
                 else {
                     // This is a "normal" character, so ...
                     // ... draw it on the screen...
@@ -62,6 +68,13 @@ var TSOS;
                 var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
                 this.currentXPosition = this.currentXPosition + offset;
             }
+        }
+        backspace() {
+            var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, this.buffer[this.buffer.length - 1]);
+            var lHeight = _DefaultFontSize + _DrawingContext.fontDescent(this.currentFont, this.currentFontSize);
+            _DrawingContext.clearRect(this.currentXPosition - offset, this.currentYPosition - lHeight, offset, lHeight + _FontHeightMargin);
+            this.currentXPosition -= offset;
+            console.log("tried to delete");
         }
         advanceLine() {
             this.currentXPosition = 0;

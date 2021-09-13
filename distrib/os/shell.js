@@ -306,6 +306,9 @@ var TSOS;
                     hours -= 12;
                 }
             }
+            if (hours == 0) {
+                hours = 12;
+            }
             var time = hours + ":" + minutes + ":" + seconds + " " + period;
             _StdOut.putText(`The current date and time is ${date} ${time}.`);
         }
@@ -316,8 +319,8 @@ var TSOS;
             _StdOut.putText("Locating...");
             _StdOut.advanceLine();
             _StdOut.putText("Please allow the popup to view the location of the UFO.");
-            var x = (Math.random() * 180) - 90;
-            var y = (Math.random() * 180) - 90;
+            var x = (Math.random() * 360) - 180;
+            var y = (Math.random() * 360) - 180;
             _StdOut.advanceLine();
             _StdOut.putText(`Found them hovering above the GPS coordinates ${x},${y}. `);
             window.open(`https://www.google.com/maps/@${x},${y},6.62z`);

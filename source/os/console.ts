@@ -13,7 +13,8 @@ module TSOS {
                     public currentFontSize = _DefaultFontSize,
                     public currentXPosition = 0,
                     public currentYPosition = _DefaultFontSize,
-                    public buffer = "") {
+                    public buffer = "",
+                    ) {
         }
 
         public init(): void {
@@ -41,6 +42,11 @@ module TSOS {
                     _OsShell.handleInput(this.buffer);
                     // ... and reset our buffer.
                     this.buffer = "";
+                }else if(chr === String.fromCharCode(8)){
+                    //backspace
+                    this.buffer = this.buffer.substr(0, this.buffer.length-1);
+                    this.backspace();
+                    console.log(this.buffer);
                 } else {
                     // This is a "normal" character, so ...
                     // ... draw it on the screen...
@@ -68,6 +74,14 @@ module TSOS {
                 this.currentXPosition = this.currentXPosition + offset;
             }
          }
+        public backspace()  : void {
+                
+                var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, this.buffer[this.buffer.length - 1]);
+                var lHeight = _DefaultFontSize + _DrawingContext.fontDescent(this.currentFont, this.currentFontSize);
+                _DrawingContext.clearRect(this.currentXPosition - offset, this.currentYPosition - lHeight, offset, lHeight + _FontHeightMargin);
+                this.currentXPosition -= offset;
+                console.log("tried to delete");
+        }
 
         public advanceLine(): void {
             this.currentXPosition = 0;
