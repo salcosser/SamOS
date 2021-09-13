@@ -92,6 +92,8 @@ var TSOS;
                 var w = CanvasTextFunctions.measure(font, size, text);
                 return CanvasTextFunctions.draw(ctx, font, size, x - w / 2, y, text);
             };
+            // ctx.GetImageData = (sx, sy, sw, sh) => { return ctx.getImageData(sx, sy, sw, sh);};
+            // ctx.drawImage = (image, dx, dy) => {return ctx.drawImage(image, dx, dy);};
         }
     }
     CanvasTextFunctions.symbols = {

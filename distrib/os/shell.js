@@ -102,6 +102,15 @@ var TSOS;
                     this.execute(this.shellInvalidCommand);
                 }
             }
+            if (_Console.currentYPosition + (_Console.currentFontSize) > _Canvas.height) {
+                // _StdOut.advanceLine();
+                var img = _DrawingContext.getImageData(0, _Console.currentFontSize, _Canvas.width, _Canvas.height + (_Console.currentFontSize * 5));
+                _Console.currentYPosition = _Canvas.height - TSOS.CanvasTextFunctions.descent(null, _Console.currentFontSize);
+                _Console.clearScreen();
+                _DrawingContext.putImageData(img, 0, (_Console.currentFontSize) * -1);
+                console.log("we tried");
+                _StdOut.advanceLine();
+            }
         }
         // Note: args is an optional parameter, ergo the ? which allows TypeScript to understand that.
         execute(fn, args) {
@@ -318,12 +327,12 @@ var TSOS;
         shellUfoTracker() {
             _StdOut.putText("Locating...");
             _StdOut.advanceLine();
-            _StdOut.putText("Please allow the popup to view the location of the UFO.");
+            // _StdOut.putText("Please allow the popup to view the location of the UFO.");
             var x = (Math.random() * 360) - 180;
             var y = (Math.random() * 360) - 180;
-            _StdOut.advanceLine();
+            // _StdOut.advanceLine();
             _StdOut.putText(`Found them hovering above the GPS coordinates ${x},${y}. `);
-            window.open(`https://www.google.com/maps/@${x},${y},6.62z`);
+            // window.open(`https://www.google.com/maps/@${x},${y},6.62z`);
         }
     }
     TSOS.Shell = Shell;

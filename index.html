@@ -5,7 +5,7 @@
    <meta name="author" content="Alan G. Labouseur" />
    <link rel="stylesheet" href="TSOS.css" type="text/css" media="screen" />
    <title>
-      TSOS - a browser-based virtual Operating System in TypeScript
+      SamOS
    </title>
 
    <!-- Globals CONSTANTS and _Variables. Must included be first. -->
@@ -31,54 +31,133 @@
    <!-- Other Routines -->
    <script type="text/javascript" src="distrib/utils.js"></script>
    <!-- Uncomment the line below to enable GLaDOS testing. -->
-   <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip0.js"></script>
+   <!-- <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip1.js"></script> -->
+
+
+   <!-- bootstrap stuff -->
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+   <!-- font-->
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
+
+   <script>
+
+      setInterval(function () {
+         var today = new Date();
+         var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+         var daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+         var date = daysOfWeek[today.getDay()] + " " + months[(today.getMonth())] + ' ' + today.getDate() + ", " + today.getFullYear();
+         var minutes = today.getMinutes() > 9 ? today.getMinutes() : "0" + today.getMinutes();
+         var seconds = today.getSeconds() > 9 ? today.getSeconds() : "0" + today.getSeconds();
+         var period = "AM";
+         var hours = today.getHours();
+         if (hours > 11) {
+            period = "PM";
+            if (hours > 12) {
+               hours -= 12;
+            }
+         }
+         if (hours == 0) {
+            hours = 12;
+         }
+
+         var time = hours + ":" + minutes + ":" + seconds + " " + period;
+         document.getElementById("time").innerHTML = `${date} ${time}`;
+      }, 1000);
+      function updateStatus(status) {
+         document.getElementById("cStatus").innerHTML = status;
+      }
+   </script>
+
+
 
 </head>
 
 <body onload="onDocumentLoad()">
 
-   <div id="divMain" style="width:100%;">
 
-      <div id="divButtonBar" style="margin:4px;">
-         <input type="button" id="btnStartOS" name="brnStartOS" class="normal_button" value="Start" tabindex="0"
-            onclick="TSOS.Control.hostBtnStartOS_click(this);">
+   <div class="container">
+      <div class=" row text-center">
 
-         <input type="button" id="btnHaltOS" name="brnHaltOS" class="normal_button" disabled="disabled" value="Halt"
-            tabindex="1" onclick="TSOS.Control.hostBtnHaltOS_click(this);">
+         <div class="col-12">
+            <span>
+               <h1 class="  display-4 "><i>SamOS</i></h1>
+               <h3 class="dislpay-5">An Operating System based on TSOS</h3>
+            </span>
+         </div>
 
-         <input type="button" id="btnReset" name="brnReset" class="normal_button" disabled="disabled" value="Reset"
-            tabindex="2" onclick="TSOS.Control.hostBtnReset_click(this);">
+
+
+
+
+
+      </div>
+      <div class="row">
+         <div class="col-5 ">
+            <div id="divButtonBar" style="margin:4px;">
+               <input type="button" id="btnStartOS" name="brnStartOS" class="btn btn-success" value="Start" tabindex="0"
+                  onclick="TSOS.Control.hostBtnStartOS_click(this);updateStatus('running');">
+
+               <input type="button" id="btnHaltOS" name="brnHaltOS" class="btn btn-danger" disabled="disabled"
+                  value="Halt" tabindex="1" onclick="TSOS.Control.hostBtnHaltOS_click(this);updateStatus('halted');">
+
+               <input type="button" id="btnReset" name="brnReset" class="btn btn-primary" disabled="disabled"
+                  value="Reset" tabindex="2"
+                  onclick="TSOS.Control.hostBtnReset_click(this);updateStatus('not running');">
+            </div>
+         </div>
+         <div class="col-2">status: <span id="cStatus"></span></div>
+         <div class="col-5 text-right">
+            <p id="time"></p>
+         </div>
+
+
+
+      </div>
+      <div class="row">
+         <div id="divConsole" class="col-9">
+            <canvas id="display" width="800px" height="500px" tabindex="3">
+            </canvas>
+         </div>
+         <div id="divLog" style="margin-top:-25px" class="col-3">
+            <label>
+               Host Log
+               <br>
+               <textarea name="taHostLog" id="taHostLog" rows="20" cols="48"></textarea>
+            </label>
+         </div>
+      </div>
+      <div class="row">
+         <div id="divUserProgramInput" class="col-7">
+            <label>
+               User Program Input
+               <br>
+               <textarea name="taProgramInput" id="taProgramInput" rows="8" cols="48"></textarea>
+            </label>
+         </div>
+
       </div>
 
-      <div id="divConsole" style="margin:4px; width:500px; height:500px; float:left;">
-         <canvas id="display" width="800px" height="500px" tabindex="3">
-         </canvas>
-      </div>
 
-      <div id="divLog" style="margin-left:820px;">
-         <label>
-            Host Log
-            <br>
-            <textarea name="taHostLog" id="taHostLog" rows="26" cols="48"></textarea>
-         </label>
-      </div>
 
-      <div id="divUserProgramInput" style="margin-left:820px;">
-         <label>
-            User Program Input
-            <br>
-            <textarea name="taProgramInput" id="taProgramInput" rows="8" cols="48"></textarea>
-         </label>
-      </div>
+
+
+
+
+
+
+      <p class="footerText" style="clear:both;">
+         <br>
+         Copyright &copy; 2008 - 2019 No Rights Reserved.
+         <br>
+         Reproduction is inhibited without the express written consent of
+         Ted Codd, Stevie Ray Vaughan, and Ian Fleming.
+      </p>
    </div>
-
-   <p class="footerText" style="clear:both;">
-      <br>
-      Copyright &copy; 2008 - 2019 No Rights Reserved.
-      <br>
-      Reproduction is inhibited without the express written consent of
-      Ted Codd, Stevie Ray Vaughan, and Ian Fleming.
-   </p>
-
 </body>
 </html>

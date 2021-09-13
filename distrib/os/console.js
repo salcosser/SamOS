@@ -31,16 +31,24 @@ var TSOS;
                 var chr = _KernelInputQueue.dequeue();
                 // Check to see if it's "special" (enter or ctrl-c) or "normal" (anything else that the keyboard device driver gave us).
                 if (chr === String.fromCharCode(13)) { // the Enter key
+                    // if(this.currentYPosition + (this.currentFontSize * 2) > _Canvas.height){
+                    //     // _StdOut.advanceLine();
+                    //     var img = _DrawingContext.getImageData(0, this.currentFontSize, _Canvas.width, _Canvas.height);
+                    //     this.currentYPosition = _Canvas.height -CanvasTextFunctions.descent(null, this.currentFontSize);
+                    //     this.clearScreen();
+                    //     _DrawingContext.putImageData(img, 0, (this.currentFontSize)* -1);
+                    //     console.log("we tried");
+                    // }
                     // The enter key marks the end of a console command, so ...
                     // ... tell the shell ...
                     _OsShell.handleInput(this.buffer);
                     // ... and reset our buffer.
                     this.buffer = "";
                 }
-                else if (chr === String.fromCharCode(8)) {
+                else if (chr === String.fromCharCode(8) && this.buffer.length > 0) {
                     //backspace
-                    this.buffer = this.buffer.substr(0, this.buffer.length - 1);
                     this.backspace();
+                    this.buffer = this.buffer.substr(0, this.buffer.length - 1);
                     console.log(this.buffer);
                 }
                 else {
@@ -71,10 +79,10 @@ var TSOS;
         }
         backspace() {
             var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, this.buffer[this.buffer.length - 1]);
-            var lHeight = _DefaultFontSize + _DrawingContext.fontDescent(this.currentFont, this.currentFontSize);
-            _DrawingContext.clearRect(this.currentXPosition - offset, this.currentYPosition - lHeight, offset, lHeight + _FontHeightMargin);
+            // var lHeight = _DefaultFontSize + _DrawingContext.fontDescent(this.currentFont, this.currentFontSize);
             this.currentXPosition -= offset;
-            console.log("tried to delete");
+            var yPos = this.currentYPosition - (this.currentFontSize - 1);
+            _DrawingContext.clearRect(this.currentXPosition, yPos, offset, this.currentFontSize);
         }
         advanceLine() {
             this.currentXPosition = 0;
