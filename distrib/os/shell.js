@@ -16,6 +16,7 @@ var TSOS;
             this.commandList = [];
             this.curses = "[fuvg],[cvff],[shpx],[phag],[pbpxfhpxre],[zbgureshpxre],[gvgf]";
             this.apologies = "[sorry]";
+            this.printLen = new Map();
         }
         init() {
             var sc;
@@ -24,36 +25,47 @@ var TSOS;
             // ver
             sc = new TSOS.ShellCommand(this.shellVer, "ver", "- Displays the current version data.");
             this.commandList[this.commandList.length] = sc;
+            this.printLen.set("ver", 1);
             // help
             sc = new TSOS.ShellCommand(this.shellHelp, "help", "- This is the help command. Seek help.");
             this.commandList[this.commandList.length] = sc;
+            this.printLen.set("help", 12);
             // shutdown
             sc = new TSOS.ShellCommand(this.shellShutdown, "shutdown", "- Shuts down the virtual OS but leaves the underlying host / hardware simulation running.");
             this.commandList[this.commandList.length] = sc;
+            this.printLen.set("shutdown", 1);
             // cls
             sc = new TSOS.ShellCommand(this.shellCls, "cls", "- Clears the screen and resets the cursor position.");
             this.commandList[this.commandList.length] = sc;
+            this.printLen.set("cls", 0);
             // man <topic>
             sc = new TSOS.ShellCommand(this.shellMan, "man", "<topic> - Displays the MANual page for <topic>.");
             this.commandList[this.commandList.length] = sc;
+            this.printLen.set("man", 4);
             // trace <on | off>
             sc = new TSOS.ShellCommand(this.shellTrace, "trace", "<on | off> - Turns the OS trace on or off.");
             this.commandList[this.commandList.length] = sc;
+            this.printLen.set("trace", 2);
             // rot13 <string>
             sc = new TSOS.ShellCommand(this.shellRot13, "rot13", "<string> - Does rot13 obfuscation on <string>.");
             this.commandList[this.commandList.length] = sc;
+            this.printLen.set("rot13", 1);
             // prompt <string>
             sc = new TSOS.ShellCommand(this.shellPrompt, "prompt", "<string> - Sets the prompt.");
             this.commandList[this.commandList.length] = sc;
+            this.printLen.set("prompt", 1);
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             // date command
             sc = new TSOS.ShellCommand(this.shellDate, "date", "- displays the current date and time.");
             this.commandList[this.commandList.length] = sc;
+            this.printLen.set("date", 1);
             sc = new TSOS.ShellCommand(this.shellAmI, "whereami", "-gives accurate information about a user's current position.");
             this.commandList[this.commandList.length] = sc;
+            this.printLen.set("whereami", 1);
             sc = new TSOS.ShellCommand(this.shellUfoTracker, "whereistheufo", "- opens a google maps tab of the current location of the UFO");
             this.commandList[this.commandList.length] = sc;
+            this.printLen.set("whereistheufo", 2);
             // Display the initial prompt.
             this.putPrompt();
         }
@@ -88,29 +100,33 @@ var TSOS;
                 }
             }
             if (found) {
+                // _OsShell.handleScroll(_OsShell.printLen.get(cmd));
                 this.execute(fn, args); // Note that args is always supplied, though it might be empty.
             }
             else {
                 // It's not found, so check for curses and apologies before declaring the command invalid.
                 if (this.curses.indexOf("[" + TSOS.Utils.rot13(cmd) + "]") >= 0) { // Check for curses.
+                    // _OsShell.handleScroll(2);
                     this.execute(this.shellCurse);
                 }
                 else if (this.apologies.indexOf("[" + cmd + "]") >= 0) { // Check for apologies.
+                    // _OsShell.handleScroll(2);
                     this.execute(this.shellApology);
                 }
                 else { // It's just a bad command. {
+                    // _OsShell.handleScroll(1);
                     this.execute(this.shellInvalidCommand);
                 }
             }
-            if (_Console.currentYPosition + (_Console.currentFontSize) > _Canvas.height) {
-                // _StdOut.advanceLine();
-                var img = _DrawingContext.getImageData(0, _Console.currentFontSize, _Canvas.width, _Canvas.height + (_Console.currentFontSize * 5));
-                _Console.currentYPosition = _Canvas.height - TSOS.CanvasTextFunctions.descent(null, _Console.currentFontSize);
-                _Console.clearScreen();
-                _DrawingContext.putImageData(img, 0, (_Console.currentFontSize) * -1);
-                console.log("we tried");
-                _StdOut.advanceLine();
-            }
+            // if(_Console.currentYPosition + (_Console.currentFontSize) > _Canvas.height){
+            //     var img = _DrawingContext.getImageData(0, _Console.currentFontSize, _Canvas.width, _Canvas.height+(_Console.currentFontSize* 5));
+            //     _Console.currentYPosition = _Canvas.height -CanvasTextFunctions.descent(null, _Console.currentFontSize);
+            //     _Console.clearScreen();
+            //     _DrawingContext.putImageData(img, 0, (_Console.currentFontSize)* -1);
+            //     console.log("we tried");
+            //     _Console.currentXPosition = 0;
+            //     this.putPrompt();
+            // }
         }
         // Note: args is an optional parameter, ergo the ? which allows TypeScript to understand that.
         execute(fn, args) {
@@ -147,6 +163,16 @@ var TSOS;
                 }
             }
             return retVal;
+        }
+        handleScroll(scrollLen) {
+            if (_Console.currentYPosition + (_Console.currentFontSize * scrollLen + 2) > _Canvas.height) {
+                var img = _DrawingContext.getImageData(0, _Console.currentFontSize, _Canvas.width, _Canvas.height);
+                _Console.currentYPosition = _Canvas.height - (TSOS.CanvasTextFunctions.descent(null, _Console.currentFontSize));
+                _Console.clearScreen();
+                _DrawingContext.putImageData(img, 0, (_Console.currentFontSize) * -(scrollLen + 1));
+                console.log("we tried");
+                _Console.currentXPosition = 0;
+            }
         }
         //
         // Shell Command Functions. Kinda not part of Shell() class exactly, but

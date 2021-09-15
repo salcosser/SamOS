@@ -25,6 +25,17 @@ var TSOS;
             this.currentXPosition = 0;
             this.currentYPosition = this.currentFontSize;
         }
+        handleScroll(scrollLen) {
+            scrollLen = scrollLen;
+            console.log(scrollLen);
+            if (this.currentYPosition + (this.currentFontSize * scrollLen + 1) > _Canvas.height) {
+                var img = _DrawingContext.getImageData(0, this.currentFontSize * scrollLen, _Canvas.width, _Canvas.height + (_DrawingContext.fontDescent(this.currentFont, this.currentFontSize) * (scrollLen + 1)));
+                this.clearScreen();
+                _DrawingContext.putImageData(img, 0, _DrawingContext.fontAscent(this.currentFont, this.currentFontSize) * -(scrollLen));
+                console.log("we tried");
+                this.backtrackLine(scrollLen);
+            }
+        }
         handleInput() {
             while (_KernelInputQueue.getSize() > 0) {
                 // Get the next character from the kernel input queue.
@@ -34,14 +45,27 @@ var TSOS;
                     // if(this.currentYPosition + (this.currentFontSize * 2) > _Canvas.height){
                     //     // _StdOut.advanceLine();
                     //     var img = _DrawingContext.getImageData(0, this.currentFontSize, _Canvas.width, _Canvas.height);
-                    //     this.currentYPosition = _Canvas.height -CanvasTextFunctions.descent(null, this.currentFontSize);
+                    //     this.currentYPosition = _Canvas.height -(CanvasTextFunctions.descent(null, this.currentFontSize) * 2);
                     //     this.clearScreen();
                     //     _DrawingContext.putImageData(img, 0, (this.currentFontSize)* -1);
                     //     console.log("we tried");
                     // }
                     // The enter key marks the end of a console command, so ...
                     // ... tell the shell ...
+                    var comLen = _OsShell.printLen.get(this.buffer);
+                    if (comLen != undefined) {
+                        this.handleScroll(comLen);
+                    }
+                    else {
+                        this.handleScroll(1);
+                    }
                     _OsShell.handleInput(this.buffer);
+                    // var comLen = _OsShell.printLen.get(this.buffer);
+                    // if(comLen != undefined){
+                    //     this.handleScroll(comLen);
+                    // }else{
+                    //     this.handleScroll(1);
+                    // }
                     // ... and reset our buffer.
                     this.buffer = "";
                 }
@@ -95,6 +119,12 @@ var TSOS;
                 _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
                 _FontHeightMargin;
             // TODO: Handle scrolling. (iProject 1)
+        }
+        backtrackLine(lineAmt) {
+            this.currentXPosition = 0;
+            this.currentYPosition += -((_DefaultFontSize +
+                _DrawingContext.fontAscent(this.currentFont, this.currentFontSize) +
+                _FontHeightMargin) * lineAmt);
         }
     }
     TSOS.Console = Console;
