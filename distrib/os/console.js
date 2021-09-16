@@ -23,17 +23,43 @@ var TSOS;
         }
         resetXY() {
             this.currentXPosition = 0;
-            this.currentYPosition = this.currentFontSize;
+            this.currentYPosition = _DefaultFontSize;
         }
         handleScroll(scrollLen) {
-            scrollLen = scrollLen;
             console.log(scrollLen);
-            if (this.currentYPosition + (this.currentFontSize * scrollLen + 1) > _Canvas.height) {
-                var img = _DrawingContext.getImageData(0, this.currentFontSize * scrollLen, _Canvas.width, _Canvas.height + (_DrawingContext.fontDescent(this.currentFont, this.currentFontSize) * (scrollLen + 1)));
+            const safeBottom = 467.0799999999998;
+            var fDSize = (_DrawingContext.fontDescent(this.currentFont, this.currentFontSize));
+            var fASize = (_DrawingContext.fontAscent(this.currentFont, this.currentFontSize));
+            var dcSize = _DefaultFontSize +
+                _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
+                _FontHeightMargin;
+            if ((scrollLen) == 0) {
+                return;
+            }
+            if (this.currentYPosition + (dcSize * scrollLen) > safeBottom) {
+                var img = _DrawingContext.getImageData(0, fDSize * scrollLen, _Canvas.width, _Canvas.height + (fDSize * (scrollLen + 1)));
                 this.clearScreen();
-                _DrawingContext.putImageData(img, 0, _DrawingContext.fontAscent(this.currentFont, this.currentFontSize) * -(scrollLen));
-                console.log("we tried");
-                this.backtrackLine(scrollLen);
+                if (((this.currentYPosition + (dcSize * -((scrollLen)) - (dcSize * 4)))) <= 0) {
+                    // this.init();
+                    // this.advanceLine();
+                    // this.advanceLine();
+                    _DrawingContext.putImageData(img, 0, -(dcSize * 16));
+                    this.resetXY();
+                    this.advanceLine();
+                    this.advanceLine();
+                    // this.advanceLine();
+                    console.log("reset all");
+                }
+                else {
+                    _DrawingContext.putImageData(img, 0, ((dcSize * -((scrollLen)) - (dcSize * 4))));
+                    // _DrawingContext.putImageData(img, 0, (fASize* -((scrollLen))) );
+                    console.log("we tried");
+                    this.backtrackLine(scrollLen + 2.5);
+                    console.log("everyting seems fine");
+                }
+            }
+            else {
+                console.log((this.currentYPosition + ((fDSize * (scrollLen)) + (fDSize))) + " Seems fine.");
             }
         }
         handleInput() {
@@ -42,31 +68,19 @@ var TSOS;
                 var chr = _KernelInputQueue.dequeue();
                 // Check to see if it's "special" (enter or ctrl-c) or "normal" (anything else that the keyboard device driver gave us).
                 if (chr === String.fromCharCode(13)) { // the Enter key
-                    // if(this.currentYPosition + (this.currentFontSize * 2) > _Canvas.height){
-                    //     // _StdOut.advanceLine();
-                    //     var img = _DrawingContext.getImageData(0, this.currentFontSize, _Canvas.width, _Canvas.height);
-                    //     this.currentYPosition = _Canvas.height -(CanvasTextFunctions.descent(null, this.currentFontSize) * 2);
-                    //     this.clearScreen();
-                    //     _DrawingContext.putImageData(img, 0, (this.currentFontSize)* -1);
-                    //     console.log("we tried");
-                    // }
                     // The enter key marks the end of a console command, so ...
                     // ... tell the shell ...
                     var comLen = _OsShell.printLen.get(this.buffer);
-                    if (comLen != undefined) {
+                    if (this.buffer.length == 0) {
+                        this.handleScroll(1);
+                    }
+                    else if (comLen != undefined) {
                         this.handleScroll(comLen);
                     }
                     else {
                         this.handleScroll(1);
                     }
                     _OsShell.handleInput(this.buffer);
-                    // var comLen = _OsShell.printLen.get(this.buffer);
-                    // if(comLen != undefined){
-                    //     this.handleScroll(comLen);
-                    // }else{
-                    //     this.handleScroll(1);
-                    // }
-                    // ... and reset our buffer.
                     this.buffer = "";
                 }
                 else if (chr === String.fromCharCode(8) && this.buffer.length > 0) {

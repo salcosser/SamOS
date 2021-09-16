@@ -29,7 +29,7 @@ var TSOS;
             // help
             sc = new TSOS.ShellCommand(this.shellHelp, "help", "- This is the help command. Seek help.");
             this.commandList[this.commandList.length] = sc;
-            this.printLen.set("help", 14);
+            this.printLen.set("help", 13);
             // shutdown
             sc = new TSOS.ShellCommand(this.shellShutdown, "shutdown", "- Shuts down the virtual OS but leaves the underlying host / hardware simulation running.");
             this.commandList[this.commandList.length] = sc;
@@ -41,11 +41,11 @@ var TSOS;
             // man <topic>
             sc = new TSOS.ShellCommand(this.shellMan, "man", "<topic> - Displays the MANual page for <topic>.");
             this.commandList[this.commandList.length] = sc;
-            this.printLen.set("man", 4);
+            this.printLen.set("man", 1);
             // trace <on | off>
             sc = new TSOS.ShellCommand(this.shellTrace, "trace", "<on | off> - Turns the OS trace on or off.");
             this.commandList[this.commandList.length] = sc;
-            this.printLen.set("trace", 2);
+            this.printLen.set("trace", 1);
             // rot13 <string>
             sc = new TSOS.ShellCommand(this.shellRot13, "rot13", "<string> - Does rot13 obfuscation on <string>.");
             this.commandList[this.commandList.length] = sc;
@@ -65,10 +65,10 @@ var TSOS;
             this.printLen.set("whereami", 1);
             sc = new TSOS.ShellCommand(this.shellUfoTracker, "whereistheufo", "- opens a google maps tab of the current location of the UFO");
             this.commandList[this.commandList.length] = sc;
-            this.printLen.set("whereistheufo", 2);
+            this.printLen.set("whereistheufo", 3);
             sc = new TSOS.ShellCommand(this.shellStatus, "status", "-sets the status of the current session");
             this.commandList[this.commandList.length] = sc;
-            this.printLen.set("status", 2);
+            this.printLen.set("status", 1);
             // Display the initial prompt.
             this.putPrompt();
         }
