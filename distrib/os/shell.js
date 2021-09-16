@@ -29,7 +29,7 @@ var TSOS;
             // help
             sc = new TSOS.ShellCommand(this.shellHelp, "help", "- This is the help command. Seek help.");
             this.commandList[this.commandList.length] = sc;
-            this.printLen.set("help", 12);
+            this.printLen.set("help", 14);
             // shutdown
             sc = new TSOS.ShellCommand(this.shellShutdown, "shutdown", "- Shuts down the virtual OS but leaves the underlying host / hardware simulation running.");
             this.commandList[this.commandList.length] = sc;
@@ -66,6 +66,9 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellUfoTracker, "whereistheufo", "- opens a google maps tab of the current location of the UFO");
             this.commandList[this.commandList.length] = sc;
             this.printLen.set("whereistheufo", 2);
+            sc = new TSOS.ShellCommand(this.shellStatus, "status", "-sets the status of the current session");
+            this.commandList[this.commandList.length] = sc;
+            this.printLen.set("status", 2);
             // Display the initial prompt.
             this.putPrompt();
         }
@@ -276,6 +279,9 @@ var TSOS;
                         _StdOut.advanceLine();
                         _StdOut.putText("nearby interplanetary friends.");
                         break;
+                    case "status":
+                        _StdOut.putText("sets the status of the current user.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -359,6 +365,11 @@ var TSOS;
             // _StdOut.advanceLine();
             _StdOut.putText(`Found them hovering above the GPS coordinates ${x},${y}. `);
             // window.open(`https://www.google.com/maps/@${x},${y},6.62z`);
+        }
+        shellStatus(status) {
+            document.getElementById("cStatus").innerHTML = status;
+            _StdOut.putText("Updated the status.");
+            _StdOut.advanceLine();
         }
     }
     TSOS.Shell = Shell;

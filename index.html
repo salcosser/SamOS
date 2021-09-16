@@ -69,9 +69,9 @@
          var time = hours + ":" + minutes + ":" + seconds + " " + period;
          document.getElementById("time").innerHTML = `${date} ${time}`;
       }, 1000);
-      function updateStatus(status) {
-         document.getElementById("cStatus").innerHTML = status;
-      }
+      // function updateStatus(status) {
+      //   document.getElementById("cStatus").innerHTML = status;
+      //} 
    </script>
 
 
@@ -101,14 +101,13 @@
          <div class="col-5 ">
             <div id="divButtonBar" style="margin:4px;">
                <input type="button" id="btnStartOS" name="brnStartOS" class="btn btn-success" value="Start" tabindex="0"
-                  onclick="TSOS.Control.hostBtnStartOS_click(this);updateStatus('running');">
+                  onclick="TSOS.Control.hostBtnStartOS_click(this);">
 
                <input type="button" id="btnHaltOS" name="brnHaltOS" class="btn btn-danger" disabled="disabled"
-                  value="Halt" tabindex="1" onclick="TSOS.Control.hostBtnHaltOS_click(this);updateStatus('halted');">
+                  value="Halt" tabindex="1" onclick="TSOS.Control.hostBtnHaltOS_click(this);">
 
                <input type="button" id="btnReset" name="brnReset" class="btn btn-primary" disabled="disabled"
-                  value="Reset" tabindex="2"
-                  onclick="TSOS.Control.hostBtnReset_click(this);updateStatus('not running');">
+                  value="Reset" tabindex="2" onclick="TSOS.Control.hostBtnReset_click(this);">
             </div>
          </div>
          <div class="col-2">status: <span id="cStatus"></span></div>

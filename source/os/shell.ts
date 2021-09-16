@@ -17,6 +17,7 @@ module TSOS {
         public curses = "[fuvg],[cvff],[shpx],[phag],[pbpxfhpxre],[zbgureshpxre],[gvgf]";
         public apologies = "[sorry]";
         public printLen = new Map();
+        
         constructor() {
         }
 
@@ -103,6 +104,15 @@ module TSOS {
                 "- opens a google maps tab of the current location of the UFO");
             this.commandList[this.commandList.length] = sc;
             this.printLen.set("whereistheufo", 2);
+
+
+            sc = new ShellCommand(this.shellStatus,
+                                "status",
+                                "-sets the status of the current session");
+            this.commandList[this.commandList.length] = sc;
+            this.printLen.set("status", 2);
+
+
 
             // Display the initial prompt.
             this.putPrompt();
@@ -337,6 +347,9 @@ module TSOS {
                         _StdOut.advanceLine();
                         _StdOut.putText("nearby interplanetary friends.");
                         break;
+                    case "status":
+                        _StdOut.putText("sets the status of the current user.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -427,7 +440,12 @@ module TSOS {
             // window.open(`https://www.google.com/maps/@${x},${y},6.62z`);
 
         }
-
+        public shellStatus(status: string): void {
+            
+            document.getElementById("cStatus").innerHTML = status;
+            _StdOut.putText("Updated the status.");
+            _StdOut.advanceLine();
+        }
        
     }
 }
