@@ -34,7 +34,7 @@ module TSOS {
         public handleScroll(scrollLen: number): void{   
             
             console.log(scrollLen);
-            const safeBottom = 467.0799999999998;
+            const safeBottom = 487.0799999999998;
             var fDSize = (_DrawingContext.fontDescent(this.currentFont, this.currentFontSize));
             var fASize = (_DrawingContext.fontAscent(this.currentFont, this.currentFontSize));
 
@@ -53,22 +53,22 @@ module TSOS {
                 var img = _DrawingContext.getImageData(0, fDSize * scrollLen, _Canvas.width, _Canvas.height +  (fDSize * (scrollLen+1)));
                 
                 this.clearScreen();
-                if( ( (this.currentYPosition+(dcSize* -((scrollLen)) - (dcSize* 4)))) <= 0  ){
-                    // this.init();
-                    // this.advanceLine();
-                    // this.advanceLine();
-                    _DrawingContext.putImageData(img, 0, -(dcSize * 16));
+                // if( ( (this.currentYPosition-((dcSize* (scrollLen+2)) + 2*(dcSize)+ this.currentFontSize) )  <= 0  )){
+                    if( ( (this.currentYPosition-((((dcSize* scrollLen) + (dcSize* 5))) )  <= 0  ))){
+                    this.init();
+                  
+                    _DrawingContext.putImageData(img, 0, -(dcSize * 22));
                     this.resetXY();
-                    this.advanceLine();
-                    this.advanceLine();
+                    
                     // this.advanceLine();
-
+                    // this.advanceLine();
+                    // this.advanceLine();
                     console.log("reset all");
                 }else{
                     _DrawingContext.putImageData(img, 0, ((dcSize* -((scrollLen)) - (dcSize* 4))));
                     // _DrawingContext.putImageData(img, 0, (fASize* -((scrollLen))) );
                     console.log("we tried");
-                    this.backtrackLine(scrollLen+2.5);
+                    this.backtrackLine(scrollLen+2);
                     console.log("everyting seems fine");
                 }
             

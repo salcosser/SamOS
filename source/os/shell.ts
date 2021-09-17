@@ -38,7 +38,7 @@ module TSOS {
                                   "help",
                                   "- This is the help command. Seek help.");
             this.commandList[this.commandList.length] = sc;
-            this.printLen.set("help", 13);
+            this.printLen.set("help", 15);
 
             // shutdown
             sc = new ShellCommand(this.shellShutdown,
