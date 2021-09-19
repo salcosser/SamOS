@@ -449,7 +449,7 @@ module TSOS {
         }
        public shellLoadProg(){
            var inputtedCode = (<HTMLInputElement>document.getElementById("taProgramInput")).value;
-           var strippedCode = inputtedCode.replace(" ", '').toUpperCase();
+           var strippedCode = inputtedCode.replace(/\s/g, '');
            if(/^[A-F0-9]+$/i.test(strippedCode)){
                _StdOut.putText("File loaded. Machine Code is valid hex.");
                _StdOut.advanceLine();
