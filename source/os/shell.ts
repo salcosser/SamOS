@@ -120,7 +120,11 @@ module TSOS {
             this.commandList[this.commandList.length] = sc;
             this.printLen.set("status", 1);
 
-
+            sc = new ShellCommand(this.shellLoadProg,
+                                "load",
+                                "-Loads the program code provided by the user");
+            this.commandList[this.commandList.length] = sc;
+            this.printLen.set("load", 1);
 
             // Display the initial prompt.
             this.putPrompt();
@@ -174,17 +178,6 @@ module TSOS {
                 }
             }
 
-            // if(_Console.currentYPosition + (_Console.currentFontSize) > _Canvas.height){
-                
-            //     var img = _DrawingContext.getImageData(0, _Console.currentFontSize, _Canvas.width, _Canvas.height+(_Console.currentFontSize* 5));
-            //     _Console.currentYPosition = _Canvas.height -CanvasTextFunctions.descent(null, _Console.currentFontSize);
-            //     _Console.clearScreen();
-            //     _DrawingContext.putImageData(img, 0, (_Console.currentFontSize)* -1);
-            //     console.log("we tried");
-            //     _Console.currentXPosition = 0;
-            //     this.putPrompt();
-
-            // }
         }
 
         // Note: args is an optional parameter, ergo the ? which allows TypeScript to understand that.
@@ -450,10 +443,22 @@ module TSOS {
         }
         public shellStatus(status: string): void {
             
-            document.getElementById("cStatus").innerHTML = status;
+            document.getElementById("cStatus").innerHTML = _Console.buffer.substring(7);
             _StdOut.putText("Updated the status.");
             _StdOut.advanceLine();
         }
-       
+       public shellLoadProg(){
+           var inputtedCode = (<HTMLInputElement>document.getElementById("taProgramInput")).value;
+           var strippedCode = inputtedCode.replace(" ", '').toUpperCase();
+           if(/^[A-F0-9]+$/i.test(strippedCode)){
+               _StdOut.putText("File loaded. Machine Code is valid hex.");
+               _StdOut.advanceLine();
+              
+           }else{
+            _StdOut.putText("File loaded. Machine Code invalid.");
+            _StdOut.advanceLine();
+          
+           }
+       }
     }
 }
