@@ -26,8 +26,10 @@ module TSOS {
                 sessionStorage.removeItem("commOptionIndex");
                 sessionStorage.removeItem("possOptions");
                 sessionStorage.removeItem("baseString");
+               
             }
-
+            sessionStorage.removeItem("commHistory");
+            sessionStorage.setItem("lCommInd", "0");
             var sc: ShellCommand;
             //
             // Load the command list.

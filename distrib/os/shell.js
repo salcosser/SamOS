@@ -24,6 +24,8 @@ var TSOS;
                 sessionStorage.removeItem("possOptions");
                 sessionStorage.removeItem("baseString");
             }
+            sessionStorage.removeItem("commHistory");
+            sessionStorage.setItem("lCommInd", "0");
             var sc;
             //
             // Load the command list.

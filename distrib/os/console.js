@@ -75,6 +75,19 @@ var TSOS;
                         this.handleScroll(1);
                     }
                     _OsShell.handleInput(this.buffer);
+                    var cHist = sessionStorage.getItem("commHistory");
+                    if (cHist) {
+                        var histList = JSON.parse(cHist);
+                        histList[histList.length] = this.buffer;
+                        var newHist = JSON.stringify(histList);
+                        sessionStorage.setItem("commHistory", newHist);
+                        sessionStorage.setItem("lCommInd", (histList.length - 1).toString());
+                    }
+                    else {
+                        var nHist = [];
+                        nHist[0] = this.buffer;
+                        sessionStorage.setItem("commHistory", JSON.stringify(nHist));
+                    }
                     this.buffer = "";
                 }
                 else if (chr === String.fromCharCode(8) && this.buffer.length > 0) {
@@ -97,7 +110,6 @@ var TSOS;
                         var cIndex = parseInt(sessionStorage.getItem("commOptionIndex"));
                         if ((cIndex + 1) >= commandOptionsList.length) {
                             cIndex = 0;
-                            console.log("IN HERE");
                         }
                         else {
                             cIndex++;
@@ -130,6 +142,28 @@ var TSOS;
                         for (var i = this.buffer.length; i < possibleCommands[0].length; i++) {
                             _KernelInputQueue.enqueue(possibleCommands[0].charAt(i));
                         }
+                    }
+                }
+                else if (chr === String.fromCharCode(38)) {
+                    var bLen = this.buffer.length;
+                    var commInd = parseInt(sessionStorage.getItem("lCommInd"));
+                    var commHistList = JSON.parse(sessionStorage.getItem("commHistory"));
+                    if (!commHistList) {
+                        continue;
+                    }
+                    var pulledComm = commHistList[commInd];
+                    for (var i = 0; i < bLen; i++) {
+                        this.backspace();
+                        this.buffer = this.buffer.substr(0, this.buffer.length - 1);
+                    }
+                    for (var i = 0; i < pulledComm.length; i++) {
+                        _KernelInputQueue.enqueue(pulledComm.charAt(i));
+                    }
+                    if (commInd === 0) {
+                        sessionStorage.setItem("lCommInd", (commHistList.length - 1).toString());
+                    }
+                    else {
+                        sessionStorage.setItem("lCommInd", `${--commInd}`);
                     }
                 }
                 else {
