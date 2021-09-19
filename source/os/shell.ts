@@ -22,6 +22,12 @@ module TSOS {
         }
 
         public init() {
+            if(sessionStorage.getItem("commOptionIndex")){
+                sessionStorage.removeItem("commOptionIndex");
+                sessionStorage.removeItem("possOptions");
+                sessionStorage.removeItem("baseString");
+            }
+
             var sc: ShellCommand;
             //
             // Load the command list.

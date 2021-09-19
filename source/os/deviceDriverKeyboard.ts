@@ -48,8 +48,14 @@ module TSOS {
                 chr = String.fromCharCode(keyCode);
                 _KernelInputQueue.enqueue(chr);
             }else if(keyCode == 8){
-                console.log("pressed backspace");
+               
                 chr = String.fromCharCode(8);
+                _KernelInputQueue.enqueue(chr);
+            }else if(keyCode == 9){
+                chr = String.fromCharCode(9);
+                _KernelInputQueue.enqueue(chr);
+            }else if(keyCode == 38){
+                chr = String.fromCharCode(38);
                 _KernelInputQueue.enqueue(chr);
             }
         }

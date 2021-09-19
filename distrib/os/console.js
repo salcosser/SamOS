@@ -28,30 +28,25 @@ var TSOS;
         handleScroll(scrollLen) {
             console.log(scrollLen);
             const safeBottom = 487.0799999999998;
-            var fDSize = (_DrawingContext.fontDescent(this.currentFont, this.currentFontSize));
-            var fASize = (_DrawingContext.fontAscent(this.currentFont, this.currentFontSize));
-            var dcSize = _DefaultFontSize +
+            const fDSize = (_DrawingContext.fontDescent(this.currentFont, this.currentFontSize));
+            const fASize = (_DrawingContext.fontAscent(this.currentFont, this.currentFontSize));
+            const dcSize = _DefaultFontSize +
                 _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
                 _FontHeightMargin;
             if ((scrollLen) == 0) {
                 return;
             }
             if (this.currentYPosition + (dcSize * scrollLen) > safeBottom) {
-                var img = _DrawingContext.getImageData(0, fDSize * scrollLen, _Canvas.width, _Canvas.height + (fDSize * (scrollLen + 1)));
+                const img = _DrawingContext.getImageData(0, fDSize * scrollLen, _Canvas.width, _Canvas.height + (fDSize * (scrollLen + 1)));
                 this.clearScreen();
-                // if( ( (this.currentYPosition-((dcSize* (scrollLen+2)) + 2*(dcSize)+ this.currentFontSize) )  <= 0  )){
                 if (((this.currentYPosition - ((((dcSize * scrollLen) + (dcSize * 5)))) <= 0))) {
                     this.init();
                     _DrawingContext.putImageData(img, 0, -(dcSize * 22));
                     this.resetXY();
-                    // this.advanceLine();
-                    // this.advanceLine();
-                    // this.advanceLine();
                     console.log("reset all");
                 }
                 else {
                     _DrawingContext.putImageData(img, 0, ((dcSize * -((scrollLen)) - (dcSize * 4))));
-                    // _DrawingContext.putImageData(img, 0, (fASize* -((scrollLen))) );
                     console.log("we tried");
                     this.backtrackLine(scrollLen + 2);
                     console.log("everyting seems fine");
@@ -87,6 +82,55 @@ var TSOS;
                     this.backspace();
                     this.buffer = this.buffer.substr(0, this.buffer.length - 1);
                     console.log(this.buffer);
+                }
+                else if (chr === String.fromCharCode(9)) {
+                    var commandOptions = sessionStorage.getItem("possOptions");
+                    var bString = sessionStorage.getItem("baseString");
+                    if (commandOptions) {
+                        var commandOptionsList = JSON.parse(commandOptions);
+                        if (commandOptionsList.indexOf(this.buffer) === -1) {
+                            sessionStorage.removeItem("commOptionIndex");
+                            sessionStorage.removeItem("possOptions");
+                            sessionStorage.removeItem("baseString");
+                            continue;
+                        }
+                        var cIndex = parseInt(sessionStorage.getItem("commOptionIndex"));
+                        if ((cIndex + 1) >= commandOptionsList.length) {
+                            cIndex = 0;
+                            console.log("IN HERE");
+                        }
+                        else {
+                            cIndex++;
+                        }
+                        var cCommand = commandOptionsList[cIndex];
+                        console.log(cCommand);
+                        var delLen = this.buffer.length;
+                        for (var n = 0; n < delLen - bString.length + 1; n++) {
+                            this.backspace();
+                            this.buffer = this.buffer.substr(0, this.buffer.length - 1);
+                        }
+                        for (var i = bString.length - 1; i < cCommand.length; i++) {
+                            _KernelInputQueue.enqueue(cCommand.charAt(i));
+                        }
+                        sessionStorage.setItem("commOptionIndex", (cIndex).toString());
+                    }
+                    else {
+                        var possibleCommands = [];
+                        for (var comm of _OsShell.commandList) {
+                            if (comm.command.substr(0, this.buffer.length) == this.buffer) {
+                                possibleCommands[possibleCommands.length] = comm.command;
+                            }
+                        }
+                        if (possibleCommands.length === 0) {
+                            continue;
+                        }
+                        sessionStorage.setItem("possOptions", JSON.stringify(possibleCommands));
+                        sessionStorage.setItem("commOptionIndex", "0");
+                        sessionStorage.setItem("baseString", this.buffer);
+                        for (var i = this.buffer.length; i < possibleCommands[0].length; i++) {
+                            _KernelInputQueue.enqueue(possibleCommands[0].charAt(i));
+                        }
+                    }
                 }
                 else {
                     // This is a "normal" character, so ...

@@ -19,6 +19,11 @@ var TSOS;
             this.printLen = new Map();
         }
         init() {
+            if (sessionStorage.getItem("commOptionIndex")) {
+                sessionStorage.removeItem("commOptionIndex");
+                sessionStorage.removeItem("possOptions");
+                sessionStorage.removeItem("baseString");
+            }
             var sc;
             //
             // Load the command list.
