@@ -150,11 +150,11 @@ var TSOS;
             // 1. Remove leading and trailing spaces.
             buffer = TSOS.Utils.trim(buffer);
             // 2. Lower-case it.
-            buffer = buffer.toLowerCase();
+            // buffer = buffer.toLowerCase();
             // 3. Separate on spaces so we can determine the command and command-line args, if any.
             var tempList = buffer.split(" ");
             // 4. Take the first (zeroth) element and use that as the command.
-            var cmd = tempList.shift(); // Yes, you can do that to an array in JavaScript. See the Queue class.
+            var cmd = tempList.shift().toLowerCase(); // Yes, you can do that to an array in JavaScript. See the Queue class.
             // 4.1 Remove any left-over spaces.
             cmd = TSOS.Utils.trim(cmd);
             // 4.2 Record it in the return value.
@@ -266,9 +266,9 @@ var TSOS;
                         _StdOut.putText("Gives positional information about the current user.");
                         break;
                     case "whereistheufo":
-                        _StdOut.putText("Uses cutting edge technology to locate the UFO of our most");
+                        _StdOut.putText("Usage: whereistheufo | whereistheufo map");
                         _StdOut.advanceLine();
-                        _StdOut.putText("nearby interplanetary friends.");
+                        _StdOut.putText("Locates nearest ufo, whereistheufo map will even open up a window showing the location");
                         break;
                     case "status":
                         _StdOut.putText("sets the status of the current user.");
@@ -353,7 +353,7 @@ var TSOS;
             _StdOut.putText("Somewhere between where you were and where you are going to be.");
         }
         //"high tech" ufo tracker
-        shellUfoTracker() {
+        shellUfoTracker(version) {
             _StdOut.putText("Locating...");
             _StdOut.advanceLine();
             // _StdOut.putText("Please allow the popup to view the location of the UFO.");
@@ -361,11 +361,14 @@ var TSOS;
             var y = (Math.random() * 360) - 180;
             // _StdOut.advanceLine();
             _StdOut.putText(`Found them hovering above the GPS coordinates ${x},${y}. `);
-            // window.open(`https://www.google.com/maps/@${x},${y},6.62z`);
+            if (version.length != 0) {
+                window.open(`https://www.google.com/maps/@${x},${y},6.62z`);
+            }
         }
         // status command for setting status
         shellStatus(status) {
-            document.getElementById("cStatus").innerHTML = _Console.buffer.substring(7); // talking directly to the DOM
+            var stat = status.join(" ");
+            document.getElementById("cStatus").innerHTML = stat; // talking directly to the DOM
             _StdOut.putText("Updated the status.");
             _StdOut.advanceLine();
         }
@@ -374,11 +377,17 @@ var TSOS;
             var inputtedCode = document.getElementById("taProgramInput").value; // casting necessary to get .value
             var strippedCode = inputtedCode.replace(/\s/g, ''); // removing spaces
             if (/^[A-F0-9]+$/i.test(strippedCode)) { // testing against a regex
-                _StdOut.putText("File loaded. Machine code is valid hex.");
-                _StdOut.advanceLine();
+                if (strippedCode.length <= 512) { //saving a computation by not dividing length by 2
+                    _StdOut.putText("File loaded. Machine code is valid hex of an acceptable length.");
+                    _StdOut.advanceLine();
+                }
+                else {
+                    _StdOut.putText("File could not be loaded. Machine code is valid hex, but program will not fit in memory.");
+                    _StdOut.advanceLine();
+                }
             }
             else {
-                _StdOut.putText("File loaded. Machine code invalid.");
+                _StdOut.putText("File could not be loaded. Machine code is not in hexidecimal format.");
                 _StdOut.advanceLine();
             }
         }

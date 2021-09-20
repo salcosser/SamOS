@@ -198,7 +198,7 @@ module TSOS {
                 
                 
                 
-                }else if(chr === String.fromCharCode(38)){ // up arrow
+                }else if(chr === "UP"){ // up arrow
                     var bLen = this.buffer.length;
                    
                     var commInd = parseInt(sessionStorage.getItem("lCommInd"))

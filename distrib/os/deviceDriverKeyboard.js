@@ -27,44 +27,48 @@ var TSOS;
             var keyCode = params[0];
             var isShifted = params[1];
             //map of the keycodes for symbols when the shift key is down
-            var shiftedSpecialChars = { 48: ")",
-                49: "!",
-                50: "@",
-                51: "#",
-                52: "$",
-                53: "%",
-                54: "^",
-                55: "&",
-                56: "*",
-                57: "(",
-                192: "~",
-                173: "_",
-                61: "+",
-                219: "{",
-                221: "}",
-                220: "|",
-                59: ":",
+            var shiftedSpecialChars = { 48: ')',
+                49: '!',
+                50: '@',
+                51: '#',
+                52: '$',
+                53: '%',
+                54: '^',
+                55: '&',
+                56: '*',
+                57: '(',
+                192: '~',
+                173: '_',
+                61: '+',
+                219: '{',
+                221: '}',
+                220: '|',
+                59: ':',
                 222: '"',
-                188: "<",
-                190: ">",
-                191: "?" };
+                188: '<',
+                190: '>',
+                191: '?' };
             //map of keycodes and symbols
-            var specialChars = { 192: "`",
-                173: "-",
-                61: "=",
-                219: "[",
-                221: "]",
-                220: "\\",
-                59: ";",
+            var specialChars = { 192: '`',
+                173: '-',
+                61: '=',
+                219: '[',
+                221: ']',
+                220: '\\',
+                59: ';',
                 222: "'",
-                188: ",",
-                190: ".",
-                191: "/" };
-            // var specNums = [50,51,52,53,54,55,56,57, 48];
+                188: ',',
+                190: '.',
+                191: '/' };
             _Kernel.krnTrace("Key code:" + keyCode + " shifted:" + isShifted);
             var chr = "";
             // Check to see if we even want to deal with the key that was pressed.
-            if ((keyCode >= 65) && (keyCode <= 90)) { // letter
+            if (keyCode == 55 && isShifted === true) { // forcing the & character
+                _KernelInputQueue.enqueue('&');
+                console.log("tried");
+                return;
+            }
+            else if ((keyCode >= 65) && (keyCode <= 90)) { // letter
                 if (isShifted === true) {
                     chr = String.fromCharCode(keyCode); // Uppercase A-Z
                 }
@@ -73,9 +77,6 @@ var TSOS;
                 }
                 // TODO: Check for caps-lock and handle as shifted if so.
                 _KernelInputQueue.enqueue(chr);
-            }
-            else if (keyCode == 55 && isShifted) { // forcing the & character
-                _KernelInputQueue.enqueue('\&');
             }
             else if (keyCode in shiftedSpecialChars && isShifted === true) { // Shifted Special Chars
                 _KernelInputQueue.enqueue(shiftedSpecialChars[keyCode]);
@@ -97,8 +98,8 @@ var TSOS;
                 chr = String.fromCharCode(9);
                 _KernelInputQueue.enqueue(chr);
             }
-            else if (keyCode == 38) { //up arrow
-                chr = String.fromCharCode(38);
+            else if (keyCode == 38 && !isShifted) { //up arrow
+                chr = "UP";
                 _KernelInputQueue.enqueue(chr);
             }
         }
