@@ -25,35 +25,37 @@ var TSOS;
             this.currentXPosition = 0;
             this.currentYPosition = _DefaultFontSize;
         }
+        /*****************************************/
+        /*os.console.handleScroll                */
+        /*purpose: handle display text overflow  */
+        /*inputs: scrollLen - predetermined space*/
+        /*accomodation for a given shell command */
+        /*output: n/a                            */
+        /*****************************************/
         handleScroll(scrollLen) {
             console.log(scrollLen);
-            const safeBottom = 487.0799999999998;
-            const fDSize = (_DrawingContext.fontDescent(this.currentFont, this.currentFontSize));
+            const safeBottom = 487.0799999999998; //standard measurments used to calculate
+            const fDSize = (_DrawingContext.fontDescent(this.currentFont, this.currentFontSize)); //scrolling distance
             const fASize = (_DrawingContext.fontAscent(this.currentFont, this.currentFontSize));
             const dcSize = _DefaultFontSize +
                 _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
                 _FontHeightMargin;
-            if ((scrollLen) == 0) {
-                return;
+            if ((scrollLen) == 0) { //some methods have no scrolling accomodation,
+                return; //a zero value would break these calculations
             }
-            if (this.currentYPosition + (dcSize * scrollLen) > safeBottom) {
+            if (this.currentYPosition + (dcSize * scrollLen) > safeBottom) { //if the necessary scrolling accomodation would overflow over the canvas, 
                 const img = _DrawingContext.getImageData(0, fDSize * scrollLen, _Canvas.width, _Canvas.height + (fDSize * (scrollLen + 1)));
                 this.clearScreen();
-                if (((this.currentYPosition - ((((dcSize * scrollLen) + (dcSize * 5)))) <= 0))) {
-                    this.init();
+                if (((this.currentYPosition - ((((dcSize * scrollLen) + (dcSize * 5)))) <= 0))) { // done in case the scrolling would be too much,
+                    this.init(); // and it would be easier to just start from the top
                     _DrawingContext.putImageData(img, 0, -(dcSize * 22));
                     this.resetXY();
                     console.log("reset all");
                 }
                 else {
                     _DrawingContext.putImageData(img, 0, ((dcSize * -((scrollLen)) - (dcSize * 4))));
-                    console.log("we tried");
                     this.backtrackLine(scrollLen + 2);
-                    console.log("everyting seems fine");
                 }
-            }
-            else {
-                console.log((this.currentYPosition + ((fDSize * (scrollLen)) + (fDSize))) + " Seems fine.");
             }
         }
         handleInput() {
@@ -64,7 +66,7 @@ var TSOS;
                 if (chr === String.fromCharCode(13)) { // the Enter key
                     // The enter key marks the end of a console command, so ...
                     // ... tell the shell ...
-                    var comLen = _OsShell.printLen.get(this.buffer);
+                    var comLen = _OsShell.printLen.get(this.buffer); //getting the right scrolling accommodation, and accounting for it
                     if (this.buffer.length == 0) {
                         this.handleScroll(1);
                     }
@@ -75,7 +77,7 @@ var TSOS;
                         this.handleScroll(1);
                     }
                     _OsShell.handleInput(this.buffer);
-                    var cHist = sessionStorage.getItem("commHistory");
+                    var cHist = sessionStorage.getItem("commHistory"); //recording this command so it can be recalled later
                     if (cHist) {
                         var histList = JSON.parse(cHist);
                         histList[histList.length] = this.buffer;
@@ -83,7 +85,7 @@ var TSOS;
                         sessionStorage.setItem("commHistory", newHist);
                         sessionStorage.setItem("lCommInd", (histList.length - 1).toString());
                     }
-                    else {
+                    else { // in case this is the first command
                         var nHist = [];
                         nHist[0] = this.buffer;
                         sessionStorage.setItem("commHistory", JSON.stringify(nHist));
@@ -96,18 +98,18 @@ var TSOS;
                     this.buffer = this.buffer.substr(0, this.buffer.length - 1);
                     console.log(this.buffer);
                 }
-                else if (chr === String.fromCharCode(9)) {
+                else if (chr === String.fromCharCode(9)) { // using tab for autocomplete
                     var commandOptions = sessionStorage.getItem("possOptions");
                     var bString = sessionStorage.getItem("baseString");
-                    if (commandOptions) {
+                    if (commandOptions) { // if this is not the first time pressing tab
                         var commandOptionsList = JSON.parse(commandOptions);
-                        if (commandOptionsList.indexOf(this.buffer) === -1) {
+                        if (commandOptionsList.indexOf(this.buffer) === -1) { // if someone presses tab, types a letter, then presses tab again
                             sessionStorage.removeItem("commOptionIndex");
                             sessionStorage.removeItem("possOptions");
                             sessionStorage.removeItem("baseString");
                             continue;
                         }
-                        var cIndex = parseInt(sessionStorage.getItem("commOptionIndex"));
+                        var cIndex = parseInt(sessionStorage.getItem("commOptionIndex")); // to get to the right place in the list
                         if ((cIndex + 1) >= commandOptionsList.length) {
                             cIndex = 0;
                         }
@@ -126,10 +128,10 @@ var TSOS;
                         }
                         sessionStorage.setItem("commOptionIndex", (cIndex).toString());
                     }
-                    else {
+                    else { // if htis is the first tab
                         var possibleCommands = [];
                         for (var comm of _OsShell.commandList) {
-                            if (comm.command.substr(0, this.buffer.length) == this.buffer) {
+                            if (comm.command.substr(0, this.buffer.length) == this.buffer) { // looking for any commands that match
                                 possibleCommands[possibleCommands.length] = comm.command;
                             }
                         }
@@ -144,11 +146,11 @@ var TSOS;
                         }
                     }
                 }
-                else if (chr === String.fromCharCode(38)) {
+                else if (chr === String.fromCharCode(38)) { // up arrow
                     var bLen = this.buffer.length;
                     var commInd = parseInt(sessionStorage.getItem("lCommInd"));
                     var commHistList = JSON.parse(sessionStorage.getItem("commHistory"));
-                    if (!commHistList) {
+                    if (!commHistList) { // in case there is no command history
                         continue;
                     }
                     var pulledComm = commHistList[commInd];
@@ -156,10 +158,10 @@ var TSOS;
                         this.backspace();
                         this.buffer = this.buffer.substr(0, this.buffer.length - 1);
                     }
-                    for (var i = 0; i < pulledComm.length; i++) {
+                    for (var i = 0; i < pulledComm.length; i++) { //adding the rest of the command
                         _KernelInputQueue.enqueue(pulledComm.charAt(i));
                     }
-                    if (commInd === 0) {
+                    if (commInd === 0) { //setting the index of the command for next time
                         sessionStorage.setItem("lCommInd", (commHistList.length - 1).toString());
                     }
                     else {
@@ -192,9 +194,15 @@ var TSOS;
                 this.currentXPosition = this.currentXPosition + offset;
             }
         }
+        /***********************************/
+        /*os.console.backspace             */
+        /*purpose: remove the last inputted*/
+        /*character from the command line  */
+        /*inputs: n/a                      */
+        /*outputs: n/a                     */
+        /***********************************/
         backspace() {
             var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, this.buffer[this.buffer.length - 1]);
-            // var lHeight = _DefaultFontSize + _DrawingContext.fontDescent(this.currentFont, this.currentFontSize);
             this.currentXPosition -= offset;
             var yPos = this.currentYPosition - (this.currentFontSize - 1);
             _DrawingContext.clearRect(this.currentXPosition, yPos, offset, this.currentFontSize);
@@ -211,6 +219,15 @@ var TSOS;
                 _FontHeightMargin;
             // TODO: Handle scrolling. (iProject 1)
         }
+        /****************************/
+        /*backTrackLine             */
+        /*purpose:push up the y     */
+        /*position of the console   */
+        /*and reset x               */
+        /*input: lineAmt : amount of*/
+        /*lines to backtrack        */
+        /*outputs: n/a              */
+        /****************************/
         backtrackLine(lineAmt) {
             this.currentXPosition = 0;
             this.currentYPosition += -((_DefaultFontSize +

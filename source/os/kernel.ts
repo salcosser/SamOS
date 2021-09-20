@@ -172,7 +172,7 @@ module TSOS {
             // TODO: Display error on console, perhaps in some sort of colored screen. (Maybe blue?)
             _StdOut.putText("A Fatal Error has occured.");
             alert("What did you do!!!!!!");
-            document.getElementById("display").style.backgroundColor = "blue";
+            document.getElementById("display").style.backgroundColor = "blue";  //putting the B in BSOD
             this.krnShutdown();
         }
     }

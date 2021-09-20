@@ -32,8 +32,8 @@ module TSOS {
             var keyCode = params[0];
             var isShifted = params[1];
             
-
-            var shiftedSpecialChars = {48: ")",
+            //map of the keycodes for symbols when the shift key is down
+            var shiftedSpecialChars = {48: ")", 
                                       49: "!",
                                       50: "@",
                                       51: "#",
@@ -54,6 +54,7 @@ module TSOS {
                                       188: "<",
                                       190: ">",
                                       191: "?"};
+            //map of keycodes and symbols
             var specialChars = {192: "`",
                                 173: "-",
                                 61: "=",
@@ -78,8 +79,7 @@ module TSOS {
                 }
                 // TODO: Check for caps-lock and handle as shifted if so.
                 _KernelInputQueue.enqueue(chr);
-            }else if(keyCode == 55 && isShifted){
-                console.log("trying and");
+            }else if(keyCode == 55 && isShifted){// forcing the & character
                 _KernelInputQueue.enqueue('\&');
                 
             }else if(keyCode in shiftedSpecialChars && isShifted === true){ // Shifted Special Chars

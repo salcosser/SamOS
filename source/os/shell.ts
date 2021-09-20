@@ -16,13 +16,13 @@ module TSOS {
         public commandList = [];
         public curses = "[fuvg],[cvff],[shpx],[phag],[pbpxfhpxre],[zbgureshpxre],[gvgf]";
         public apologies = "[sorry]";
-        public printLen = new Map();
+        public printLen = new Map(); // used to store predetermined line accomodation amounts for each command
         
         constructor() {
         }
 
         public init() {
-            if(sessionStorage.getItem("commOptionIndex")){
+            if(sessionStorage.getItem("commOptionIndex")){  // resetting all of the session variables
                 sessionStorage.removeItem("commOptionIndex");
                 sessionStorage.removeItem("possOptions");
                 sessionStorage.removeItem("baseString");
@@ -39,7 +39,7 @@ module TSOS {
                                   "ver",
                                   "- Displays the current version data.");
             this.commandList[this.commandList.length] = sc;
-            this.printLen.set("ver",1);
+            this.printLen.set("ver",1); // setting the accomodation                                          
 
             // help
             sc = new ShellCommand(this.shellHelp,
@@ -100,26 +100,28 @@ module TSOS {
                                  "- displays the current date and time.");
             this.commandList[this.commandList.length] = sc;
             this.printLen.set("date", 1);
-
+            
+            //whereami command
             sc = new ShellCommand(this.shellAmI,
                 "whereami",
                 "-gives accurate information about a user's current position.");
             this.commandList[this.commandList.length] = sc;
             this.printLen.set("whereami", 1);
 
+            //special command (ufo tracker, uncomment the window.open command in this method for a cool trick)
             sc = new ShellCommand(this.shellUfoTracker,
                 "whereistheufo",
                 "- opens a google maps tab of the current location of the UFO");
             this.commandList[this.commandList.length] = sc;
             this.printLen.set("whereistheufo", 3);
 
-
+            //status command
             sc = new ShellCommand(this.shellStatus,
                                 "status",
                                 "-sets the status of the current session");
             this.commandList[this.commandList.length] = sc;
             this.printLen.set("status", 1);
-
+            //load command
             sc = new ShellCommand(this.shellLoadProg,
                                 "load",
                                 "-Loads the program code provided by the user");
@@ -161,18 +163,18 @@ module TSOS {
                 }
             }
             if (found) {
-                // _OsShell.handleScroll(_OsShell.printLen.get(cmd));
+               
                 this.execute(fn, args);  // Note that args is always supplied, though it might be empty.
             } else {
                 // It's not found, so check for curses and apologies before declaring the command invalid.
                 if (this.curses.indexOf("[" + Utils.rot13(cmd) + "]") >= 0) {     // Check for curses.
-                    // _OsShell.handleScroll(2);
+                    
                     this.execute(this.shellCurse);
                 } else if (this.apologies.indexOf("[" + cmd + "]") >= 0) {        // Check for apologies.
-                    // _OsShell.handleScroll(2);
+                    
                     this.execute(this.shellApology);
                 } else { // It's just a bad command. {
-                    // _OsShell.handleScroll(1);
+                    
                     this.execute(this.shellInvalidCommand);
                    
                 }
@@ -223,18 +225,7 @@ module TSOS {
             return retVal;
         }
 
-        public handleScroll(scrollLen: number){
-            if(_Console.currentYPosition + (_Console.currentFontSize * scrollLen+2) > _Canvas.height){
-                var img = _DrawingContext.getImageData(0, _Console.currentFontSize, _Canvas.width, _Canvas.height);
-                _Console.currentYPosition = _Canvas.height -(CanvasTextFunctions.descent(null, _Console.currentFontSize));
-                _Console.clearScreen();
-                _DrawingContext.putImageData(img, 0, (_Console.currentFontSize)* -(scrollLen+1));
-                console.log("we tried");
-                _Console.currentXPosition = 0;
-                
-
-            }
-        }
+        
 
 
 
@@ -351,6 +342,9 @@ module TSOS {
                     case "status":
                         _StdOut.putText("sets the status of the current user.");
                         break;
+                    case "load":
+                        _StdOut.putText("Loads and validates hex machine code from input.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -401,17 +395,18 @@ module TSOS {
                 _StdOut.putText("Usage: prompt <string>  Please supply a string.");
             }
         }
+        // date command
         public shellDate(){
             var today = new Date();
             var months = ["January", "February", "March", "April", "May", "June", "July","August","September", "October", "November", "December"];
             var daysOfWeek = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
             
-            var date = daysOfWeek[today.getDay()] + " "+months[(today.getMonth())]+' '+today.getDate()+", "+today.getFullYear();
-            var minutes = today.getMinutes() > 9 ? today.getMinutes() : "0"+today.getMinutes();
+            var date = daysOfWeek[today.getDay()] + " "+months[(today.getMonth())]+' '+today.getDate()+", "+today.getFullYear(); //building the date portion
+            var minutes = today.getMinutes() > 9 ? today.getMinutes() : "0"+today.getMinutes(); //building the time while taking into acount spacing
             var seconds = today.getSeconds() > 9 ? today.getSeconds() : "0"+today.getSeconds();
             var period = "AM";
             var hours = today.getHours();
-            if(hours > 11){
+            if(hours > 11){ // handling edge cases in times
                 period = "PM";
                 if(hours > 12){
                     hours -= 12;
@@ -424,38 +419,41 @@ module TSOS {
             var time = hours + ":" + minutes + ":" + seconds + " "+period;
             _StdOut.putText(`The current date and time is ${date} ${time}.`);
         }
+        // simple little reminder of where you are
         public shellAmI(){
             _StdOut.putText("Somewhere between where you were and where you are going to be.");
             
         }
 
-
+        //"high tech" ufo tracker
         public shellUfoTracker(){
             _StdOut.putText("Locating...");
             _StdOut.advanceLine();
             // _StdOut.putText("Please allow the popup to view the location of the UFO.");
-            var x = (Math.random() * 360) - 180;
+            var x = (Math.random() * 360) - 180;    // making random coordinates
             var y = (Math.random() * 360) - 180;
             // _StdOut.advanceLine();
             _StdOut.putText(`Found them hovering above the GPS coordinates ${x},${y}. `);
             // window.open(`https://www.google.com/maps/@${x},${y},6.62z`);
 
         }
+        // status command for setting status
         public shellStatus(status: string): void {
             
-            document.getElementById("cStatus").innerHTML = _Console.buffer.substring(7);
+            document.getElementById("cStatus").innerHTML = _Console.buffer.substring(7); // talking directly to the DOM
             _StdOut.putText("Updated the status.");
             _StdOut.advanceLine();
         }
+      //loading in the program code and checking it for valid hex
        public shellLoadProg(){
-           var inputtedCode = (<HTMLInputElement>document.getElementById("taProgramInput")).value;
-           var strippedCode = inputtedCode.replace(/\s/g, '');
-           if(/^[A-F0-9]+$/i.test(strippedCode)){
-               _StdOut.putText("File loaded. Machine Code is valid hex.");
+           var inputtedCode = (<HTMLInputElement>document.getElementById("taProgramInput")).value; // casting necessary to get .value
+           var strippedCode = inputtedCode.replace(/\s/g, ''); // removing spaces
+           if(/^[A-F0-9]+$/i.test(strippedCode)){ // testing against a regex
+               _StdOut.putText("File loaded. Machine code is valid hex.");
                _StdOut.advanceLine();
               
            }else{
-            _StdOut.putText("File loaded. Machine Code invalid.");
+            _StdOut.putText("File loaded. Machine code invalid.");
             _StdOut.advanceLine();
           
            }
