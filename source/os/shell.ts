@@ -454,8 +454,54 @@ module TSOS {
            if(/^[A-F0-9]+$/i.test(strippedCode)){ // testing against a regex
                
               if(strippedCode.length <= 512){ //saving a computation by not dividing length by 2
+                var memList = [];
+                var memInd = 0;
+                while(memInd < strippedCode.length){
+                    memList[memList.length] = strippedCode.substring(memInd, (memInd+2));
+                    memInd+=3;
+                }
+                if(memList.length < 256){
+                    for(let i = memList.length; i < 256;i++){
+                        memList[i] = "00";
+                    }
+                }
+
+                var cMemTable = document.getElementById("memTableRows").getElementsByTagName("tr");
+              
+                var realMemInd = 0;
+                for(let i = 0;i<32;i++){
+                    var tempRow = cMemTable[i];
+                    tempRow[0].innerHTML = memList[realMemInd];
+                    realMemInd++;
+                    tempRow[1].innerHTML = memList[realMemInd];
+                    realMemInd++;
+                    tempRow[2].innerHTML = memList[realMemInd];
+                    realMemInd++;
+                    tempRow[3].innerHTML = memList[realMemInd];
+                    realMemInd++;
+                    tempRow[4].innerHTML = memList[realMemInd];
+                    realMemInd++;
+                    tempRow[5].innerHTML = memList[realMemInd];
+                    realMemInd++;
+                    tempRow[6].innerHTML = memList[realMemInd];
+                    realMemInd++;
+                    tempRow[7].innerHTML = memList[realMemInd];
+                 
+
+                    document.getElementById("memTableRows").getElementsByTagName("tr")[i] = tempRow;
+                    console.log("in here");
+                }
+
+
+
+
                 _StdOut.putText("File loaded. Machine code is valid hex of an acceptable length.");
                 _StdOut.advanceLine();
+                
+                
+
+
+
               }else{
                 _StdOut.putText("File could not be loaded. Machine code is valid hex, but program will not fit in memory.");
                 _StdOut.advanceLine();

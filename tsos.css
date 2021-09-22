@@ -1,16 +1,17 @@
 /* TSOS.css */
-
+/* color pallete */
+/* 231f20-bb4430-7ebdc2-f3dfa2-efe6dd */
 body {
-  background: darkslategray !important;
+  background: #bb4430 !important;
   font-family: 'IBM Plex Mono', monospace !important ;
   font-size: 12pt;
   font-weight: normal;
   font-style: normal;
-  color: lightgreen !important;
+  color: #7ebdc2 !important;
 }
 
 h1 {
-  color: lightgreen;
+  color: #7ebdc2;
   font-size: 24pt;
   font-weight: normal;
   font-style: normal;
@@ -18,7 +19,7 @@ h1 {
 }
 
 h2 {
-  color: lightgreen;
+  color: #7ebdc2;
   font-size: 20pt;
   font-weight: normal;
   font-style: normal;
@@ -26,14 +27,14 @@ h2 {
 
 h3 {
   /* font-family: Helvetica, Verdana, Arial, sans-serif; */
-  font-size: 16pt;
+  font-size: 16px;
   font-weight: normal;
   font-style: normal;
 }
 
 #display {
   background-color:lightblue;
-  border: 2px solid red;
+  border: 2px solid #f3dfa2;
   cursor: default;
 }
 
@@ -49,5 +50,34 @@ h3 {
 }
 .card{
   background-color:darkslategray !important;
-  border: 1px solid lightgreen !important;
+  border: 1px solid #7ebdc2 !important;
+}
+#procVals{
+  border:2px solid #7ebdc2;
+  background-color: #efe6dd;
+  color: #231f20;
+}
+th ,td{
+  padding: 5px;
+
+}
+th{
+  border-bottom: 2px solid #7ebdc2;
+}
+td{
+  border-left: 1px dotted #7ebdc2;
+  border-right: 1px dotted #7ebdc2;
+  text-align: center;
+}
+#memTable{
+  border:2px solid #7ebdc2;
+  background-color: #efe6dd;
+  color: #231f20;
+  height: 400px;
+  width:447px;
+  overflow-y: scroll;
+  display:block;
+}
+#memTable table tbody tr td:first-child{
+  font-weight: bold !important;
 }

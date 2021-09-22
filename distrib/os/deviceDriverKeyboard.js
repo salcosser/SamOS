@@ -63,12 +63,7 @@ var TSOS;
             _Kernel.krnTrace("Key code:" + keyCode + " shifted:" + isShifted);
             var chr = "";
             // Check to see if we even want to deal with the key that was pressed.
-            if (keyCode == 55 && isShifted === true) { // forcing the & character
-                _KernelInputQueue.enqueue('&');
-                console.log("tried");
-                return;
-            }
-            else if ((keyCode >= 65) && (keyCode <= 90)) { // letter
+            if ((keyCode >= 65) && (keyCode <= 90)) { // letter
                 if (isShifted === true) {
                     chr = String.fromCharCode(keyCode); // Uppercase A-Z
                 }
@@ -99,7 +94,7 @@ var TSOS;
                 _KernelInputQueue.enqueue(chr);
             }
             else if (keyCode == 38 && !isShifted) { //up arrow
-                chr = "UP";
+                chr = "UP"; // necessary to differentiate and force the correct action, even if not using the right key code
                 _KernelInputQueue.enqueue(chr);
             }
         }
