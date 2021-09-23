@@ -1,6 +1,16 @@
 2019 - 2021 Browser-based Operating System in TypeScript
 ========================================================
 
+Documentation Specific to SamOS
+===============================
+
+For each project due, check the corresponding branch, for example, for <code>iProject1</code>, check the branch named <code>iProject1</code>.
+<h3>Other Bits</h3>
+My special command is executed using <code>whereistheufo</code>. It will "find" the nearest UFO orbiting earth using "Complex Machinery".
+
+Check Branch iProject1
+======================
+
 This is Alan's Operating Systems class initial project.
 See https://www.labouseur.com/courses/os/ for details.
 It was originally developed by Alan and then enhanced by alums Bob Nisco and Rebecca Murphy over the years.
