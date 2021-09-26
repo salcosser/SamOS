@@ -382,33 +382,32 @@ var TSOS;
                     var memInd = 0;
                     while (memInd < strippedCode.length) {
                         memList[memList.length] = strippedCode.substring(memInd, (memInd + 2));
-                        memInd += 3;
+                        memInd += 2;
                     }
                     if (memList.length < 256) {
                         for (let i = memList.length; i < 256; i++) {
                             memList[i] = "00";
                         }
                     }
-                    var cMemTable = document.getElementById("memTableRows").getElementsByTagName("tr");
+                    // var cMemTable = document.getElementById("memTableRows").getElementsByTagName("tr");
                     var realMemInd = 0;
                     for (let i = 0; i < 32; i++) {
-                        var tempRow = cMemTable[i];
-                        tempRow[0].innerHTML = memList[realMemInd];
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[1].innerHTML = memList[realMemInd];
                         realMemInd++;
-                        tempRow[1].innerHTML = memList[realMemInd];
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[2].innerHTML = memList[realMemInd];
                         realMemInd++;
-                        tempRow[2].innerHTML = memList[realMemInd];
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[3].innerHTML = memList[realMemInd];
                         realMemInd++;
-                        tempRow[3].innerHTML = memList[realMemInd];
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[4].innerHTML = memList[realMemInd];
                         realMemInd++;
-                        tempRow[4].innerHTML = memList[realMemInd];
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[5].innerHTML = memList[realMemInd];
                         realMemInd++;
-                        tempRow[5].innerHTML = memList[realMemInd];
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[6].innerHTML = memList[realMemInd];
                         realMemInd++;
-                        tempRow[6].innerHTML = memList[realMemInd];
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[7].innerHTML = memList[realMemInd];
                         realMemInd++;
-                        tempRow[7].innerHTML = memList[realMemInd];
-                        document.getElementById("memTableRows").getElementsByTagName("tr")[i] = tempRow;
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[8].innerHTML = memList[realMemInd];
+                        console.log("We updated this row.");
                         console.log("in here");
                     }
                     _StdOut.putText("File loaded. Machine code is valid hex of an acceptable length.");
