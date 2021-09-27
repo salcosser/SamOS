@@ -39,56 +39,56 @@ module TSOS {
                                   "ver",
                                   "- Displays the current version data.");
             this.commandList[this.commandList.length] = sc;
-            this.printLen.set("ver",1); // setting the accomodation                                          
+                                               
 
             // help
             sc = new ShellCommand(this.shellHelp,
                                   "help",
                                   "- This is the help command. Seek help.");
             this.commandList[this.commandList.length] = sc;
-            this.printLen.set("help", 15);
+           
 
             // shutdown
             sc = new ShellCommand(this.shellShutdown,
                                   "shutdown",
                                   "- Shuts down the virtual OS but leaves the underlying host / hardware simulation running.");
             this.commandList[this.commandList.length] = sc;
-            this.printLen.set("shutdown", 1);
+
 
             // cls
             sc = new ShellCommand(this.shellCls,
                                   "cls",
                                   "- Clears the screen and resets the cursor position.");
             this.commandList[this.commandList.length] = sc;
-            this.printLen.set("cls", 0);
+           
 
             // man <topic>
             sc = new ShellCommand(this.shellMan,
                                   "man",
                                   "<topic> - Displays the MANual page for <topic>.");
             this.commandList[this.commandList.length] = sc;
-            this.printLen.set("man", 1);
+        
 
             // trace <on | off>
             sc = new ShellCommand(this.shellTrace,
                                   "trace",
                                   "<on | off> - Turns the OS trace on or off.");
             this.commandList[this.commandList.length] = sc;
-            this.printLen.set("trace" , 1);
+            
 
             // rot13 <string>
             sc = new ShellCommand(this.shellRot13,
                                   "rot13",
                                   "<string> - Does rot13 obfuscation on <string>.");
             this.commandList[this.commandList.length] = sc;
-            this.printLen.set("rot13", 1);
+          
 
             // prompt <string>
             sc = new ShellCommand(this.shellPrompt,
                                   "prompt",
                                   "<string> - Sets the prompt.");
             this.commandList[this.commandList.length] = sc;
-            this.printLen.set("prompt", 1);
+           
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             
@@ -99,35 +99,42 @@ module TSOS {
                                  "date",
                                  "- displays the current date and time.");
             this.commandList[this.commandList.length] = sc;
-            this.printLen.set("date", 1);
+            
             
             //whereami command
             sc = new ShellCommand(this.shellAmI,
                 "whereami",
                 "-gives accurate information about a user's current position.");
             this.commandList[this.commandList.length] = sc;
-            this.printLen.set("whereami", 1);
+            
 
             //special command (ufo tracker, uncomment the window.open command in this method for a cool trick)
             sc = new ShellCommand(this.shellUfoTracker,
                 "whereistheufo",
                 "- opens a google maps tab of the current location of the UFO");
             this.commandList[this.commandList.length] = sc;
-            this.printLen.set("whereistheufo", 3);
+          
 
             //status command
             sc = new ShellCommand(this.shellStatus,
                                 "status",
                                 "-sets the status of the current session");
             this.commandList[this.commandList.length] = sc;
-            this.printLen.set("status", 1);
+           
             //load command
             sc = new ShellCommand(this.shellLoadProg,
                                 "load",
                                 "-Loads the program code provided by the user");
             this.commandList[this.commandList.length] = sc;
-            this.printLen.set("load", 1);
+           
 
+
+
+            sc = new ShellCommand(this.shellTestBsod,
+                "testbsod",
+                "-Tests blue screen of death");
+            this.commandList[this.commandList.length] = sc;
+           
             // Display the initial prompt.
             this.putPrompt();
         }
@@ -345,6 +352,9 @@ module TSOS {
                     case "load":
                         _StdOut.putText("Loads and validates hex machine code from input.");
                         break;
+                    case "testbsod":
+                        _StdOut.putText("Tests blue screen of death.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -513,6 +523,9 @@ module TSOS {
             _StdOut.advanceLine();
           
            }
+       }
+       public shellTestBsod(){
+           _Kernel.krnTrapError("BSOD TEST");
        }
     }
 }

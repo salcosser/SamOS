@@ -97,6 +97,10 @@ var TSOS;
                 chr = "UP"; // necessary to differentiate and force the correct action, even if not using the right key code
                 _KernelInputQueue.enqueue(chr);
             }
+            else if (keyCode == 40) {
+                chr = "DOWN";
+                _KernelInputQueue.enqueue(chr);
+            }
         }
     }
     TSOS.DeviceDriverKeyboard = DeviceDriverKeyboard;

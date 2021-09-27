@@ -150,10 +150,12 @@ var TSOS;
         krnTrapError(msg) {
             TSOS.Control.hostLog("OS ERROR - TRAP: " + msg);
             // TODO: Display error on console, perhaps in some sort of colored screen. (Maybe blue?)
-            _StdOut.putText("A Fatal Error has occured.");
-            alert("What did you do!!!!!!");
+            _StdOut.clearScreen();
+            _StdOut.resetXY();
             document.getElementById("display").style.backgroundColor = "blue"; //putting the B in BSOD
-            this.krnShutdown();
+            _StdOut.putText(msg + " - A Fatal Error has occured.");
+            alert("What did you do!!!!!!");
+            _Kernel.krnShutdown();
         }
     }
     TSOS.Kernel = Kernel;

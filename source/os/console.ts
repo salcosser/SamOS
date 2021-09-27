@@ -38,49 +38,7 @@ module TSOS {
         /*accomodation for a given shell command */
         /*output: n/a                            */
         /*****************************************/
-        public handleScroll(scrollLen: number): void{    
-            
-            console.log(scrollLen);
-            const safeBottom = 487.0799999999998;                                                       //standard measurments used to calculate
-            const fDSize = (_DrawingContext.fontDescent(this.currentFont, this.currentFontSize));       //scrolling distance
-            const fASize = (_DrawingContext.fontAscent(this.currentFont, this.currentFontSize));
-
-            const dcSize = _DefaultFontSize + 
-            _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
-            _FontHeightMargin;
-
-
-
-            if((scrollLen) == 0){              //some methods have no scrolling accomodation,
-                return;                        //a zero value would break these calculations
-            } 
-            
-            
-                if(this.currentYPosition + (dcSize* scrollLen) > safeBottom){       //if the necessary scrolling accomodation would overflow over the canvas, 
-                const img = _DrawingContext.getImageData(0, fDSize * scrollLen, _Canvas.width, _Canvas.height +  (fDSize * (scrollLen+1)));
-                
-                this.clearScreen();
-                    if( ( (this.currentYPosition-((((dcSize* scrollLen) + (dcSize* 5))) )  <= 0  ))){// done in case the scrolling would be too much,
-                    this.init();                                                                     // and it would be easier to just start from the top
-                  
-                    _DrawingContext.putImageData(img, 0, -(dcSize * 22));
-                    this.resetXY();
-                    
-                   
-                    console.log("reset all");
-                }else{
-                    _DrawingContext.putImageData(img, 0, ((dcSize* -((scrollLen)) - (dcSize* 4))));
-                   
-                    this.backtrackLine(scrollLen+2);
-                   
-                }
-            
-                
-                
-
-            }
-           
-        }
+       
 
 
 
@@ -105,14 +63,7 @@ module TSOS {
                     
                     // The enter key marks the end of a console command, so ...
                     // ... tell the shell ...
-                    var comLen = _OsShell.printLen.get(this.buffer);    //getting the right scrolling accommodation, and accounting for it
-                    if(this.buffer.length == 0){
-                        this.handleScroll(1);
-                    }else if(comLen != undefined){
-                        this.handleScroll(comLen);
-                    }else{
-                        this.handleScroll(1);
-                    }
+                   
                     _OsShell.handleInput(this.buffer);
                     
 
@@ -224,6 +175,30 @@ module TSOS {
                     }
 
                     
+                }else if(chr === "DOWN"){
+                    var bLen = this.buffer.length;
+                   
+                    var commInd = parseInt(sessionStorage.getItem("lCommInd"))
+                    var commHistList = JSON.parse(sessionStorage.getItem("commHistory"));
+                    
+                    if(!commHistList){ // in case there is no command history
+                        continue;
+                    }
+                    
+                    var pulledComm = commHistList[commInd];
+
+                    for(var i = 0;i< bLen;i++) {
+                        this.backspace();
+                        this.buffer = this.buffer.substr(0, this.buffer.length-1);
+                    }
+                    for(var i = 0; i< pulledComm.length; i++) {     //adding the rest of the command
+                        _KernelInputQueue.enqueue(pulledComm.charAt(i));
+                    }
+                    if(commInd === commHistList.length-1) {                 //setting the index of the command for next time
+                        sessionStorage.setItem("lCommInd", (0).toString());
+                    }else{
+                        sessionStorage.setItem("lCommInd", `${++commInd}`);
+                    }  
                 } else {
                     // This is a "normal" character, so ...
                     // ... draw it on the screen...
@@ -270,7 +245,10 @@ module TSOS {
                 
                 this.currentXPosition -= offset;
                 var yPos = this.currentYPosition - (this.currentFontSize - 1);
-                _DrawingContext.clearRect(this.currentXPosition, yPos, offset, this.currentFontSize);
+                var vertSize = _DefaultFontSize + 
+                _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
+                _FontHeightMargin;
+                _DrawingContext.clearRect(this.currentXPosition, yPos, offset, vertSize);
                 
                 
         }
@@ -286,7 +264,24 @@ module TSOS {
                                      _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
                                      _FontHeightMargin;
 
+                                     this.currentXPosition = 0;
+       
+           
+            if (this.currentYPosition > _Canvas.height) {
+                
+                var img = _DrawingContext.getImageData(0, 0, _Canvas.width, _Canvas.height);
+               
+                this.clearScreen();
+                var imgOffset = -(_DefaultFontSize +
+                    _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
+                    _FontHeightMargin);
+                _DrawingContext.putImageData(img, 0, imgOffset);
+                
+                this.currentYPosition = _Canvas.height - this.currentFontSize;
+            }
             // TODO: Handle scrolling. (iProject 1)
+
+         // ^^^ found this todo marker and thought of how to improve scrolling 
         }
         /****************************/
         /*backTrackLine             */

@@ -102,6 +102,9 @@ module TSOS {
             }else if(keyCode == 38 && !isShifted){ //up arrow
                 chr = "UP"; // necessary to differentiate and force the correct action, even if not using the right key code
                 _KernelInputQueue.enqueue(chr);
+            }else if(keyCode == 40 ){
+                chr = "DOWN";
+                _KernelInputQueue.enqueue(chr);
             }
         }
     }

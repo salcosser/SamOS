@@ -37,6 +37,34 @@ module TSOS {
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
+           this.PC = parseInt(document.getElementById("PC").innerHTML, 16);
+           var currentInstruction =  this.fetch();
+           this.decodeAndExecute(currentInstruction);
         }
+        public fetch(): string{
+            var rowOffset = this.PC % 8;
+            var row = ((this.PC - rowOffset) / 8) - 1;
+            var currentInstruction = document.getElementById("memTableRows").getElementsByTagName("tr")[row].cells[rowOffset+1].innerHTML;
+            return currentInstruction;
+        }
+
+
+
+        public decodeAndExecute(instruction: string): void{
+            // switch(instruction){
+            //     case "A9": // LDA constant
+            //         var constOffset = (this.PC+1) % 8;
+            //         var constRow = (((this.PC+1) - constOffset) / 8) - 1;
+            //         var constVal = document.getElementById("memTableRows").getElementsByTagName("tr")[constRow].cells[constOffset+1].innerHTML;
+            //         document.getElementById("ACC").innerHTML =  constVal;
+            //         break;
+            //     case "AD":
+            //         var 
+               
+            // }
+
+        }
+
+       
     }
 }
