@@ -72,6 +72,8 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellTestBsod, "testbsod", "-Tests blue screen of death");
             this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellRun, "run", "- runs specified PID");
+            this.commandList[this.commandList.length] = sc;
             // Display the initial prompt.
             this.putPrompt();
         }
@@ -268,6 +270,10 @@ var TSOS;
                     case "testbsod":
                         _StdOut.putText("Tests blue screen of death.");
                         break;
+                    case "run":
+                        _StdOut.putText("Usage: run <PID>");
+                        _StdOut.advanceLine();
+                        _StdOut.putText("Runs specified PID.");
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -376,12 +382,13 @@ var TSOS;
                         memList[memList.length] = strippedCode.substring(memInd, (memInd + 2));
                         memInd += 2;
                     }
+                    _Scheduler.setupProcess(memList); // to avoid having the 0s in the data
                     if (memList.length < 256) {
                         for (let i = memList.length; i < 256; i++) {
                             memList[i] = "00";
                         }
                     }
-                    // var cMemTable = document.getElementById("memTableRows").getElementsByTagName("tr");
+                    var cMemTable = document.getElementById("memTableRows").getElementsByTagName("tr");
                     var realMemInd = 0;
                     for (let i = 0; i < 32; i++) {
                         document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[1].innerHTML = memList[realMemInd];
@@ -417,6 +424,11 @@ var TSOS;
         }
         shellTestBsod() {
             _Kernel.krnTrapError("BSOD TEST");
+        }
+        shellRun(pid) {
+            _Scheduler.runProcess(pid[0]);
+            _StdOut.putText(`PID ${pid[0]} has started.`);
+            _StdOut.advanceLine();
         }
     }
     TSOS.Shell = Shell;

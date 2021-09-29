@@ -16,20 +16,21 @@ module TSOS {
     export class Cpu {
 
         constructor(public PC: number = 0,
-                    public Acc: number = 0,
-                    public Xreg: number = 0,
-                    public Yreg: number = 0,
-                    public Zflag: number = 0,
+                    public Acc: string = "00",
+                    public Xreg: string = "00",
+                    public Yreg: string = "00",
+                    public IR: string = "00",
+                    public Zflag: string = "00",
                     public isExecuting: boolean = false) {
 
         }
 
         public init(): void {
             this.PC = 0;
-            this.Acc = 0;
-            this.Xreg = 0;
-            this.Yreg = 0;
-            this.Zflag = 0;
+            this.Acc = "00";
+            this.Xreg = "00";
+            this.Yreg = "00";
+            this.Zflag = "00";
             this.isExecuting = false;
         }
 
@@ -37,9 +38,11 @@ module TSOS {
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
-           this.PC = parseInt(document.getElementById("PC").innerHTML, 16);
-           var currentInstruction =  this.fetch();
-           this.decodeAndExecute(currentInstruction);
+          
+               this.fetchDecodeExecute();
+               this.updatePCBInfo();
+         
+          
         }
         public fetch(): string{
             var rowOffset = this.PC % 8;
@@ -47,24 +50,38 @@ module TSOS {
             var currentInstruction = document.getElementById("memTableRows").getElementsByTagName("tr")[row].cells[rowOffset+1].innerHTML;
             return currentInstruction;
         }
-
-
-
-        public decodeAndExecute(instruction: string): void{
-            // switch(instruction){
-            //     case "A9": // LDA constant
-            //         var constOffset = (this.PC+1) % 8;
-            //         var constRow = (((this.PC+1) - constOffset) / 8) - 1;
-            //         var constVal = document.getElementById("memTableRows").getElementsByTagName("tr")[constRow].cells[constOffset+1].innerHTML;
-            //         document.getElementById("ACC").innerHTML =  constVal;
-            //         break;
-            //     case "AD":
-            //         var 
-               
-            // }
-
+        public fetchDecodeExecute(): void{
+            this.IR = _MemoryAccessor.readByte((this.PC).toString(16));
+            switch(this.IR){
+                case "A9":
+                    this.loadConst();
+                    break;
+                case "00":
+                    this.break();
+                    break;
+            }
+            
+            
+           
         }
 
+        public updatePCBInfo(): void{
+            document.getElementById("PC").innerHTML = this.PC.toString();
+            document.getElementById("IR").innerHTML = this.IR;
+            document.getElementById("ACC").innerHTML = this.Acc;
+            document.getElementById("xReg").innerHTML = this.Xreg;
+            document.getElementById("yReg").innerHTML = this.Yreg;
+            document.getElementById("zFlg").innerHTML = this.Zflag;
+        }
+        public loadConst(): void{
+           var constAddr16 = (this.PC + 1).toString(16);
+           this.Acc = _MemoryAccessor.readByte(constAddr16);
+           this.PC++;
+           this.PC++;
+        } 
+        public break(): void{
+            _KernelInterruptQueue.enqueue(new Interrupt(END_PROC_IRQ, [_Scheduler.readyPCB.pid]));
+        }
        
     }
 }
