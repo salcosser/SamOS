@@ -215,9 +215,24 @@ module TSOS {
                
             }
         }
-
-        public putText(text): void {
-            /*  My first inclination here was to write two functions: putChar() and putString().
+        public formattedLine(text){
+            var remLen = _Canvas.width - this.currentXPosition;
+            var tempText = "";
+            var formattedOut = [];
+            while (text.length > 0) {
+                
+                while (  _DrawingContext.measureText(this.currentFont, this.currentFontSize, (tempText + text.charAt(0))) <= remLen && (text.length > 0) ) {
+                    tempText += text.charAt(0);
+                    text = text.slice(1);
+                }
+                formattedOut.push(tempText);
+                tempText = "";
+                remLen = _Canvas.width; 
+            }
+            return formattedOut;
+        }
+        public putText(text) {
+              /*  My first inclination here was to write two functions: putChar() and putString().
                 Then I remembered that JavaScript is (sadly) untyped and it won't differentiate
                 between the two. (Although TypeScript would. But we're compiling to JavaScipt anyway.)
                 So rather than be like PHP and write two (or more) functions that
@@ -225,13 +240,21 @@ module TSOS {
                 decided to write one function and use the term "text" to connote string or char.
             */
             if (text !== "") {
-                // Draw the text at the current X and Y coordinates.
-                _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, text);
-                // Move the current X position.
-                var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
-                this.currentXPosition = this.currentXPosition + offset;
+                var formattedLine = this.formattedLine(text);
+                for (var i = 0; i < formattedLine.length; i++) {
+                    var cLine = formattedLine[i];
+                    // Draw the text at the current X and Y coordinates.
+                    _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, cLine);
+                    // Move the current X position.
+                    var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, cLine);
+                    this.currentXPosition = this.currentXPosition + offset;
+                    if (i + 1 < formattedLine.length) {
+                        this.advanceLine();
+                    }
+                }
             }
-         }
+        }
+   
         /***********************************/
         /*os.console.backspace             */
         /*purpose: remove the last inputted*/

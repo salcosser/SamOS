@@ -4,7 +4,7 @@ module TSOS{
        constructor(){
 
        }
-       public writeByte(data, addr): void{
+       public writeByte(addr, data): void{
            if(parseInt(data,16) < 16){
                data = "0"+data;
            }

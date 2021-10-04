@@ -110,6 +110,20 @@ var TSOS;
                     _CPU.isExecuting = false;
                     _StdOut.putText(`Program with pid ${params[0]} has ended`);
                     _StdOut.advanceLine();
+                case PRINT_YREG_IRQ:
+                    _StdOut.putText(params[0]);
+                    break;
+                case PRINT_FROM_MEM_IRQ:
+                    let addr = params[0];
+                    let memVal = _MemoryAccessor.readByte(addr);
+                    let res = "";
+                    while (memVal !== "00") {
+                        res += String.fromCharCode(parseInt(memVal, 16));
+                        addr = (addr + 1).toString(16);
+                        memVal = _MemoryAccessor.readByte(addr);
+                    }
+                    _StdOut.putText(res);
+                    break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
             }

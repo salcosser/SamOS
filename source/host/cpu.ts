@@ -44,23 +44,57 @@ module TSOS {
          
           
         }
-        public fetch(): string{
-            var rowOffset = this.PC % 8;
-            var row = ((this.PC - rowOffset) / 8) - 1;
-            var currentInstruction = document.getElementById("memTableRows").getElementsByTagName("tr")[row].cells[rowOffset+1].innerHTML;
-            return currentInstruction;
-        }
+      
         public fetchDecodeExecute(): void{
             this.IR = _MemoryAccessor.readByte((this.PC).toString(16));
             switch(this.IR){
                 case "A9":
                     this.loadConst();
                     break;
+                case "AD":
+                    this.loadMem();
+                    break;
+                case "8D":
+                    this.storeMem();
+                    break;
+                case "6D":
+                    this.addWCarry();
+                    break;
+                case "A2":
+                    this.loadXConst();
+                    break;
+                case "AE":
+                    this.loadXMem();
+                    break;
+                case "A0":
+                    this.loadYConst();
+                    break;
+                case "AC":
+                    this.loadYMem();
+                    break;
+                case "EA": // no op
+                    break;
                 case "00":
                     this.break();
+                    this.isExecuting = false;
                     break;
+                case "EC":
+                    this.compareX();
+                    break;
+                case "D0":
+                    this.branchNBytes();
+                    break;
+                case "EE":
+                    this.incByte();
+                    break;
+                case "FF":
+                    this.systemCall();
+                    break;
+                default:
+                    _Kernel.krnTrapError(`Something went wrong with execution, instruction:'${this.IR}'`);
+                    //this.stopProc();
+                    this.isExecuting = false;
             }
-            
             
            
         }
@@ -74,13 +108,135 @@ module TSOS {
             document.getElementById("zFlg").innerHTML = this.Zflag;
         }
         public loadConst(): void{
-           var constAddr16 = (this.PC + 1).toString(16);
+            this.PC++;
+           let constAddr16 = (this.PC).toString(16);
            this.Acc = _MemoryAccessor.readByte(constAddr16);
-           this.PC++;
-           this.PC++;
+           
         } 
+
+
+        public loadMem(){
+           this.PC++;
+            let memAddr16 = (this.PC).toString(16);
+           this.PC++;
+            let addr = _MemoryAccessor.readByte(memAddr16);
+           
+           this.Acc = _MemoryAccessor.readByte(addr);
+
+
+        }
+
+
+        public storeMem(){
+            this.PC++;
+            let storeAddr16 = (this.PC).toString(16);
+            this.PC++;
+             _MemoryAccessor.writeByte(storeAddr16, this.Acc);
+             
+
+        }
+
+        public addWCarry(){
+            this.PC++;
+            let addr = _MemoryAccessor.readByte(this.PC);
+            this.PC++;
+            this.Acc = _MemoryAccessor.readByte(addr);
+
+        }
+
+        public loadXConst(){
+            this.PC++;
+            this.Xreg = _MemoryAccessor.readByte(this.PC);
+
+        }
+
+        public loadXMem(){
+            this.PC++;
+            let memAddr16 = (this.PC).toString(16);
+           this.PC++;
+            let addr = _MemoryAccessor.readByte(memAddr16);
+           
+           this.Xreg = _MemoryAccessor.readByte(addr);
+        }
+        public loadYConst(){
+            this.PC++;
+            this.Yreg = _MemoryAccessor.readByte(this.PC);
+        }
+
+        public loadYMem(){
+            this.PC++;
+            let memAddr16 = (this.PC).toString(16);
+           this.PC++;
+            let addr = _MemoryAccessor.readByte(memAddr16);
+           
+           this.Yreg = _MemoryAccessor.readByte(addr);
+        }
+
+
+        public compareX(){
+            this.PC++;
+            let addr = _MemoryAccessor.readByte(this.PC);
+            this.PC++;
+            if(_MemoryAccessor.readByte(this.PC) === this.Xreg){
+                this.Zflag = "01";
+            }else{
+                this.Zflag = "00";
+            }
+        }
+
+        public branchNBytes() {
+            this.PC++;
+            let bytes = _MemoryAccessor.readByte(this.PC);
+            if (this.Zflag === "00"){
+                this.PC += parseInt(bytes,16);
+            }
+               // handling the looping issue
+            if (this.PC > MEM_LIMIT){
+                let rem = this.PC % MEM_LIMIT;
+                this.PC = rem;
+            }
+                
+        }
+
+        public incByte() {
+           this.PC++;
+            let addr = _MemoryAccessor.readByte(this.PC);
+            this.PC++;
+            let tempVal = _MemoryAccessor.readByte(addr);
+            tempVal = (parseInt(tempVal,16) + 1).toString(16);
+           
+            _MemoryAccessor.writeByte(addr, tempVal);
+        }
+       
+        public systemCall() {
+            if (this.Xreg === "01") {
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PRINT_YREG_IRQ, [this.Yreg]));
+            }
+            else if (this.Xreg === "01") {
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PRINT_FROM_MEM_IRQ, [this.Yreg]));
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         public break(): void{
-            _KernelInterruptQueue.enqueue(new Interrupt(END_PROC_IRQ, [_Scheduler.readyPCB.pid]));
+            _KernelInterruptQueue.enqueue(new Interrupt(END_PROC_IRQ, [_Scheduler.runningPID]));
         }
        
     }

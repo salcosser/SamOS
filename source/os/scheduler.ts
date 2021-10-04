@@ -1,9 +1,11 @@
 module TSOS{
     export class Scheduler{
         //public readyQueue: TSOS.Queue;
-        public readyPCB: TSOS.PCB;
+        public readyQueue: TSOS.Queue;
+        public residentSet = new Map();
         public pid = 0;
         public resPCB: TSOS.PCB;
+        public runningPID: number;
         constructor(){
            // this.readyQueue = new Queue();
         }
@@ -12,25 +14,61 @@ module TSOS{
         }
         public setupProcess(inputCode): void{
             _MemoryManager.loadMemory(inputCode);
-            var memEnd = (inputCode.length).toString(16);
-            var newPcb = new PCB("00",memEnd, this.pid);
-            _StdOut.putText(`Loaded new program, PID ${this.pid}`);
+            let memEnd = (inputCode.length).toString(16);
+            let newPcb = new PCB(_Scheduler.pid);
+            _StdOut.putText(`Loaded new program, PID ${_Scheduler.pid}`);
             _StdOut.advanceLine();
-            this.resPCB = newPcb;
-            this.pid++;
+            _Scheduler.residentSet.set(_Scheduler.pid, newPcb);
+            console.log("did this");
+            console.log(_Scheduler.residentSet.get(_Scheduler.pid).pid);
+            _Scheduler.pid++;
         }
 
-        public runProcess(pid){
-            var tempPCB   = this.resPCB;
+        public runProcess(pid): void{
+            console.log("I got pid:"+ pid);
+            let tempPCB   = _Scheduler.residentSet.get(pid);
+            console.log("pid:" + tempPCB.pid+ " is running.");
             tempPCB.state = "ready";
-            this.readyPCB = tempPCB;
-            _CPU.PC       = this.readyPCB.PC;
-            _CPU.IR       = this.readyPCB.IR;
-            _CPU.Xreg     = this.readyPCB.xReg;
-            _CPU.Yreg     = this.readyPCB.yReg;
-            _CPU.Zflag    = this.readyPCB.zFlag;
-            _CPU.Acc      = this.readyPCB.Acc;
+            _Scheduler.readyQueue.enqueue(tempPCB);
+            _Scheduler.contextSwitch();
+            //this.residentSet.delete(pid);
+
+            
+        }
+
+        public contextSwitch(): void{
+           if(_Scheduler.runningPID){
+            _CPU.isExecuting = false;
+            let tempPcb = new PCB(_Scheduler.runningPID);
+            tempPcb.PC = _CPU.PC;
+            tempPcb.IR = _CPU.IR;
+            tempPcb.xReg = _CPU.Xreg;
+            tempPcb.yReg = _CPU.Yreg;
+            tempPcb.zFlag    = _CPU.Zflag;
+            tempPcb.Acc = _CPU.Acc;
+            _Scheduler.residentSet.set(_Scheduler.runningPID, tempPcb);
+            let newPcb = _Scheduler.readyQueue.dequeue();
+            _CPU.PC       = newPcb.PC;
+            _CPU.IR       = newPcb.IR;
+            _CPU.Xreg     = newPcb.xReg;
+            _CPU.Yreg     = newPcb.yReg;
+            _CPU.Zflag    = newPcb.zFlag;
+            _CPU.Acc      = newPcb.Acc;
+            _Scheduler.runningPID = newPcb.pid;
             _CPU.isExecuting = true;
+           }else{
+            _CPU.isExecuting = false;
+            let newPcb = _Scheduler.readyQueue.dequeue();
+            _CPU.PC       = newPcb.PC;
+            _CPU.IR       = newPcb.IR;
+            _CPU.Xreg     = newPcb.xReg;
+            _CPU.Yreg     = newPcb.yReg;
+            _CPU.Zflag    = newPcb.zFlag;
+            _CPU.Acc      = newPcb.Acc;
+            _Scheduler.runningPID = newPcb.pid;
+            _CPU.isExecuting = true;
+           }
+            
         }
     }
 }

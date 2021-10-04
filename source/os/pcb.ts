@@ -10,9 +10,9 @@ module TSOS{
         public zFlag: string;
         public Acc: string;
         public state: string;
-        constructor(base, limit, pid){
-            this.base  = base;
-            this.limit = limit;
+        constructor(pid){
+            this.base  = "00";// both to be updated in the future
+            this.limit = "ff";
             this.pid   = pid;
             this.PC    = 0;
             this.Acc   = "00";
@@ -20,7 +20,7 @@ module TSOS{
             this.yReg  = "00";
             this.zFlag = "00";
             this.state = "resident";
-            this.IR    = _MemoryManager.getMemory(base);
+            this.IR    = _MemoryManager.getMemory(this.base);
         }
     }
 }
