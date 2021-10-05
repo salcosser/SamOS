@@ -13,7 +13,7 @@
 var TSOS;
 (function (TSOS) {
     class Cpu {
-        constructor(PC = 0, Acc = "00", Xreg = "00", Yreg = "00", IR = "00", Zflag = "00", isExecuting = false) {
+        constructor(PC = "00", Acc = "00", Xreg = "00", Yreg = "00", IR = "00", Zflag = "00", isExecuting = false) {
             this.PC = PC;
             this.Acc = Acc;
             this.Xreg = Xreg;
@@ -21,9 +21,10 @@ var TSOS;
             this.IR = IR;
             this.Zflag = Zflag;
             this.isExecuting = isExecuting;
+            this.cnt = 0;
         }
         init() {
-            this.PC = 0;
+            this.PC = "00";
             this.Acc = "00";
             this.Xreg = "00";
             this.Yreg = "00";
@@ -38,7 +39,8 @@ var TSOS;
             this.updatePCBInfo();
         }
         fetchDecodeExecute() {
-            this.IR = _MemoryAccessor.readByte((this.PC).toString(16));
+            _CPU.IR = _MemoryAccessor.readByte(_CPU.PC);
+            console.log("cnt: " + ++this.cnt + "instruction: " + this.IR + "pc " + this.PC);
             switch (this.IR) {
                 case "A9":
                     this.loadConst();
@@ -65,6 +67,7 @@ var TSOS;
                     this.loadYMem();
                     break;
                 case "EA": // no op
+                    _CPU.incProgCnt();
                     break;
                 case "00":
                     this.break();
@@ -83,10 +86,15 @@ var TSOS;
                     this.systemCall();
                     break;
                 default:
-                    _Kernel.krnTrapError(`Something went wrong with execution, instruction:'${this.IR}'`);
-                    //this.stopProc();
+                    _Kernel.krnTrapError(`Something went wrong with execution, instruction:'${this.IR}' at memory address ${this.PC}`);
                     this.isExecuting = false;
+                    break;
             }
+            this.updatePCBInfo();
+        }
+        incProgCnt() {
+            _CPU.PC = (parseInt(_CPU.PC, 16) + 1).toString(16).toUpperCase();
+            this.updatePCBInfo();
         }
         updatePCBInfo() {
             document.getElementById("PC").innerHTML = this.PC.toString();
@@ -97,89 +105,106 @@ var TSOS;
             document.getElementById("zFlg").innerHTML = this.Zflag;
         }
         loadConst() {
-            this.PC++;
-            let constAddr16 = (this.PC).toString(16);
-            this.Acc = _MemoryAccessor.readByte(constAddr16);
+            _CPU.incProgCnt();
+            // let constAddr16 = (this.PC).toString(16);
+            this.Acc = _MemoryAccessor.readByte(this.PC);
+            _CPU.incProgCnt();
         }
         loadMem() {
-            this.PC++;
-            let memAddr16 = (this.PC).toString(16);
-            this.PC++;
-            let addr = _MemoryAccessor.readByte(memAddr16);
+            _CPU.incProgCnt();
+            // let memAddr16 = (this.PC).toString(16);
+            let addr = _MemoryAccessor.readByte(this.PC);
             this.Acc = _MemoryAccessor.readByte(addr);
+            _CPU.incProgCnt();
+            _CPU.incProgCnt();
         }
         storeMem() {
-            this.PC++;
-            let storeAddr16 = (this.PC).toString(16);
-            this.PC++;
-            _MemoryAccessor.writeByte(storeAddr16, this.Acc);
+            _CPU.incProgCnt();
+            // let storeAddr16 = (this.PC).toString(16);
+            _MemoryAccessor.writeByte(this.PC, this.Acc);
+            _CPU.incProgCnt();
+            _CPU.incProgCnt();
         }
         addWCarry() {
-            this.PC++;
-            let addr = _MemoryAccessor.readByte(this.PC);
-            this.PC++;
-            this.Acc = _MemoryAccessor.readByte(addr);
+            _CPU.incProgCnt();
+            // let addr = _MemoryAccessor.readByte(this.PC);
+            this.Acc = _MemoryAccessor.readByte(this.PC);
+            _CPU.incProgCnt();
+            _CPU.incProgCnt();
         }
         loadXConst() {
-            this.PC++;
+            _CPU.incProgCnt();
             this.Xreg = _MemoryAccessor.readByte(this.PC);
+            _CPU.incProgCnt();
         }
         loadXMem() {
-            this.PC++;
-            let memAddr16 = (this.PC).toString(16);
-            this.PC++;
-            let addr = _MemoryAccessor.readByte(memAddr16);
+            _CPU.incProgCnt();
+            //let memAddr16 = (this.PC).toString(16);
+            let addr = _MemoryAccessor.readByte(this.PC);
+            _CPU.incProgCnt();
+            _CPU.incProgCnt();
             this.Xreg = _MemoryAccessor.readByte(addr);
         }
         loadYConst() {
-            this.PC++;
+            _CPU.incProgCnt();
             this.Yreg = _MemoryAccessor.readByte(this.PC);
+            _CPU.incProgCnt();
         }
         loadYMem() {
-            this.PC++;
-            let memAddr16 = (this.PC).toString(16);
-            this.PC++;
-            let addr = _MemoryAccessor.readByte(memAddr16);
+            _CPU.incProgCnt();
+            // let memAddr16 = (this.PC).toString(16);
+            let addr = _MemoryAccessor.readByte(this.PC);
+            _CPU.incProgCnt();
+            _CPU.incProgCnt();
             this.Yreg = _MemoryAccessor.readByte(addr);
         }
         compareX() {
-            this.PC++;
+            _CPU.incProgCnt();
             let addr = _MemoryAccessor.readByte(this.PC);
-            this.PC++;
             if (_MemoryAccessor.readByte(this.PC) === this.Xreg) {
                 this.Zflag = "01";
             }
             else {
                 this.Zflag = "00";
             }
+            _CPU.incProgCnt();
+            _CPU.incProgCnt();
         }
         branchNBytes() {
-            this.PC++;
+            _CPU.incProgCnt();
             let bytes = _MemoryAccessor.readByte(this.PC);
             if (this.Zflag === "00") {
-                this.PC += parseInt(bytes, 16);
+                this.PC = (parseInt(this.PC, 16) + parseInt(bytes, 16)).toString(16);
+                if (parseInt(this.PC, 16) > MEM_LIMIT) {
+                    let rem = parseInt(this.PC, 16) % MEM_LIMIT;
+                    this.PC = rem.toString(16);
+                }
+                console.log("Branched");
+                _CPU.incProgCnt();
+            }
+            else {
+                console.log("skipped branch");
+                _CPU.incProgCnt();
             }
             // handling the looping issue
-            if (this.PC > MEM_LIMIT) {
-                let rem = this.PC % MEM_LIMIT;
-                this.PC = rem;
-            }
         }
         incByte() {
-            this.PC++;
+            _CPU.incProgCnt();
             let addr = _MemoryAccessor.readByte(this.PC);
-            this.PC++;
             let tempVal = _MemoryAccessor.readByte(addr);
             tempVal = (parseInt(tempVal, 16) + 1).toString(16);
             _MemoryAccessor.writeByte(addr, tempVal);
+            _CPU.incProgCnt();
+            _CPU.incProgCnt();
         }
         systemCall() {
             if (this.Xreg === "01") {
                 _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PRINT_YREG_IRQ, [this.Yreg]));
             }
-            else if (this.Xreg === "01") {
+            else if (this.Xreg === "02") {
                 _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PRINT_FROM_MEM_IRQ, [this.Yreg]));
             }
+            _CPU.incProgCnt();
         }
         break() {
             _KernelInterruptQueue.enqueue(new TSOS.Interrupt(END_PROC_IRQ, [_Scheduler.runningPID]));

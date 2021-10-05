@@ -5,9 +5,9 @@ module TSOS{
 
        }
        public writeByte(addr, data): void{
-           if(parseInt(data,16) < 16){
-               data = "0"+data;
-           }
+        //    if(parseInt(data,16) < 16){
+        //        data = "0"+data;
+        //    }
            addr = parseInt(addr, 16);
            _Memory.memSet[addr] = data;
        }

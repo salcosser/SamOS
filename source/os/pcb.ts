@@ -3,7 +3,7 @@ module TSOS{
         public base: string;
         public limit: string;
         public pid: number;
-        public PC: number;
+        public PC: string;
         public IR: string;
         public xReg: string;
         public yReg: string;
@@ -14,7 +14,7 @@ module TSOS{
             this.base  = "00";// both to be updated in the future
             this.limit = "ff";
             this.pid   = pid;
-            this.PC    = 0;
+            this.PC    = "00";
             this.Acc   = "00";
             this.xReg  = "00";
             this.yReg  = "00";
