@@ -8,12 +8,17 @@ module TSOS{
    
            addr = parseInt(addr, 16);
 
-           _Memory.memSet[addr] = data;
+           _Memory.memSet[addr] = parseInt(data,16);
        }
 
-       public readByte(addr16): number{ // takes in hex, but uses base 10 in the actual memory
+       public readByte(addr16): string{ // takes in hex, but uses base 10 in the actual memory
         var addr10 = parseInt(addr16, 16);
-        return _Memory.memSet[addr10];
+        let res =  _Memory.memSet[addr10];
+        if(res < 16){
+            return "0"+res.toString(16);
+        }else{
+            return res;
+        }
        }
 
        public loadBytes(dataList): void{

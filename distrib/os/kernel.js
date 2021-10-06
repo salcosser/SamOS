@@ -117,10 +117,10 @@ var TSOS;
                     break;
                 case PRINT_FROM_MEM_IRQ:
                     let addr = params[0];
-                    let memVal = _MemoryManager.getMemory(addr).toString(16);
+                    let memVal = _MemoryManager.getMemory(addr);
                     let res = "";
                     while (memVal !== "00") {
-                        res += String.fromCharCode(parseInt(memVal, 16));
+                        res += String.fromCharCode(memVal);
                         addr = (parseInt(addr, 16) + 1).toString(16);
                         memVal = _MemoryManager.getMemory(addr).toString(16);
                     }

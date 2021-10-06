@@ -39,7 +39,10 @@ var TSOS;
             this.updatePCBInfo();
         }
         fetchDecodeExecute() {
-            _CPU.IR = _MemoryAccessor.readByte(_CPU.PC).toString(16);
+            _CPU.IR = _MemoryAccessor.readByte(_CPU.PC).toString(16).toUpperCase();
+            if (parseInt(_CPU.IR, 16) < 16) {
+                _CPU.IR = "0" + _CPU.IR;
+            }
             console.log("cnt: " + ++this.cnt + "instruction: " + this.IR + "pc " + this.PC + "acc:" + this.Acc + " y:" + this.Yreg + " x:" + this.Xreg + "z:" + this.Zflag);
             switch (this.IR) {
                 case "A9":
@@ -62,9 +65,11 @@ var TSOS;
                     break;
                 case "A0":
                     this.loadYConst();
+                    console.log("did the thing");
                     break;
                 case "AC":
                     this.loadYMem();
+                    console.log("did the other thing");
                     break;
                 case "EA": // no op
                     _CPU.incProgCnt();
@@ -107,83 +112,78 @@ var TSOS;
         loadConst() {
             _CPU.incProgCnt();
             // let constAddr16 = (this.PC).toString(16);
-            this.Acc = _MemoryAccessor.readByte(this.PC).toString(16);
+            this.Acc = _MemoryAccessor.readByte(this.PC);
             _CPU.incProgCnt();
         }
         loadMem() {
             _CPU.incProgCnt();
             // let memAddr16 = (this.PC).toString(16);
-            let addr = _MemoryAccessor.readByte(this.PC).toString(16);
-            _CPU.incProgCnt();
-            addr = parseInt(_MemoryAccessor.readByte(this.PC).toString(16) + addr, 16).toString(16);
-            this.Acc = _MemoryAccessor.readByte(addr).toString(16);
+            let addr = parseInt((_MemoryAccessor.readByte(this.PC + 1) + _MemoryAccessor.readByte(this.PC)), 16).toString(16);
+            this.Acc = _MemoryAccessor.readByte(addr);
             _CPU.incProgCnt();
         }
         storeMem() {
-            _CPU.incProgCnt();
             // let storeAddr16 = (this.PC).toString(16);
-            let addr = _MemoryAccessor.readByte(this.PC).toString(16);
             _CPU.incProgCnt();
-            addr = parseInt(_MemoryAccessor.readByte(this.PC).toString(16) + addr, 16).toString(16);
-            _MemoryAccessor.writeByte(addr, this.Acc);
+            let addr = parseInt((_MemoryAccessor.readByte(this.PC + 1) + _MemoryAccessor.readByte(this.PC)), 16);
+            //addr = parseInt(_MemoryAccessor.readByte(this.PC) + addr,16).toString(16);
+            _MemoryAccessor.writeByte(addr.toString(16), this.Acc);
+            _CPU.incProgCnt();
             _CPU.incProgCnt();
         }
         addWCarry() {
             _CPU.incProgCnt();
-            var addr = _MemoryAccessor.readByte(this.PC).toString(16);
+            let addr = parseInt((_MemoryAccessor.readByte(this.PC + 1) + _MemoryAccessor.readByte(this.PC)), 16);
+            let value = _MemoryAccessor.readByte(addr.toString(16));
+            this.Acc = (parseInt(this.Acc, 16) + parseInt(value, 16)).toString(16);
             _CPU.incProgCnt();
-            addr = parseInt(_MemoryAccessor.readByte(this.PC).toString(16) + addr, 16).toString(16);
-            this.Acc = (parseInt(this.Acc, 16) + parseInt(addr, 16)).toString(16);
             _CPU.incProgCnt();
         }
         loadXConst() {
             _CPU.incProgCnt();
-            this.Xreg = _MemoryAccessor.readByte(this.PC).toString(16);
+            this.Xreg = _MemoryAccessor.readByte(this.PC);
             _CPU.incProgCnt();
         }
         loadXMem() {
             _CPU.incProgCnt();
             //let memAddr16 = (this.PC).toString(16);
-            let addr = _MemoryAccessor.readByte(this.PC).toString(16);
+            let addr = parseInt((_MemoryAccessor.readByte(this.PC + 1) + _MemoryAccessor.readByte(this.PC)), 16).toString(16);
+            this.Xreg = _MemoryAccessor.readByte(addr);
             _CPU.incProgCnt();
-            addr = parseInt(_MemoryAccessor.readByte(this.PC).toString(16) + addr, 16).toString(16);
-            this.Xreg = _MemoryAccessor.readByte(addr).toString(16);
             _CPU.incProgCnt();
         }
         loadYConst() {
             _CPU.incProgCnt();
-            this.Yreg = _MemoryAccessor.readByte(this.PC).toString(16);
+            this.Yreg = _MemoryAccessor.readByte(this.PC);
             _CPU.incProgCnt();
         }
         loadYMem() {
             _CPU.incProgCnt();
             //let memAddr16 = (this.PC).toString(16);
-            let addr = _MemoryAccessor.readByte(this.PC).toString(16);
+            let addr = parseInt((_MemoryAccessor.readByte(this.PC + 1) + _MemoryAccessor.readByte(this.PC)), 16).toString(16);
+            this.Yreg = _MemoryAccessor.readByte(addr);
             _CPU.incProgCnt();
-            addr = parseInt(_MemoryAccessor.readByte(this.PC).toString(16) + addr, 16).toString(16);
-            this.Yreg = _MemoryAccessor.readByte(addr).toString(16);
             _CPU.incProgCnt();
         }
         compareX() {
             _CPU.incProgCnt();
-            let addr = _MemoryAccessor.readByte(this.PC).toString(16);
-            _CPU.incProgCnt();
-            addr = parseInt(_MemoryAccessor.readByte(this.PC).toString(16) + addr, 16).toString(16);
-            if (_MemoryAccessor.readByte(addr).toString(16) === this.Xreg) {
+            let addr = parseInt((_MemoryAccessor.readByte(this.PC + 1) + _MemoryAccessor.readByte(this.PC)), 16).toString(16);
+            if (_MemoryAccessor.readByte(addr) === this.Xreg) {
                 this.Zflag = "01";
             }
             else {
                 this.Zflag = "00";
             }
             _CPU.incProgCnt();
+            _CPU.incProgCnt();
         }
         branchNBytes() {
             _CPU.incProgCnt();
-            let bytes = _MemoryAccessor.readByte(this.PC);
+            let bytes = parseInt(_MemoryAccessor.readByte(this.PC), 16);
             if (this.Zflag === "00") {
                 this.PC = (parseInt(this.PC, 16) + bytes).toString(16);
                 if (parseInt(this.PC, 16) > MEM_LIMIT - 1) {
-                    let rem = parseInt(this.PC, 16) % MEM_LIMIT;
+                    let rem = parseInt(this.PC, 16) % (MEM_LIMIT - 1);
                     this.PC = rem.toString(16);
                 }
                 console.log("Branched");
@@ -197,12 +197,11 @@ var TSOS;
         }
         incByte() {
             _CPU.incProgCnt();
-            let addr = _MemoryAccessor.readByte(this.PC).toString(16);
-            _CPU.incProgCnt();
-            addr = parseInt(_MemoryAccessor.readByte(this.PC).toString(16) + addr, 16).toString(16);
-            let tempVal = _MemoryAccessor.readByte(addr);
-            tempVal = (tempVal + 1);
+            let addr = parseInt((_MemoryAccessor.readByte(this.PC + 1) + _MemoryAccessor.readByte(this.PC)), 16).toString(16);
+            let tempVal = parseInt(_MemoryAccessor.readByte(addr), 16);
+            tempVal++;
             _MemoryAccessor.writeByte(addr, tempVal.toString(16));
+            _CPU.incProgCnt();
             _CPU.incProgCnt();
         }
         systemCall() {

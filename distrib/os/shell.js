@@ -406,6 +406,7 @@ var TSOS;
                         document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[7].innerHTML = memList[realMemInd];
                         realMemInd++;
                         document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[8].innerHTML = memList[realMemInd];
+                        realMemInd++;
                         // console.log("We updated this row.");
                         console.log("in here");
                     }
