@@ -15,9 +15,9 @@ module TSOS{
         var addr10 = parseInt(addr16, 16);
         let res =  _Memory.memSet[addr10];
         if(res < 16){
-            return "0"+res.toString(16);
+            return ("0"+res.toString(16));
         }else{
-            return res;
+            return res.toString(16);
         }
        }
 

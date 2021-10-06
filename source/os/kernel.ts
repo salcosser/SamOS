@@ -139,7 +139,7 @@ module TSOS {
                     let memVal = _MemoryManager.getMemory(addr);
                     let res = "";
                     while(memVal !== "00"){
-                        res+= String.fromCharCode(memVal);
+                        res+= String.fromCharCode(parseInt(memVal,16));
                         addr = (parseInt(addr,16)+1).toString(16);
                         memVal= _MemoryManager.getMemory(addr).toString(16);
                     }

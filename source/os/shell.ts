@@ -515,7 +515,7 @@ module TSOS {
                     // console.log("We updated this row.");
 
                     
-                    console.log("in here");
+                   
                 }    
                
 

@@ -408,7 +408,6 @@ var TSOS;
                         document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[8].innerHTML = memList[realMemInd];
                         realMemInd++;
                         // console.log("We updated this row.");
-                        console.log("in here");
                     }
                     _StdOut.putText("File loaded. Machine code is valid hex of an acceptable length.");
                     _StdOut.advanceLine();
