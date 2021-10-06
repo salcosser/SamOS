@@ -33,7 +33,7 @@ module TSOS{
 
 
 
-        public getMemory(addr16): string{
+        public getMemory(addr16): number{
             return _MemoryAccessor.readByte(addr16);
         } 
     }

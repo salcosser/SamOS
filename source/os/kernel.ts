@@ -132,17 +132,19 @@ module TSOS {
                     _StdOut.advanceLine();
                 case PRINT_YREG_IRQ:
                      _StdOut.putText(params[0].toString());
+                     console.log("tried to print"+ params[0] + "from the y reg");
                      break;
                 case PRINT_FROM_MEM_IRQ:
                     let addr = params[0];
-                    let memVal = _MemoryAccessor.readByte(addr);
+                    let memVal = _MemoryManager.getMemory(addr).toString(16);
                     let res = "";
                     while(memVal !== "00"){
                         res+= String.fromCharCode(parseInt(memVal, 16));
                         addr = (parseInt(addr,16)+1).toString(16);
-                        memVal=  _MemoryAccessor.readByte(addr);
+                        memVal= _MemoryManager.getMemory(addr).toString(16);
                     }
                     _StdOut.putText(res);
+                    console.log("tried to print"+ res + "from the y mem");
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
