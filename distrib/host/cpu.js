@@ -39,9 +39,10 @@ var TSOS;
             this.updatePCBInfo();
         }
         fetchDecodeExecute() {
-            _CPU.IR = _MemoryAccessor.readByte(_CPU.PC).toUpperCase();
+            // the fetch part of the cycle
+            _CPU.IR = _MemoryAccessor.readByte(_CPU.PC).toUpperCase(); // normalizing the IR in case memory was not updated in upper case
             console.log("cnt: " + ++this.cnt + " | instruction: " + this.IR + " | pc " + this.PC + " | acc:" + this.Acc + " | y:" + this.Yreg + " | x:" + this.Xreg + " | z:" + this.Zflag);
-            switch (this.IR) {
+            switch (this.IR) { // the decode part of the cycle
                 case "A9":
                     this.loadConst();
                     break;
@@ -62,11 +63,9 @@ var TSOS;
                     break;
                 case "A0":
                     this.loadYConst();
-                    console.log("did the thing");
                     break;
                 case "AC":
                     this.loadYMem();
-                    console.log("did the other thing");
                     break;
                 case "EA": // no op
                     _CPU.incProgCnt();
@@ -94,11 +93,13 @@ var TSOS;
             }
             this.updatePCBInfo();
         }
+        // used to increment the program counter in hex
         incProgCnt() {
             _CPU.PC = (parseInt(_CPU.PC, 16) + 1).toString(16).toUpperCase();
             this.updatePCBInfo();
             this.updateMemViewer();
         }
+        // used to update the status linees
         updatePCBInfo() {
             document.getElementById("PC").innerHTML = this.PC;
             document.getElementById("IR").innerHTML = this.IR;
@@ -107,43 +108,40 @@ var TSOS;
             document.getElementById("yReg").innerHTML = this.Yreg;
             document.getElementById("zFlg").innerHTML = this.Zflag;
         }
+        // used to update the memory viewer, as well as give an idea of where the program is in processing
         updateMemViewer() {
             var realMemInd = 0;
             for (let i = 0; i < 32; i++) {
-                document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[1].innerHTML = _MemoryAccessor.readByte(realMemInd.toString(16)).toUpperCase();
-                realMemInd++;
-                document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[2].innerHTML = _MemoryAccessor.readByte(realMemInd.toString(16)).toUpperCase();
-                realMemInd++;
-                document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[3].innerHTML = _MemoryAccessor.readByte(realMemInd.toString(16)).toUpperCase();
-                realMemInd++;
-                document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[4].innerHTML = _MemoryAccessor.readByte(realMemInd.toString(16)).toUpperCase();
-                realMemInd++;
-                document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[5].innerHTML = _MemoryAccessor.readByte(realMemInd.toString(16)).toUpperCase();
-                realMemInd++;
-                document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[6].innerHTML = _MemoryAccessor.readByte(realMemInd.toString(16)).toUpperCase();
-                realMemInd++;
-                document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[7].innerHTML = _MemoryAccessor.readByte(realMemInd.toString(16)).toUpperCase();
-                realMemInd++;
-                document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[8].innerHTML = _MemoryAccessor.readByte(realMemInd.toString(16)).toUpperCase();
-                realMemInd++;
-                // console.log("We updated this row.");
+                for (let j = 1; j <= 8; j++) {
+                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].innerHTML = _MemoryAccessor.readByte(realMemInd.toString(16)).toUpperCase();
+                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.fontWeight = "normal";
+                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.color = "black";
+                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.backgroundColor = "lightgray";
+                    if (realMemInd.toString(16).toUpperCase() == this.PC) {
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.fontWeight = "bold";
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.color = "lightgreen";
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.backgroundColor = "black";
+                    }
+                    realMemInd++;
+                }
             }
         }
+        //loads a constant into the accumulator
         loadConst() {
             let constAddr16 = (parseInt((this.PC), 16) + 1).toString(16);
             this.Acc = _MemoryAccessor.readByte(constAddr16).toUpperCase();
             _CPU.incProgCnt();
             _CPU.incProgCnt();
         }
+        //loads a value from a specified memory address into the accumulator
         loadMem() {
-            // let memAddr16 = (this.PC).toString(16);
             let addr = parseInt((_MemoryAccessor.readByte((parseInt(this.PC, 16) + 2).toString(16)) + _MemoryAccessor.readByte((parseInt(this.PC, 16) + 1).toString(16))), 16);
             this.Acc = _MemoryAccessor.readByte(addr.toString(16)).toUpperCase();
             _CPU.incProgCnt();
             _CPU.incProgCnt();
         }
+        //writes the value currently in the accumulator into a specified address in memory
         storeMem() {
-            // let storeAddr16 = (this.PC).toString(16);
             let addr = parseInt((_MemoryAccessor.readByte((parseInt(this.PC, 16) + 2).toString(16)) + _MemoryAccessor.readByte((parseInt(this.PC, 16) + 1).toString(16))), 16);
             //addr = parseInt(_MemoryAccessor.readByte(this.PC) + addr,16).toString(16);
             _MemoryAccessor.writeByte(addr.toString(16), this.Acc);
@@ -151,6 +149,7 @@ var TSOS;
             _CPU.incProgCnt();
             _CPU.incProgCnt();
         }
+        // sets the accumulator equal to (<current accumulator value> + <value in specifed memory address>)
         addWCarry() {
             let addr = parseInt((_MemoryAccessor.readByte((parseInt(this.PC, 16) + 2).toString(16)) + _MemoryAccessor.readByte((parseInt(this.PC, 16) + 1).toString(16))), 16);
             let value = _MemoryAccessor.readByte(addr.toString(16));
@@ -159,25 +158,27 @@ var TSOS;
             _CPU.incProgCnt();
             _CPU.incProgCnt();
         }
+        //puts a specified value into the x register
         loadXConst() {
-            console.log("at x const");
             _CPU.incProgCnt();
             this.Xreg = _MemoryAccessor.readByte(this.PC);
             _CPU.incProgCnt();
         }
+        // puts the value in a certain memory address into the x register
         loadXMem() {
-            //let memAddr16 = (this.PC).toString(16);
             let addr = parseInt((_MemoryAccessor.readByte((parseInt(this.PC, 16) + 2).toString(16)) + _MemoryAccessor.readByte((parseInt(this.PC, 16) + 1).toString(16))), 16).toString(16);
             this.Xreg = _MemoryAccessor.readByte(addr);
             _CPU.incProgCnt();
             _CPU.incProgCnt();
             _CPU.incProgCnt();
         }
+        //puts a specified value into the y register
         loadYConst() {
             this.Yreg = _MemoryAccessor.readByte((parseInt(this.PC, 16) + 1).toString(16));
             _CPU.incProgCnt();
             _CPU.incProgCnt();
         }
+        // puts the value in a certain memory address into the y register
         loadYMem() {
             let addr = parseInt((_MemoryAccessor.readByte((parseInt(this.PC, 16) + 2).toString(16)) + _MemoryAccessor.readByte((parseInt(this.PC, 16) + 1).toString(16))), 16);
             this.Yreg = _MemoryAccessor.readByte(addr.toString(16));
@@ -185,9 +186,9 @@ var TSOS;
             _CPU.incProgCnt();
             _CPU.incProgCnt();
         }
+        //checks if the value in a specified memory address is equal to the value currently in the x register, and sets the z flag if so
         compareX() {
             let addr = parseInt((_MemoryAccessor.readByte((parseInt(this.PC, 16) + 2).toString(16)) + _MemoryAccessor.readByte((parseInt(this.PC, 16) + 1).toString(16))), 16);
-            console.log("comparing x to mem addr" + addr);
             if (_MemoryAccessor.readByte(addr.toString(16)).toUpperCase() === this.Xreg.toUpperCase()) {
                 this.Zflag = "01";
             }
@@ -198,6 +199,7 @@ var TSOS;
             _CPU.incProgCnt();
             _CPU.incProgCnt();
         }
+        //branches the current execution by a number of bytes specified within a given memory address, while accounting for the memory limit
         branchNBytes() {
             let bytes = parseInt(_MemoryAccessor.readByte((parseInt(this.PC, 16) + 1).toString(16)), 16);
             if (this.Zflag === "00") {
@@ -219,16 +221,17 @@ var TSOS;
             }
             // handling the looping issue
         }
+        //increments a value in a specified memory addresss
         incByte() {
             let addr = parseInt((_MemoryAccessor.readByte((parseInt(this.PC, 16) + 2).toString(16)) + _MemoryAccessor.readByte((parseInt(this.PC, 16) + 1).toString(16))), 16);
             let tempVal = parseInt(_MemoryAccessor.readByte(addr.toString(16)), 16);
             tempVal++;
             _MemoryAccessor.writeByte(addr.toString(16), tempVal.toString(16));
-            console.log("Incremented to " + tempVal);
             _CPU.incProgCnt();
             _CPU.incProgCnt();
             _CPU.incProgCnt();
         }
+        // handling system calls
         systemCall() {
             if (this.Xreg === "01") {
                 _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PRINT_YREG_IRQ, [this.Yreg]));
@@ -238,6 +241,7 @@ var TSOS;
             }
             _CPU.incProgCnt();
         }
+        // tells the kernel to end execution
         break() {
             _KernelInterruptQueue.enqueue(new TSOS.Interrupt(END_PROC_IRQ, [_Scheduler.runningPID]));
         }

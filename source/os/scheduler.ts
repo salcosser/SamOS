@@ -1,3 +1,17 @@
+/*
+Scheduler class for SamOS
+Scheduler is responsible for setting up and managing processes loaded in by the user.
+Scheduler is also responsible for owning the ready queue as well as the resident queue.
+
+
+
+*/
+
+
+
+
+
+
 module TSOS{
     export class Scheduler{
         //public readyQueue: TSOS.Queue;
@@ -21,14 +35,12 @@ module TSOS{
             _StdOut.putText(`Loaded new program, PID ${_Scheduler.pid}`);
             _StdOut.advanceLine();
             _Scheduler.residentSet.set(_Scheduler.pid, newPcb);
-            console.log("I just set pid:"+ _Scheduler.pid + "to, see?:"+ _Scheduler.residentSet.get(_Scheduler.pid).pid);
-            console.log("did this");
-            console.log(_Scheduler.residentSet.get(_Scheduler.pid).pid);
+          
             _Scheduler.pid++;
         }
 
         public runProcess(pid): void{
-            console.log("I got pid: "+ pid);
+           
             let tempPCB: TSOS.PCB   = _Scheduler.residentSet.get(parseInt(pid));
             if(tempPCB){
                 

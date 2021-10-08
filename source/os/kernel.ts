@@ -131,10 +131,11 @@ module TSOS {
                     _StdOut.advanceLine();
                     _StdOut.putText(`Program with pid ${params[0]} has ended`);
                     _StdOut.advanceLine();
+                    _OsShell.putPrompt();
                     break;
                 case PRINT_YREG_IRQ:
                      _StdOut.putText(parseInt(params[0],16).toString());
-                     console.log("tried to print"+ params[0] + "from the y reg");
+                     
                      break;
                 case PRINT_FROM_MEM_IRQ:
                     let addr = params[0];
@@ -146,7 +147,7 @@ module TSOS {
                         memVal= _MemoryManager.getMemory(addr).toString(16);
                     }
                     _StdOut.putText(res);
-                    console.log("tried to print"+ res + "from the y mem");
+                    
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");

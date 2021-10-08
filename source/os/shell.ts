@@ -495,27 +495,13 @@ module TSOS {
               
                 var realMemInd = 0;
                 for(let i = 0;i<32;i++){
-                    
-                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[1].innerHTML = memList[realMemInd];
-                    realMemInd++;
-                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[2].innerHTML = memList[realMemInd];
-                    realMemInd++;
-                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[3].innerHTML = memList[realMemInd];
-                    realMemInd++;
-                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[4].innerHTML = memList[realMemInd];
-                    realMemInd++;
-                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[5].innerHTML = memList[realMemInd];
-                    realMemInd++;
-                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[6].innerHTML = memList[realMemInd];
-                    realMemInd++;
-                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[7].innerHTML = memList[realMemInd];
-                    realMemInd++;
-                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[8].innerHTML = memList[realMemInd];
-                    realMemInd++;
-                    // console.log("We updated this row.");
-
-                    
-                   
+                    for(let j = 1;j<=8;j++){
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].innerHTML = memList[realMemInd];
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.backgroundColor = "lightgray";
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.fontWeight = "normal";
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.color = "black";
+                        realMemInd++;
+                    }   
                 }    
                
 

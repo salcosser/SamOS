@@ -1,6 +1,12 @@
+/*
+MemoryAccessor for SamOS
+used to allow the hardware of the system access the memory
+
+*/
+
 module TSOS{
     export class MemoryAccessor{
-        //code
+        
        constructor(){
 
        }

@@ -88,7 +88,7 @@ module TSOS {
                     
                     this.backspace();
                     this.buffer = this.buffer.substr(0, this.buffer.length-1);
-                    console.log(this.buffer);
+                    
                 }else if(chr === String.fromCharCode(9)){ // using tab for autocomplete
                     
                     
@@ -115,7 +115,7 @@ module TSOS {
                             cIndex++;
                         }
                         var cCommand = commandOptionsList[cIndex];
-                        console.log(cCommand);
+                        
                         var delLen = this.buffer.length;
                         for(var n = 0;n<delLen - bString.length+1;n++){
                             this.backspace();
@@ -215,22 +215,7 @@ module TSOS {
                
             }
         }
-        public formattedLine(text){
-            var remLen = _Canvas.width - this.currentXPosition;
-            var tempText = "";
-            var formattedOut = [];
-            while (text.length > 0) {
-                
-                while (  _DrawingContext.measureText(this.currentFont, this.currentFontSize, (tempText + text.charAt(0))) <= remLen && (text.length > 0) ) {
-                    tempText += text.charAt(0);
-                    text = text.slice(1);
-                }
-                formattedOut.push(tempText);
-                tempText = "";
-                remLen = _Canvas.width; 
-            }
-            return formattedOut;
-        }
+      
         public putText(text) {
               /*  My first inclination here was to write two functions: putChar() and putString().
                 Then I remembered that JavaScript is (sadly) untyped and it won't differentiate
@@ -253,6 +238,23 @@ module TSOS {
                     }
                 }
             }
+        }
+
+        public formattedLine(text){
+            var remLen = _Canvas.width - this.currentXPosition;
+            var tempText = "";
+            var formattedOut = [];
+            while (text.length > 0) {
+                
+                while (  _DrawingContext.measureText(this.currentFont, this.currentFontSize, (tempText + text.charAt(0))) <= remLen && (text.length > 0) ) {
+                    tempText += text.charAt(0);
+                    text = text.slice(1);
+                }
+                formattedOut.push(tempText);
+                tempText = "";
+                remLen = _Canvas.width; 
+            }
+            return formattedOut;
         }
    
         /***********************************/

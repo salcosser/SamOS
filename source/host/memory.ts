@@ -1,3 +1,12 @@
+/*
+Memory for SamOS
+Memory is responsible for simulating the volitile memory within this simulated computer system.
+Memory
+
+
+*/
+
+
 module TSOS{
     export class Memory{
         
