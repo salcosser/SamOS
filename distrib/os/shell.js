@@ -426,8 +426,6 @@ var TSOS;
         }
         shellRun(pid) {
             _Scheduler.runProcess(pid[0]);
-            _StdOut.putText(`PID ${pid[0]} has started.`);
-            _StdOut.advanceLine();
         }
     }
     TSOS.Shell = Shell;

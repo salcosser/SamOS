@@ -545,8 +545,7 @@ module TSOS {
        }
        public shellRun( pid: string[]){
             _Scheduler.runProcess(pid[0]);
-            _StdOut.putText(`PID ${pid[0]} has started.`);
-            _StdOut.advanceLine();
+            
        }
 
     }

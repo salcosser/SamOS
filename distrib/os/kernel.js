@@ -112,6 +112,7 @@ var TSOS;
                     _StdOut.advanceLine();
                     _StdOut.putText(`Program with pid ${params[0]} has ended`);
                     _StdOut.advanceLine();
+                    break;
                 case PRINT_YREG_IRQ:
                     _StdOut.putText(parseInt(params[0], 16).toString());
                     console.log("tried to print" + params[0] + "from the y reg");

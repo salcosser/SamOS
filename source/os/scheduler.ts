@@ -13,7 +13,9 @@ module TSOS{
             
         }
         public setupProcess(inputCode): void{
+
             _MemoryManager.loadMemory(inputCode);
+
             let memEnd = (inputCode.length).toString(16);
             let newPcb = new PCB(_Scheduler.pid);
             _StdOut.putText(`Loaded new program, PID ${_Scheduler.pid}`);
@@ -27,20 +29,22 @@ module TSOS{
 
         public runProcess(pid): void{
             console.log("I got pid: "+ pid);
-            
             let tempPCB: TSOS.PCB   = _Scheduler.residentSet.get(parseInt(pid));
             if(tempPCB){
                 
                 tempPCB.state = "ready";
                 _Scheduler.readyQueue.enqueue(tempPCB);// in later projects, more will be added to this process
                 let rPcb = _Scheduler.readyQueue.dequeue();
+                this.runningPID = parseInt(pid);
                 _Scheduler.contextSwitch(rPcb);
             }else{
-                console.log("PCB with PID of " + pid + " Was not found in the resident queue.");
+               _StdOut.putText("PCB with PID of " + pid + " was not found in the resident queue.");
+                return;
             }
           
-            this.residentSet.delete(pid);
-
+            this.residentSet.delete(parseInt(pid));
+            _StdOut.putText(`PID ${pid[0]} has started.`);
+            _StdOut.advanceLine();
             
         }
 
