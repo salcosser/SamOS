@@ -5,6 +5,7 @@ module TSOS{
         }
 
         public loadMemory(dataList): void{
+            this.clearMemory();
             var addr = "00" // for now, until we are doing multiple programs
             var cAddr10 = 0;
             var cAddr16 = "00";

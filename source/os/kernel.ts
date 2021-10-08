@@ -128,10 +128,11 @@ module TSOS {
                 case END_PROC_IRQ:
                     _CPU.isExecuting = false;
                     _Scheduler.termProc();
+                    _StdOut.advanceLine();
                     _StdOut.putText(`Program with pid ${params[0]} has ended`);
                     _StdOut.advanceLine();
                 case PRINT_YREG_IRQ:
-                     _StdOut.putText(params[0].toString());
+                     _StdOut.putText(parseInt(params[0],16).toString());
                      console.log("tried to print"+ params[0] + "from the y reg");
                      break;
                 case PRINT_FROM_MEM_IRQ:

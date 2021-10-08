@@ -491,7 +491,7 @@ module TSOS {
                 }
 
                
-                var cMemTable = document.getElementById("memTableRows").getElementsByTagName("tr");
+               
               
                 var realMemInd = 0;
                 for(let i = 0;i<32;i++){

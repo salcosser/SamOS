@@ -388,7 +388,6 @@ var TSOS;
                             memList[i] = "00";
                         }
                     }
-                    var cMemTable = document.getElementById("memTableRows").getElementsByTagName("tr");
                     var realMemInd = 0;
                     for (let i = 0; i < 32; i++) {
                         document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[1].innerHTML = memList[realMemInd];
