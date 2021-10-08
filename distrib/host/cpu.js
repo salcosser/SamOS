@@ -188,7 +188,7 @@ var TSOS;
         compareX() {
             let addr = parseInt((_MemoryAccessor.readByte((parseInt(this.PC, 16) + 2).toString(16)) + _MemoryAccessor.readByte((parseInt(this.PC, 16) + 1).toString(16))), 16);
             console.log("comparing x to mem addr" + addr);
-            if (_MemoryAccessor.readByte(addr.toString(16)).toUpperCase() === this.Xreg) {
+            if (_MemoryAccessor.readByte(addr.toString(16)).toUpperCase() === this.Xreg.toUpperCase()) {
                 this.Zflag = "01";
             }
             else {
@@ -223,7 +223,8 @@ var TSOS;
             let addr = parseInt((_MemoryAccessor.readByte((parseInt(this.PC, 16) + 2).toString(16)) + _MemoryAccessor.readByte((parseInt(this.PC, 16) + 1).toString(16))), 16);
             let tempVal = parseInt(_MemoryAccessor.readByte(addr.toString(16)), 16);
             tempVal++;
-            _MemoryAccessor.writeByte(addr, tempVal.toString(16));
+            _MemoryAccessor.writeByte(addr.toString(16), tempVal.toString(16));
+            console.log("Incremented to " + tempVal);
             _CPU.incProgCnt();
             _CPU.incProgCnt();
             _CPU.incProgCnt();
