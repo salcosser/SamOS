@@ -293,9 +293,17 @@ module TSOS {
         }
 
         public shellShutdown(args: string[]) {
-             _StdOut.putText("Shutting down...");
+             _StdOut.putText("Shutting down");
+             _KernelInterruptQueue.enqueue(new Interrupt(KILL_PROC_IRQ, [_Scheduler.runningPID]));
+             setTimeout(() =>{_StdOut.putText(".");},500); 
+             setTimeout(() =>{_StdOut.putText(".");},1000); 
+             setTimeout(() =>{_StdOut.putText(".");_Kernel.krnShutdown();},1500);
+           
              // Call Kernel shutdown routine.
-            _Kernel.krnShutdown();
+            
+             
+            
+
             // TODO: Stop the final prompt from being displayed. If possible. Not a high priority. (Damn OCD!)
         }
 
@@ -530,7 +538,14 @@ module TSOS {
            _Kernel.krnTrapError("BSOD TEST");
        }
        public shellRun( pid: string[]){
+           if(pid[0]){
             _Scheduler.runProcess(pid[0]);
+           }else{
+               _StdOut.putText("Please enter a pid to run. ex : run 0");
+               _StdOut.advanceLine();
+             
+           }
+            
             
        }
 

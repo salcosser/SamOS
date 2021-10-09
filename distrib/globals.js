@@ -17,6 +17,7 @@ const TIMER_IRQ = 0; // Pages 23 (timer), 9 (interrupts), and 561 (interrupt pri
 // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
 const KEYBOARD_IRQ = 1;
 const END_PROC_IRQ = 3;
+const KILL_PROC_IRQ = 9;
 const PRINT_YREG_IRQ = 4;
 const PRINT_FROM_MEM_IRQ = 5;
 const MEM_LIMIT = 256;

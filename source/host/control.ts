@@ -108,6 +108,16 @@ module TSOS {
             // TODO: Is there anything else we need to do here?
         }
 
+        public static HostHaltOS(): void{
+            Control.hostLog("Emergency halt", "host");
+            Control.hostLog("Attempting Kernel shutdown.", "host");
+            // Call the OS shutdown routine.
+            _Kernel.krnShutdown();
+            // Stop the interval that's simulating our clock pulse.
+            clearInterval(_hardwareClockID);
+            // TODO: Is there anything else we need to do here?
+        }
+
         public static hostBtnReset_click(btn): void {
             // The easiest and most thorough way to do this is to reload (not refresh) the document.
             location.reload();

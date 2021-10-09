@@ -40,7 +40,7 @@ module TSOS {
             // Do the real work here. Be sure to set this.isExecuting appropriately.
           
                this.fetchDecodeExecute();
-               this.updatePCBInfo();
+              
          
           
         }
@@ -101,46 +101,17 @@ module TSOS {
                     break;
             }
            
-           this.updatePCBInfo();
+           
         }
 
 
         // used to increment the program counter in hex
         public incProgCnt(){ 
             _CPU.PC = (parseInt(_CPU.PC, 16) + 1).toString(16).toUpperCase();
-            this.updatePCBInfo();
-            this.updateMemViewer();
+           
         }
         // used to update the status linees
-        public updatePCBInfo(): void{
-            document.getElementById("PC").innerHTML = this.PC;
-            document.getElementById("IR").innerHTML = this.IR;
-            document.getElementById("ACC").innerHTML = this.Acc;
-            document.getElementById("xReg").innerHTML = this.Xreg;
-            document.getElementById("yReg").innerHTML = this.Yreg;
-            document.getElementById("zFlg").innerHTML = this.Zflag;
-        }
-
-        // used to update the memory viewer, as well as give an idea of where the program is in processing
-        public updateMemViewer(){
-            
-              
-            var realMemInd = 0;
-            for(let i = 0;i<32;i++){
-                for(let j = 1;j<=8;j++){
-                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].innerHTML = _MemoryAccessor.readByte(realMemInd.toString(16)).toUpperCase();
-                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.fontWeight = "normal";
-                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.color = "black";
-                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.backgroundColor = "lightgray";
-                    if(realMemInd.toString(16).toUpperCase() == this.PC){
-                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.fontWeight = "bold";
-                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.color = "lightgreen";
-                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.backgroundColor = "black";
-                    }
-                    realMemInd++;
-                }  
-            }    
-        }
+     
 
         //loads a constant into the accumulator
         public loadConst(): void{

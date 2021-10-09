@@ -69,6 +69,8 @@ module TSOS {
             // More?
             //
             this.krnTrace("end shutdown OS");
+            clearInterval(_hardwareClockID);
+
         }
 
 
@@ -87,6 +89,8 @@ module TSOS {
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             } else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is anything being processed.
                 _CPU.cycle();
+                this.updatePCBInfo();
+                this.updateMemViewer();
             } else {                       // If there are no interrupts and there is nothing being executed then just be idle.
                 this.krnTrace("Idle");
             }
@@ -130,6 +134,14 @@ module TSOS {
                     _Scheduler.termProc();
                     _StdOut.advanceLine();
                     _StdOut.putText(`Program with pid ${params[0]} has ended`);
+                    _StdOut.advanceLine();
+                    _OsShell.putPrompt();
+                    break;
+                case KILL_PROC_IRQ:
+                    _CPU.isExecuting = false;
+                    _Scheduler.termProc();
+                    _StdOut.advanceLine();
+                    _StdOut.putText(`Program with pid ${params[0]} has been stopped`);
                     _StdOut.advanceLine();
                     _OsShell.putPrompt();
                     break;
@@ -194,7 +206,35 @@ module TSOS {
                 }
              }
         }
+        public updatePCBInfo(): void{
+            document.getElementById("PC").innerHTML = _CPU.PC;
+            document.getElementById("IR").innerHTML = _CPU.IR;
+            document.getElementById("ACC").innerHTML = _CPU.Acc;
+            document.getElementById("xReg").innerHTML = _CPU.Xreg;
+            document.getElementById("yReg").innerHTML = _CPU.Yreg;
+            document.getElementById("zFlg").innerHTML = _CPU.Zflag;
+        }
 
+        // used to update the memory viewer, as well as give an idea of where the program is in processing
+        public updateMemViewer(){
+            
+              
+            var realMemInd = 0;
+            for(let i = 0;i<32;i++){
+                for(let j = 1;j<=8;j++){
+                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].innerHTML = _MemoryManager.getMemory(realMemInd.toString(16)).toString(16).toUpperCase();
+                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.fontWeight = "normal";
+                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.color = "black";
+                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.backgroundColor = "lightgray";
+                    if(realMemInd.toString(16).toUpperCase() == _CPU.PC){
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.fontWeight = "bold";
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.color = "lightgreen";
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.backgroundColor = "black";
+                    }
+                    realMemInd++;
+                }  
+            }    
+        }
         public krnTrapError(msg) {
             Control.hostLog("OS ERROR - TRAP: " + msg);
             // TODO: Display error on console, perhaps in some sort of colored screen. (Maybe blue?)

@@ -204,9 +204,12 @@ var TSOS;
             }
         }
         shellShutdown(args) {
-            _StdOut.putText("Shutting down...");
+            _StdOut.putText("Shutting down");
+            _KernelInterruptQueue.enqueue(new TSOS.Interrupt(KILL_PROC_IRQ, [_Scheduler.runningPID]));
+            setTimeout(() => { _StdOut.putText("."); }, 500);
+            setTimeout(() => { _StdOut.putText("."); }, 1000);
+            setTimeout(() => { _StdOut.putText("."); _Kernel.krnShutdown(); }, 1500);
             // Call Kernel shutdown routine.
-            _Kernel.krnShutdown();
             // TODO: Stop the final prompt from being displayed. If possible. Not a high priority. (Damn OCD!)
         }
         shellCls(args) {
@@ -415,7 +418,13 @@ var TSOS;
             _Kernel.krnTrapError("BSOD TEST");
         }
         shellRun(pid) {
-            _Scheduler.runProcess(pid[0]);
+            if (pid[0]) {
+                _Scheduler.runProcess(pid[0]);
+            }
+            else {
+                _StdOut.putText("Please enter a pid to run. ex : run 0");
+                _StdOut.advanceLine();
+            }
         }
     }
     TSOS.Shell = Shell;
