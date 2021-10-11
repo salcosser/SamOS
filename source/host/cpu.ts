@@ -131,6 +131,7 @@ module TSOS {
            this.Acc = _MemoryAccessor.readByte(addr.toString(16)).toUpperCase();
            _CPU.incProgCnt();
            _CPU.incProgCnt();
+           _CPU.incProgCnt();
           
 
         }
