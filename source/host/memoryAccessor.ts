@@ -11,13 +11,14 @@ module TSOS{
 
        }
        public writeByte(addr, data): void{ // takes in hex, but uses base 10 in the actual memory
-   
+       
            addr = parseInt(addr, 16);
 
            _Memory.memSet[addr] = parseInt(data,16);
        }
 
        public readByte(addr16): string{ // takes in hex, but uses base 10 in the actual memory
+        
         var addr10 = parseInt(addr16, 16);
         let res =  _Memory.memSet[addr10];
         if(res < 16){
@@ -28,9 +29,9 @@ module TSOS{
        }
 
        public loadBytes(dataList): void{
-           _Memory.init();// *********************** THIS IS TEMPORARY UNTIL MULTI PROGRAM SUPPORT IS IMPLEMENTED ********************
-           
-           for(let i = 0; i< dataList.length;i++){ // starting at 0 until multi program support is implemented
+           //_Memory.init();// *********************** THIS IS TEMPORARY UNTIL MULTI PROGRAM SUPPORT IS IMPLEMENTED ********************
+           let offset = (_CurrentSeg  * 255) + 1;
+           for(let i = offset; i< dataList.length;i++){
                 this.writeByte(dataList[i], i);
                
            }

@@ -10,17 +10,17 @@ module TSOS{
         public zFlag: string;
         public Acc: string;
         public state: string;
-        constructor(pid){
-            this.base  = "00";// both to be updated in the future
-            this.limit = "ff";
+        constructor(pid, base, limit){
+            this.base  = base;// both to be updated in the future
+            this.limit = limit;
             this.pid   = pid;
-            this.PC    = "00";
+            this.PC    = base;
             this.Acc   = "00";
             this.xReg  = "00";
             this.yReg  = "00";
             this.zFlag = "00";
             this.state = "resident";
-            this.IR    = _MemoryManager.getMemory(this.base);
+            this.IR    = _MemoryManager.getMemory(base);
         }
     }
 }

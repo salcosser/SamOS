@@ -489,8 +489,12 @@ module TSOS {
                     memInd+=2;
                 }
 
-                _Scheduler.setupProcess(memList);// to avoid having the 0s in the data
-
+                let isSetup = _Scheduler.setupProcess(memList);
+                if(!isSetup){
+                    _StdOut.putText("File could not be loaded. No availible room in memory.");
+                    _StdOut.advanceLine();
+                    return;
+                }
 
                 if(memList.length < 256){
                     for(let i = memList.length; i < 256;i++){

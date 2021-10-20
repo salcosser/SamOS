@@ -19,24 +19,30 @@ module TSOS{
         public residentSet = new Map();
         public pid = 0;
         public resPCB: TSOS.PCB;
+        
         public runningPID: number;
+        public quantum: number = 6;
+        public cQuant: number = -1;
         constructor(){
            // this.readyQueue = new Queue();
         }
         init(){
             
         }
-        public setupProcess(inputCode): void{
+        public setupProcess(inputCode): boolean{
 
-            _MemoryManager.loadMemory(inputCode);
-
+            let loadedSeg = _MemoryManager.loadMemory(inputCode);
+            if(loadedSeg == -1){
+                return false;
+            }
+            let base = (loadedSeg * 256) - 1;
             let memEnd = (inputCode.length).toString(16);
-            let newPcb = new PCB(_Scheduler.pid);
+            let newPcb = new PCB(_Scheduler.pid,base, base+ 255);
             _StdOut.putText(`Loaded new program, PID ${_Scheduler.pid}`);
             _StdOut.advanceLine();
             _Scheduler.residentSet.set(_Scheduler.pid, newPcb);
-          
             _Scheduler.pid++;
+            return true;
         }
 
         public runProcess(pid): void{
@@ -46,9 +52,7 @@ module TSOS{
                 
                 tempPCB.state = "ready";
                 _Scheduler.readyQueue.enqueue(tempPCB);// in later projects, more will be added to this process
-                let rPcb = _Scheduler.readyQueue.dequeue();
-                this.runningPID = parseInt(pid);
-                _Scheduler.contextSwitch(rPcb);
+             
             }else{
                _StdOut.putText("PCB with PID of " + pid + " was not found in the resident queue.");
                 return;
@@ -60,47 +64,27 @@ module TSOS{
             
         }
 
-        public contextSwitch(newPcb): void{
-           if(_Scheduler.runningPID){
-            _CPU.isExecuting = false;
-            let tempPcb = new PCB(_Scheduler.runningPID);
-            tempPcb.PC = _CPU.PC;
-            tempPcb.IR = _CPU.IR;
-            tempPcb.xReg = _CPU.Xreg;
-            tempPcb.yReg = _CPU.Yreg;
-            tempPcb.zFlag    = _CPU.Zflag;
-            tempPcb.Acc = _CPU.Acc;
-            tempPcb.state = "resident";
-            _Scheduler.residentSet.set(_Scheduler.runningPID, tempPcb);
-        
-            
-                
-                _CPU.PC       = newPcb.PC;
-                _CPU.IR       = newPcb.IR;
-                _CPU.Xreg     = newPcb.xReg;
-                _CPU.Yreg     = newPcb.yReg;
-                _CPU.Zflag    = newPcb.zFlag;
-                _CPU.Acc      = newPcb.Acc;
-                _Scheduler.runningPID = newPcb.pid;
-                _CPU.isExecuting = true; 
-           }else{
-            _CPU.isExecuting = false;
-
-            
-            _CPU.PC       = newPcb.PC;
-            _CPU.IR       = newPcb.IR;
-            _CPU.Xreg     = newPcb.xReg;
-            _CPU.Yreg     = newPcb.yReg;
-            _CPU.Zflag    = newPcb.zFlag;
-            _CPU.Acc      = newPcb.Acc;
-            _Scheduler.runningPID = newPcb.pid;
-            _CPU.isExecuting = true;
-           }
-            
-        }
         public termProc(){
             
             
         }
+
+        public keepTime(): void{
+            if(this.cQuant == -1){
+                if(!this.readyQueue.isEmpty()){
+                    let newProc = this.readyQueue.dequeue();
+                    _Dispatcher.contextSwitch(newProc);
+                    this.cQuant = 0;
+                }
+            }else{
+                this.cQuant++;
+                if(this.cQuant == this.quantum && !this.readyQueue.isEmpty()){
+                    let newProc = this.readyQueue.dequeue();
+                    _Dispatcher.contextSwitch(newProc);
+                    this.cQuant = 0;
+                }
+            }
+        }
+       
     }
 }
