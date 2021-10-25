@@ -10,9 +10,18 @@ MemoryManager is responsible for communicating with the memory "device" through 
 
 module TSOS{
     export class MemoryManager{
-        public seg1Allocated: boolean = false;
-        public seg2Allocated: boolean = false;
-        public seg3Allocated: boolean = false;
+        
+        /*
+        *to keep track of allocation, had to do some odd stuff to not use too many variables.
+        *Because we have to find a place to allocate memory before we can assign a PID, we cannot
+        *look for a place in memory and assign a PID to that segment all in one go. So instead,
+        *that segment is temporarily set from -2 (meaning no assinged pid) to -1 (meaning assigned, awaiting pid)
+        *then the scheduler will talk to the memory manager and set the segment in question to the assigned PID once the PCB is created.
+        *--edit: now same logic holds, but the -2 for not allocated and -1 for awaiting are constants
+        *
+        */
+        
+        public segAllocStatus = [NOT_ALLOCATED,NOT_ALLOCATED,NOT_ALLOCATED];
         public init(): void{
         
         }
@@ -26,7 +35,7 @@ module TSOS{
             var cAddr10 = 0;
             var cAddr16 = "00";
             for(let i = cAddr10; i< dataList.length;i++){
-                 _MemoryAccessor.writeByte(cAddr16, dataList[i].toUpperCase(),segment);
+                 _MemoryAccessor.writeByteStrict(cAddr16, dataList[i].toUpperCase(), segment);
                  cAddr16 = (++cAddr10).toString(16);
                 if(cAddr10<16){
                     cAddr16 = "0"+cAddr16;
@@ -48,15 +57,15 @@ module TSOS{
             }
         }
         public findOpenSegment(): number{
-            if(!this.seg1Allocated){
-                this.seg1Allocated = true;
+            if(this.segAllocStatus[0] != NOT_ALLOCATED){
+                this.segAllocStatus[0] = ALLOC_AWAITING_PID;
                 return 1;
-            }else if(!this.seg2Allocated){
-                this.seg2Allocated = true;
+            }else if(this.segAllocStatus[1] != NOT_ALLOCATED){
+                this.segAllocStatus[1] = ALLOC_AWAITING_PID;
                 return 2;
 
-            }else if(!this.seg3Allocated){
-                this.seg3Allocated = true;
+            }else if(this.segAllocStatus[2] != NOT_ALLOCATED){
+                this.segAllocStatus[2] = ALLOC_AWAITING_PID;
                 return 3;
             }else{
                 return -1;

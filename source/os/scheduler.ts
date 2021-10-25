@@ -20,7 +20,7 @@ module TSOS{
         public pid = 0;
         public resPCB: TSOS.PCB;
         
-        public runningPID: number;
+        public runningPID: number =;
         public quantum: number = 6;
         public cQuant: number = -1;
         constructor(){
@@ -35,9 +35,11 @@ module TSOS{
             if(loadedSeg == -1){
                 return false;
             }
+            
             let base = (loadedSeg * 256) - 1;
             let memEnd = (inputCode.length).toString(16);
             let newPcb = new PCB(_Scheduler.pid,base, base+ 255);
+            _MemoryManager.segAllocStatus[loadedSeg] = _Scheduler.pid;
             _StdOut.putText(`Loaded new program, PID ${_Scheduler.pid}`);
             _StdOut.advanceLine();
             _Scheduler.residentSet.set(_Scheduler.pid, newPcb);

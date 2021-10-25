@@ -10,17 +10,40 @@ module TSOS{
        constructor(){
 
        }
-       public writeByte(addr, data): void{ // takes in hex, but uses base 10 in the actual memory
-       
-           addr = parseInt(addr, 16);
+       public writeByte(addr, data): boolean{ // takes in hex, but uses base 10 in the actual memory
+            let cSeg = _MemoryManager.segAllocStatus.indexOf(_Scheduler.runningPID);
+           let offset = (cSeg * 256);
+           
+           let physAddr = parseInt(addr, 16) + offset;
+           let deviation = physAddr - offset;
+           if(deviation  > 255 || deviation < 0){
+               return false;
+           }
 
-           _Memory.memSet[addr] = parseInt(data,16);
+           _Memory.memSet[physAddr] = parseInt(data,16);
+           return true;
        }
 
+       public writeByteStrict(addr, data, segment): boolean{
+        let offset = (segment * 256);
+        let physAddr = parseInt(addr, 16) + offset;
+           let deviation = physAddr - offset;
+           if(deviation  > 255 || deviation < 0){
+               return false;
+           }
+
+           _Memory.memSet[physAddr] = parseInt(data,16);
+        return true;
+       }
        public readByte(addr16): string{ // takes in hex, but uses base 10 in the actual memory
-        
-        var addr10 = parseInt(addr16, 16);
-        let res =  _Memory.memSet[addr10];
+        let cSeg = _MemoryManager.segAllocStatus.indexOf(_Scheduler.runningPID);
+        let offset = (cSeg * 256);
+       let physAddr = parseInt(addr16, 16) + offset;
+           let deviation = physAddr - offset;
+           if(deviation  > 255 || deviation < 0){
+               return "ZZ";
+           }
+        let res =  _Memory.memSet[physAddr];
         if(res < 16){
             return ("0"+res.toString(16));
         }else{
@@ -28,14 +51,7 @@ module TSOS{
         }
        }
 
-       public loadBytes(dataList): void{
-           //_Memory.init();// *********************** THIS IS TEMPORARY UNTIL MULTI PROGRAM SUPPORT IS IMPLEMENTED ********************
-           let offset = (_CurrentSeg  * 255) + 1;
-           for(let i = offset; i< dataList.length;i++){
-                this.writeByte(dataList[i], i);
-               
-           }
-       }
+      
        
 
 

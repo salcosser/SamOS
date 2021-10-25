@@ -496,11 +496,7 @@ module TSOS {
                     return;
                 }
 
-                if(memList.length < 256){
-                    for(let i = memList.length; i < 256;i++){
-                        memList[i] = "00";
-                    }
-                }
+              
 
                
                

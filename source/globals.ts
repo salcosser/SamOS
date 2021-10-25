@@ -24,6 +24,11 @@ const KILL_PROC_IRQ: number = 9;
 const PRINT_YREG_IRQ: number = 4;
 const PRINT_FROM_MEM_IRQ: number = 5;
 const MEM_LIMIT = 768;
+
+//used in the mem mgr
+const NOT_ALLOCATED = -2;
+const ALLOC_AWAITING_PID = -1;
+
 //
 // Global Variables
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
