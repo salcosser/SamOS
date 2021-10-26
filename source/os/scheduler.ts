@@ -18,11 +18,13 @@ module TSOS{
         public readyQueue: TSOS.Queue = new Queue();
         public residentSet = new Map();
         public pid = 0;
-        public resPCB: TSOS.PCB;
+      
         
-        public runningPID: number =;
+        public runningPID: number = -1;
         public quantum: number = 6;
         public cQuant: number = -1;
+        public procTime = new Map();
+
         constructor(){
            // this.readyQueue = new Queue();
         }
@@ -35,8 +37,10 @@ module TSOS{
             if(loadedSeg == -1){
                 return false;
             }
-            
-            let base = (loadedSeg * 256) - 1;
+            let nSpot = _MemoryManager.segAllocStatus.indexOf(ALLOC_AWAITING_PID);
+            _MemoryManager[nSpot] = _Scheduler.pid;
+            console.log(`I assigned ${this.pid} to seg ${nSpot}: proof- seg:${_MemoryManager[nSpot]}`);
+            let base = (loadedSeg * 256);
             let memEnd = (inputCode.length).toString(16);
             let newPcb = new PCB(_Scheduler.pid,base, base+ 255);
             _MemoryManager.segAllocStatus[loadedSeg] = _Scheduler.pid;
@@ -52,7 +56,7 @@ module TSOS{
             let tempPCB: TSOS.PCB   = _Scheduler.residentSet.get(parseInt(pid));
             if(tempPCB){
                 
-                tempPCB.state = "ready";
+                tempPCB.state = READY;
                 _Scheduler.readyQueue.enqueue(tempPCB);// in later projects, more will be added to this process
              
             }else{
@@ -66,27 +70,79 @@ module TSOS{
             
         }
 
-        public termProc(){
-            
-            
+        public termProc(pid: number){
+            let seg = _MemoryManager.indexOf(pid);
+            let tempPcb = new PCB(pid, seg*255, (seg+1)*255);
+             tempPcb.PC = _CPU.PC;
+             tempPcb.IR = _CPU.IR;
+             tempPcb.xReg = _CPU.Xreg;
+             tempPcb.yReg = _CPU.Yreg;
+             tempPcb.zFlag    = _CPU.Zflag;
+             tempPcb.Acc = _CPU.Acc;
+             tempPcb.state = TERMINATED;
+             _Scheduler.readyQueue.enqueue(tempPcb);
+            this.rrSync();
         }
 
-        public keepTime(): void{
-            if(this.cQuant == -1){
-                if(!this.readyQueue.isEmpty()){
-                    let newProc = this.readyQueue.dequeue();
-                    _Dispatcher.contextSwitch(newProc);
-                    this.cQuant = 0;
+        public recessDuty(): void{ // keeping track of the round robin scheduling
+           
+            if(this.procTime.has(this.runningPID)){
+                let cQuantVal = this.procTime.get(this.runningPID);
+                
+
+                if(this.cQuant == this.quantum){
+                   //finding if there is something to switch to
+                    let foundNewProc = false;
+                    while(!foundNewProc){
+                        let tProc = this.readyQueue.dequeue();
+                        if(tProc.state == READY || tProc.state == WAITING){
+                            _Dispatcher.contextSwitch(tProc);
+                            tProc.state = RUNNING;
+                            if(this.procTime.has(this.runningPID)){
+                                let nQuantVal = this.procTime.get(this.runningPID);
+                                this.procTime.set(this.runningPID, ++nQuantVal);
+                            }else{
+                                this.procTime.set(this.runningPID,1);
+                            }
+                        }    
+                    }      
+                }else{
+                    this.procTime.set(this.runningPID, ++cQuantVal);
                 }
+
+                
+            }else if(this.runningPID = -1){
+                this.rrSync();
             }else{
-                this.cQuant++;
-                if(this.cQuant == this.quantum && !this.readyQueue.isEmpty()){
-                    let newProc = this.readyQueue.dequeue();
-                    _Dispatcher.contextSwitch(newProc);
-                    this.cQuant = 0;
-                }
-            }
+                this.procTime.set(this.runningPID, 1);
+            }          
         }
+            // code to handle what happens when a program terminates
+        public rrSync(): void{
+         
+                let foundReady = false;
+                
+                let procCount = 0;
+                while(!foundReady){
+                    let tProc = this.readyQueue.dequeue();
+                    if(tProc.state == READY || tProc.state == WAITING){
+                        let newProc = tProc;
+                        _Dispatcher.contextSwitch(newProc);
+                        
+                        this.recessDuty();
+                        foundReady = true;
+                    }else{
+                        if(++procCount >= this.readyQueue.getSize()){
+                            _KernelInterruptQueue.enqueue(new Interrupt(FINISHED_PROC_QUEUE, [_Scheduler.runningPID]));
+                            break;
+                        }
+                        this.readyQueue.enqueue(tProc);
+                    }
+                }
+           }
+
+        }
+
+       
        
     }
-}

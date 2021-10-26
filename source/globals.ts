@@ -23,11 +23,26 @@ const END_PROC_IRQ: number = 3;
 const KILL_PROC_IRQ: number = 9;
 const PRINT_YREG_IRQ: number = 4;
 const PRINT_FROM_MEM_IRQ: number = 5;
+const FINISHED_PROC_QUEUE: number = 6;
+const MEM_BOUNDS_ERR_R: number = 32;
+const MEM_BOUNDS_ERR_W: number = 33;
 const MEM_LIMIT = 768;
 
 //used in the mem mgr
 const NOT_ALLOCATED = -2;
 const ALLOC_AWAITING_PID = -1;
+
+
+//states
+const RESIDENT = 0;
+const READY = 1;
+const RUNNING = 2;
+const WAITING = 3;
+const TERMINATED = 4;
+
+
+
+
 
 //
 // Global Variables

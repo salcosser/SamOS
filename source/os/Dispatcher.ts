@@ -11,7 +11,7 @@ module TSOS{
              tempPcb.yReg = _CPU.Yreg;
              tempPcb.zFlag    = _CPU.Zflag;
              tempPcb.Acc = _CPU.Acc;
-             tempPcb.state = "ready";
+             tempPcb.state = WAITING;
              _Scheduler.readyQueue.enqueue(tempPcb);
          
              
@@ -24,6 +24,7 @@ module TSOS{
                  _CPU.Acc      = newPcb.Acc;
                  _Scheduler.runningPID = newPcb.pid;
                  _CurrentSeg = newPcb.base / 255;
+                
                  _CPU.isExecuting = true; 
             }else{
              _CPU.isExecuting = false;

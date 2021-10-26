@@ -385,11 +385,11 @@ var TSOS;
                         memList[memList.length] = strippedCode.substring(memInd, (memInd + 2));
                         memInd += 2;
                     }
-                    _Scheduler.setupProcess(memList); // to avoid having the 0s in the data
-                    if (memList.length < 256) {
-                        for (let i = memList.length; i < 256; i++) {
-                            memList[i] = "00";
-                        }
+                    let isSetup = _Scheduler.setupProcess(memList);
+                    if (!isSetup) {
+                        _StdOut.putText("File could not be loaded. No availible room in memory.");
+                        _StdOut.advanceLine();
+                        return;
                     }
                     var realMemInd = 0;
                     for (let i = 0; i < 32; i++) {

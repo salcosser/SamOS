@@ -28,10 +28,11 @@ module TSOS{
         // making successive writeByte() calls to fill up memory with the new program
         public loadMemory(dataList): number{
             let segment = this.findOpenSegment();
+            
             if(segment == -1){
                 return -1;
             }
-          
+            console.log("got all the way to here");
             var cAddr10 = 0;
             var cAddr16 = "00";
             for(let i = cAddr10; i< dataList.length;i++){
@@ -57,24 +58,28 @@ module TSOS{
             }
         }
         public findOpenSegment(): number{
-            if(this.segAllocStatus[0] != NOT_ALLOCATED){
+            if(this.segAllocStatus[0] == NOT_ALLOCATED){
                 this.segAllocStatus[0] = ALLOC_AWAITING_PID;
-                return 1;
-            }else if(this.segAllocStatus[1] != NOT_ALLOCATED){
+                return 0;
+            }else if(this.segAllocStatus[1] == NOT_ALLOCATED){
                 this.segAllocStatus[1] = ALLOC_AWAITING_PID;
-                return 2;
+                return 1;
 
-            }else if(this.segAllocStatus[2] != NOT_ALLOCATED){
+            }else if(this.segAllocStatus[2] == NOT_ALLOCATED){
                 this.segAllocStatus[2] = ALLOC_AWAITING_PID;
-                return 3;
+                return 2;
             }else{
                 return -1;
             }
         }
 
+        
         // really only here so the kernel doesnt directly touch the memory accessor
         public getMemory(addr16): string{
             return _MemoryAccessor.readByte(addr16);
+        } 
+        public getMemoryStrict(addr16, pid): string{
+            return _MemoryAccessor.readByteStrict(addr16,pid);
         } 
     }
 }

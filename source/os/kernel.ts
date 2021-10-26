@@ -80,7 +80,7 @@ module TSOS {
                This, on the other hand, is the clock pulse from the hardware / VM / host that tells the kernel
                that it has to look for interrupts and process them if it finds any.                          
             */
-               _Scheduler.keepTime();
+               
             // Check for an interrupt, if there are any. Page 560
             
             if (_KernelInterruptQueue.getSize() > 0) {
@@ -89,6 +89,7 @@ module TSOS {
                 var interrupt = _KernelInterruptQueue.dequeue();
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             } else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is anything being processed.
+                _Scheduler.recessDuty();
                 _CPU.cycle();
                 this.updatePCBInfo();
                 this.updateMemViewer();
@@ -131,17 +132,15 @@ module TSOS {
                     _krnKeyboardDriver.isr(params);   // Kernel mode device driver
                     _StdIn.handleInput();
                     break;
-                case END_PROC_IRQ:
-                    _CPU.isExecuting = false;
-                    _Scheduler.termProc();
+                case END_PROC_IRQ:  
+                    _Scheduler.termProc(params[0]);
                     _StdOut.advanceLine();
                     _StdOut.putText(`Program with pid ${params[0]} has ended`);
                     _StdOut.advanceLine();
                     _OsShell.putPrompt();
                     break;
                 case KILL_PROC_IRQ:
-                    _CPU.isExecuting = false;
-                    _Scheduler.termProc();
+                    _Scheduler.termProc(params[0]);
                     _StdOut.advanceLine();
                     _StdOut.putText(`Program with pid ${params[0]} has been stopped`);
                     _StdOut.advanceLine();
@@ -162,6 +161,19 @@ module TSOS {
                     }
                     _StdOut.putText(res);
                     
+                    break;
+                case FINISHED_PROC_QUEUE:
+                    _CPU.isExecuting = false;
+                    _StdOut.putText("All processes have completed.");
+                    _StdOut.advanceLine();
+                    break;
+                case MEM_BOUNDS_ERR_R:
+                    _CPU.isExecuting = false;
+                    this.krnTrapError(`Memory out of bounds error. proc with pid[${params[0]}] tried to read memory address ${params[1]}, which is ${params[2]} bytes outside of it's memory bounds.`);
+                    break;
+                case MEM_BOUNDS_ERR_W:
+                    _CPU.isExecuting = false;
+                    this.krnTrapError(`Memory out of bounds error. proc with pid[${params[0]}] tried to write to memory address ${params[1]}, which is ${params[2]} bytes outside of it's memory bounds.`);
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");

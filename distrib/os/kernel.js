@@ -25,6 +25,7 @@ var TSOS;
             _StdIn = _Console;
             _StdOut = _Console;
             _MemoryManager = new TSOS.MemoryManager();
+            _Dispatcher = new TSOS.Dispatcher();
             // Load the Keyboard Device Driver
             this.krnTrace("Loading the keyboard device driver.");
             _krnKeyboardDriver = new TSOS.DeviceDriverKeyboard(); // Construct it.
@@ -72,6 +73,7 @@ var TSOS;
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             }
             else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is anything being processed.
+                _Scheduler.recessDuty();
                 _CPU.cycle();
                 this.updatePCBInfo();
                 this.updateMemViewer();
@@ -110,16 +112,14 @@ var TSOS;
                     _StdIn.handleInput();
                     break;
                 case END_PROC_IRQ:
-                    _CPU.isExecuting = false;
-                    _Scheduler.termProc();
+                    _Scheduler.termProc(params[0]);
                     _StdOut.advanceLine();
                     _StdOut.putText(`Program with pid ${params[0]} has ended`);
                     _StdOut.advanceLine();
                     _OsShell.putPrompt();
                     break;
                 case KILL_PROC_IRQ:
-                    _CPU.isExecuting = false;
-                    _Scheduler.termProc();
+                    _Scheduler.termProc(params[0]);
                     _StdOut.advanceLine();
                     _StdOut.putText(`Program with pid ${params[0]} has been stopped`);
                     _StdOut.advanceLine();
@@ -138,6 +138,19 @@ var TSOS;
                         memVal = _MemoryManager.getMemory(addr).toString(16);
                     }
                     _StdOut.putText(res);
+                    break;
+                case FINISHED_PROC_QUEUE:
+                    _CPU.isExecuting = false;
+                    _StdOut.putText("All processes have completed.");
+                    _StdOut.advanceLine();
+                    break;
+                case MEM_BOUNDS_ERR_R:
+                    _CPU.isExecuting = false;
+                    this.krnTrapError(`Memory out of bounds error. proc with pid[${params[0]}] tried to read memory address ${params[1]}, which is ${params[2]} bytes outside of it's memory bounds.`);
+                    break;
+                case MEM_BOUNDS_ERR_W:
+                    _CPU.isExecuting = false;
+                    this.krnTrapError(`Memory out of bounds error. proc with pid[${params[0]}] tried to write to memory address ${params[1]}, which is ${params[2]} bytes outside of it's memory bounds.`);
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
