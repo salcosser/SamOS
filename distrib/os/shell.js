@@ -438,11 +438,40 @@ var TSOS;
                     var realMemInd = 0;
                     for (let i = 0; i < 32; i++) {
                         for (let j = 1; j <= 8; j++) {
-                            document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].innerHTML = memList[realMemInd];
+                            document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].innerHTML = _MemoryManager.getMemoryPerSeg(realMemInd.toString(16), 0).toString(16);
                             document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.backgroundColor = "lightgray";
                             document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.fontWeight = "normal";
                             document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.color = "black";
                             realMemInd++;
+                            if (typeof (memList[realMemInd]) === 'undefined') {
+                                console.log(realMemInd + " apparently has no value");
+                            }
+                        }
+                    }
+                    realMemInd = 0;
+                    for (let i = 32; i < 64; i++) {
+                        for (let j = 1; j <= 8; j++) {
+                            document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].innerHTML = _MemoryManager.getMemoryPerSeg(realMemInd.toString(16), 1).toString(16);
+                            document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.backgroundColor = "lightgray";
+                            document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.fontWeight = "normal";
+                            document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.color = "black";
+                            realMemInd++;
+                            if (typeof (memList[realMemInd]) === 'undefined') {
+                                console.log(realMemInd + " apparently has no value");
+                            }
+                        }
+                    }
+                    realMemInd = 0;
+                    for (let i = 64; i < 96; i++) {
+                        for (let j = 1; j <= 8; j++) {
+                            document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].innerHTML = _MemoryManager.getMemoryPerSeg(realMemInd.toString(16), 2).toString(16);
+                            document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.backgroundColor = "lightgray";
+                            document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.fontWeight = "normal";
+                            document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.color = "black";
+                            realMemInd++;
+                            if (typeof (memList[realMemInd]) === 'undefined') {
+                                console.log(realMemInd + " apparently has no value");
+                            }
                         }
                     }
                     _StdOut.putText("File loaded. Machine code is valid hex of an acceptable length.");

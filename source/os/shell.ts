@@ -567,15 +567,38 @@ module TSOS {
                
               
                 var realMemInd = 0;
-                for(let i = 0;i<32;i++){
-                    for(let j = 1;j<=8;j++){
-                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].innerHTML = memList[realMemInd];
+                for(let i = 0;i<32 ;i++){
+                    for(let j = 1;j<=8;j++){                   
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].innerHTML = _MemoryManager.getMemoryPerSeg(realMemInd.toString(16),0).toString(16);
                         document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.backgroundColor = "lightgray";
                         document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.fontWeight = "normal";
                         document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.color = "black";
                         realMemInd++;
+                        
                     }   
                 }    
+                realMemInd = 0;
+                for(let i = 32;i<64 ;i++){
+                    for(let j = 1;j<=8;j++){                   
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].innerHTML = _MemoryManager.getMemoryPerSeg(realMemInd.toString(16),1).toString(16);
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.backgroundColor = "lightgray";
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.fontWeight = "normal";
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.color = "black";
+                        realMemInd++;
+                        
+                    }   
+                }  
+                realMemInd = 0;
+                for(let i = 64;i<96 ;i++){
+                    for(let j = 1;j<=8;j++){                   
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].innerHTML = _MemoryManager.getMemoryPerSeg(realMemInd.toString(16),2).toString(16);
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.backgroundColor = "lightgray";
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.fontWeight = "normal";
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.color = "black";
+                        realMemInd++;
+                       
+                    }   
+                }  
                
 
 

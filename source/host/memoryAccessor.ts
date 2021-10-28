@@ -36,6 +36,7 @@ module TSOS{
        }
 
            _Memory.memSet[physAddr] = parseInt(data,16);
+          
         
        }
        public readByte(addr16): string{ // takes in hex, but uses base 10 in the actual memory
@@ -76,7 +77,26 @@ module TSOS{
             return res.toString(16);
         }
        }
-      
+       
+       public readByteBySegment(addr16,seg): string{
+        
+        console.log("2seg"+seg);
+        let offset = (seg * 256);
+       let physAddr = parseInt(addr16, 16) + offset;
+       console.log("trying to get" +parseInt(addr16,16));
+       console.log("PA:"+ physAddr);
+           let deviation = physAddr - offset;
+           if(deviation  > 255 || deviation < 0){
+            _KernelInterruptQueue.enqueue(new Interrupt(MEM_BOUNDS_ERR_R, [_Scheduler.runningPID, physAddr, deviation]));
+            return "FF";
+       }
+        let res =  _Memory.memSet[physAddr];
+        if(res < 16){
+            return ("0"+res.toString(16));
+        }else{
+            return res.toString(16);
+        }
+       } 
        
 
 
