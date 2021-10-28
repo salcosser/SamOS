@@ -32,18 +32,20 @@ module TSOS{
             
         }
         public setupProcess(inputCode): boolean{
-
+            while(inputCode.length < 256){
+                inputCode[inputCode.length] = "00";
+            }
             let loadedSeg = _MemoryManager.loadMemory(inputCode);
             if(loadedSeg == -1){
                 return false;
             }
-            let nSpot = _MemoryManager.segAllocStatus.indexOf(ALLOC_AWAITING_PID);
-            _MemoryManager[nSpot] = _Scheduler.pid;
-            console.log(`I assigned ${this.pid} to seg ${nSpot}: proof- seg:${_MemoryManager[nSpot]}`);
+            // let nSpot = _MemoryManager.segAllocStatus.indexOf(ALLOC_AWAITING_PID);
+             _MemoryManager.segAllocStatus[loadedSeg] = _Scheduler.pid;
+            console.log(`I assigned ${this.pid} to seg ${loadedSeg}: proof- seg:${_MemoryManager.segAllocStatus[loadedSeg]}`);
             let base = (loadedSeg * 256);
             let memEnd = (inputCode.length).toString(16);
             let newPcb = new PCB(_Scheduler.pid,base, base+ 255);
-            _MemoryManager.segAllocStatus[loadedSeg] = _Scheduler.pid;
+           // _MemoryManager.segAllocStatus[loadedSeg] = _Scheduler.pid;
             _StdOut.putText(`Loaded new program, PID ${_Scheduler.pid}`);
             _StdOut.advanceLine();
             _Scheduler.residentSet.set(_Scheduler.pid, newPcb);
@@ -58,6 +60,7 @@ module TSOS{
                 
                 tempPCB.state = READY;
                 _Scheduler.readyQueue.enqueue(tempPCB);// in later projects, more will be added to this process
+                _CPU.isExecuting = true;
              
             }else{
                _StdOut.putText("PCB with PID of " + pid + " was not found in the resident queue.");
@@ -124,7 +127,7 @@ module TSOS{
                 
                 let procCount = 0;
                 while(!foundReady){
-                    let tProc = this.readyQueue.dequeue();
+                    let tProc = _Scheduler.readyQueue.dequeue();
                     if(tProc.state == READY || tProc.state == WAITING){
                         let newProc = tProc;
                         _Dispatcher.contextSwitch(newProc);
@@ -136,7 +139,7 @@ module TSOS{
                             _KernelInterruptQueue.enqueue(new Interrupt(FINISHED_PROC_QUEUE, [_Scheduler.runningPID]));
                             break;
                         }
-                        this.readyQueue.enqueue(tProc);
+                        _Scheduler.readyQueue.enqueue(tProc);
                     }
                 }
            }

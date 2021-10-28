@@ -62,6 +62,7 @@ module TSOS{
         console.log("2seg"+cSeg);
         let offset = (cSeg * 256);
        let physAddr = parseInt(addr16, 16) + offset;
+       console.log("trying to get" +parseInt(addr16,16));
        console.log("PA:"+ physAddr);
            let deviation = physAddr - offset;
            if(deviation  > 255 || deviation < 0){

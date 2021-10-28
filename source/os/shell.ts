@@ -140,7 +140,40 @@ module TSOS {
                 "run",
                 "- runs specified PID");
             this.commandList[this.commandList.length] = sc;
+
+            sc = new ShellCommand(this.shellClearMem,
+                "clearmem",
+                "clears all memory partitions");
+            this.commandList[this.commandList.length] = sc;
+
+            sc = new ShellCommand(this.shRunAll,
+                "runall",
+                "runs all loaded programs");
+            this.commandList[this.commandList.length] = sc;
            
+            sc = new ShellCommand(this.shPs,
+                "ps",
+                "display the PID and state of all processes");
+            this.commandList[this.commandList.length] = sc;
+
+            sc = new ShellCommand(this.shKill,
+                "kill",
+                "kill one process");
+            this.commandList[this.commandList.length] = sc;
+
+            sc = new ShellCommand(this.shKillAll,
+                "killall",
+                "kill all process");
+            this.commandList[this.commandList.length] = sc;
+
+            sc = new ShellCommand(this.shQuant,
+                "quantum",
+                "set the Round Robin quantum");
+            this.commandList[this.commandList.length] = sc;
+
+            
+            
+
             // Display the initial prompt.
             this.putPrompt();
         }
@@ -373,6 +406,37 @@ module TSOS {
                         _StdOut.putText("Usage: run <PID>");
                         _StdOut.advanceLine();
                         _StdOut.putText("Runs specified PID.");
+                        break;
+                    case "clearmem":
+                        _StdOut.putText("usage: clearmem");
+                        _StdOut.advanceLine();
+                        _StdOut.putText("clears all memory partitons");
+                        break;
+                    case "runall":
+                        _StdOut.putText("usage: runall");
+                        _StdOut.advanceLine();
+                        _StdOut.putText("execute all programs at once");
+                        break;
+                    case "ps":
+                        _StdOut.putText("usage: ps");
+                        _StdOut.advanceLine();
+                        _StdOut.putText("display the PID and state of all processes");
+                        break;
+                    case "kill":
+                        _StdOut.putText("usage: kill <PID>");
+                        _StdOut.advanceLine();
+                        _StdOut.putText("kill one process");
+                        break;
+                    case "killall":
+                        _StdOut.putText("usage: killall");
+                        _StdOut.advanceLine();
+                        _StdOut.putText("kill all processes");
+                        break;
+                    case "quantum":
+                        _StdOut.putText("usage: quantum <quantum>");
+                        _StdOut.advanceLine();
+                        _StdOut.putText("set the Round Robin Quantum");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -490,6 +554,7 @@ module TSOS {
                 }
 
                 let isSetup = _Scheduler.setupProcess(memList);
+                console.log("we did the stuffystuff");
                 if(!isSetup){
                     _StdOut.putText("File could not be loaded. No availible room in memory.");
                     _StdOut.advanceLine();
@@ -548,6 +613,61 @@ module TSOS {
             
             
        }
+
+      public shellClearMem(){
+          
+      }
+
+    public shRunAll(){
+        const resPids = _Scheduler.residentSet.keys();
+        for(let key of resPids){
+            _Scheduler.runProcess(key);
+            _StdOut.putText("Process"+ key + "has started.");
+            _StdOut.advanceLine();
+        }
+    }
+    public shPs(){
+        _StdOut.putText("PID STATE");
+        _StdOut.putText(`${_Scheduler.runningPID} | RUNNING`);
+        let qCopy = _Scheduler.readyQueue.q;
+        for(let i = 0;i<qCopy.length; i++){
+            switch(qCopy[i].state){
+                case WAITING:
+                    _StdOut.putText(`${qCopy[i].pid} | WAITING IN READY QUEUE`);
+                    _StdOut.advanceLine();
+                    break;
+                case TERMINATED:
+                    _StdOut.putText(`${qCopy[i].pid} | TERMINATED IN READY QUEUE`);
+                    _StdOut.advanceLine();
+                    break;
+                default:
+                    _StdOut.putText(`${qCopy[i].pid} | UNDEF IN READY QUEUE`);
+                    _StdOut.advanceLine();
+            }
+        }
+        let rKeys = _Scheduler.residentSet.keys();
+        for(let key of rKeys){
+            _StdOut.putText(`${key} | RESIDENT IN RES LIST`);
+            _StdOut.advanceLine();
+        }
+    }
+    public shKill(){
+
+    }
+    public shKillAll(){
+
+    }
+    public shQuant(quantum: string[]){
+        const nQuant = parseInt(quantum[0]);
+        if(nQuant > 0){
+            _Scheduler.quantum = nQuant;
+            _StdOut.putText("Quantum for RR has been updated to " + nQuant + " cycles.");
+            _StdOut.advanceLine();
+        }else{
+            _StdOut.putText("Invalid quantum. Please use an integer value greater than zero.");
+            _StdOut.advanceLine();
+        }
+    }
 
     }
 }

@@ -20,7 +20,7 @@ module TSOS{
             this.yReg  = "00";
             this.zFlag = "00";
             this.state = RESIDENT;
-            this.IR    = _MemoryManager.getMemoryStrict(base,pid);
+            this.IR    = _MemoryManager.getMemoryStrict(0,pid);
         }
     }
 }
