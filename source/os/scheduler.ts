@@ -88,6 +88,48 @@ module TSOS{
            // this.rrSync();
         }
 
+        public termRunningProc(pid: number): void{
+            let pCount = 0;
+            let found = false;
+            if(pid == this.runningPID){
+                _Dispatcher.remPcb();
+                _Kernel.updateProcViewer();
+                _StdOut.putText(`Process with pid ${pid} has been killed.`);
+                _StdOut.advanceLine();
+                return;
+            }
+
+            while(!found){
+                if(pCount >= _Scheduler.readyQueue.getSize()){
+                    _StdOut.putText("Could not find a running process with PID "+ pid);
+                    _StdOut.advanceLine();
+                    return;
+                }
+                let tPcb = _Scheduler.readyQueue.dequeue();
+                if(tPcb.pid == pid){
+                    tPcb.state = TERMINATED;
+                    _Scheduler.readyQueue.enqueue(tPcb);
+                    found = true;
+                    let seg = _MemoryManager.segAllocStatus.indexOf(pid);
+                     _MemoryManager.segAllocStatus[seg] = NOT_ALLOCATED;
+                     _StdOut.putText(`Process with pid ${pid} has been killed.`);
+                     _StdOut.advanceLine();
+                     return ;
+                }else{
+                    pCount++;
+                    _Scheduler.readyQueue.enqueue(tPcb);
+                }
+            }
+
+
+
+            for(let i = 0;i< _Scheduler.readyQueue.q.length;i++){
+                if(_Scheduler.readyQueue.q[i].pid == pid && _Scheduler.readyQueue.q[i].state != TERMINATED ){
+                   
+                }
+            }
+        }
+
         public recessDuty(): void{ // keeping track of the round robin scheduling
            // console.log("recTime");
             if(this.procTime.has(this.runningPID)){

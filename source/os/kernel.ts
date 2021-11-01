@@ -147,8 +147,7 @@ module TSOS {
                     _OsShell.putPrompt();
                     break;
                 case KILL_PROC_IRQ:
-                    _Scheduler.termProc(params[0]);
-                    _Scheduler.rrSync();
+                    _Scheduler.termRunningProc(params[0]);
                     this.updateProcViewer();
                     _StdOut.advanceLine();
                     _StdOut.putText(`Program with pid ${params[0]} has been stopped`);

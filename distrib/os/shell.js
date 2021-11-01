@@ -535,7 +535,26 @@ var TSOS;
                 _StdOut.advanceLine();
             }
         }
-        shKill() {
+        shKill(pid) {
+            let rPid = parseInt(pid[0]);
+            if (rPid > _Scheduler.pid) {
+                _StdOut.putText("Could not find process with PID " + rPid);
+                _StdOut.advanceLine();
+                return;
+            }
+            let foundIt = false;
+            for (let i = 0; i < _Scheduler.readyQueue.q.length; i++) {
+                if (_Scheduler.readyQueue.q[i].pid == rPid && _Scheduler.readyQueue.q[i].state != TERMINATED) {
+                    _KernelInterruptQueue.enqueue(new TSOS.Interrupt(KILL_PROC_IRQ, [rPid]));
+                    foundIt = true;
+                    return;
+                }
+            }
+            if (!foundIt) {
+                _StdOut.putText("Could not find a running process with PID " + rPid);
+                _StdOut.advanceLine();
+                return;
+            }
         }
         shKillAll() {
         }
