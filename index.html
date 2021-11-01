@@ -141,37 +141,62 @@
       </div>
       <div class="row">
          <div id="divUserProgramInput" class="col-6">
-            <label>
-               User Program Input
-               <br>
-               <textarea name="taProgramInput" id="taProgramInput" rows="8" cols="48"></textarea>
-            </label>
-         </div>
-         <div class="col-3">
-            <table class"card" id="procVals">
-               <thead class="card-header">
-                  <tr>
+            <div class="row">
+               <label>
+                  User Program Input
+                  <br>
+                  <textarea name="taProgramInput" id="taProgramInput" rows="8" cols="48"></textarea>
+               </label>
+            </div>
+            <div class="row">
+               <table class="card" id="pcbTable">
+                  <thead class="card-header">
+                     <th scope="col">PID</th>
+                     <th scope="col">SEG</th>
                      <th scope="col">PC</th>
                      <th scope="col">IR</th>
                      <th scope="col">ACC</th>
                      <th scope="col">X</th>
                      <th scope="col">Y</th>
                      <th scope="col">Z</th>
-                  </tr>
-               </thead>
-               <tbody class="card-body">
-                  <tr>
-                     <td id="PC">00</td>
-                     <td id="IR">00</td>
-                     <td id="ACC">00</td>
-                     <td id="xReg">00</td>
-                     <td id="yReg">00</td>
-                     <td id="zFlg">00</td>
+                     <th scope="col">STATE</th>
+                  </thead>
 
-                  </tr>
+               </table>
+            </div>
+         </div>
+         <div class="col-3" style="margin-left:-50px">
+            <div class="row">
+               <table class="card col-12" id="procVals">
+                  <thead class="card-header">
+                     <tr>
+                        <th scope="col">PC</th>
+                        <th scope="col">IR</th>
+                        <th scope="col">ACC</th>
+                        <th scope="col">X</th>
+                        <th scope="col">Y</th>
+                        <th scope="col">Z</th>
+                     </tr>
+                  </thead>
+                  <tbody class="card-body">
+                     <tr>
+                        <td id="PC">00</td>
+                        <td id="IR">00</td>
+                        <td id="ACC">00</td>
+                        <td id="xReg">00</td>
+                        <td id="yReg">00</td>
+                        <td id="zFlg">00</td>
 
-               </tbody>
-            </table>
+                     </tr>
+
+                  </tbody>
+               </table>
+            </div>
+            <div class="row">
+
+
+            </div>
+
          </div>
          <div class="col-3">
 

@@ -82,7 +82,7 @@ module TSOS{
             return _MemoryAccessor.readByteStrict(addr16,pid);
         } 
         public getMemoryPerSeg(addr16,seg): string{
-            console.log("###"+seg);
+            // console.log("###"+seg);
             return _MemoryAccessor.readByteBySegment(addr16,seg);
         }
     }

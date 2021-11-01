@@ -443,9 +443,6 @@ var TSOS;
                             document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.fontWeight = "normal";
                             document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.color = "black";
                             realMemInd++;
-                            if (typeof (memList[realMemInd]) === 'undefined') {
-                                console.log(realMemInd + " apparently has no value");
-                            }
                         }
                     }
                     realMemInd = 0;
@@ -456,9 +453,6 @@ var TSOS;
                             document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.fontWeight = "normal";
                             document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.color = "black";
                             realMemInd++;
-                            if (typeof (memList[realMemInd]) === 'undefined') {
-                                console.log(realMemInd + " apparently has no value");
-                            }
                         }
                     }
                     realMemInd = 0;
@@ -469,9 +463,6 @@ var TSOS;
                             document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.fontWeight = "normal";
                             document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.color = "black";
                             realMemInd++;
-                            if (typeof (memList[realMemInd]) === 'undefined') {
-                                console.log(realMemInd + " apparently has no value");
-                            }
                         }
                     }
                     _StdOut.putText("File loaded. Machine code is valid hex of an acceptable length.");

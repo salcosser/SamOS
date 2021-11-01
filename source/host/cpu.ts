@@ -50,7 +50,7 @@ module TSOS {
 
             // the fetch part of the cycle
             _CPU.IR = _MemoryAccessor.readByte(_CPU.PC).toUpperCase(); // normalizing the IR in case memory was not updated in upper case
-            console.log("cnt: "+ ++this.cnt + " | instruction: " + this.IR + " | pc "+ this.PC + " | acc:" + this.Acc + " | y:" + this.Yreg + " | x:" + this.Xreg + " | z:" + this.Zflag);
+            console.log("pid "+ _Scheduler.runningPID+"| cnt: "+ ++this.cnt + " | instruction: " + this.IR + " | pc "+ this.PC + " | acc:" + this.Acc + " | y:" + this.Yreg + " | x:" + this.Xreg + " | z:" + this.Zflag);
             switch(this.IR){ // the decode part of the cycle
                 case "A9":
                     this.loadConst();
@@ -118,6 +118,9 @@ module TSOS {
            
            let constAddr16 = (parseInt((this.PC),16) + 1).toString(16);
            this.Acc = _MemoryAccessor.readByte(constAddr16).toUpperCase();
+           if(this.Acc == "FF"){
+            throw "OUT OF RANGE ERROR";
+           }
            _CPU.incProgCnt();
            _CPU.incProgCnt();
         } 
@@ -273,18 +276,6 @@ module TSOS {
             }
             _CPU.incProgCnt();
         }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

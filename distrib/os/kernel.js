@@ -77,6 +77,7 @@ var TSOS;
                 _CPU.cycle();
                 this.updatePCBInfo();
                 this.updateMemViewer();
+                this.updateProcViewer();
             }
             else { // If there are no interrupts and there is nothing being executed then just be idle.
                 this.krnTrace("Idle");
@@ -113,6 +114,8 @@ var TSOS;
                     break;
                 case END_PROC_IRQ:
                     _Scheduler.termProc(params[0]);
+                    _Scheduler.rrSync();
+                    this.updateProcViewer();
                     _StdOut.advanceLine();
                     _StdOut.putText(`Program with pid ${params[0]} has ended`);
                     _StdOut.advanceLine();
@@ -120,6 +123,8 @@ var TSOS;
                     break;
                 case KILL_PROC_IRQ:
                     _Scheduler.termProc(params[0]);
+                    _Scheduler.rrSync();
+                    this.updateProcViewer();
                     _StdOut.advanceLine();
                     _StdOut.putText(`Program with pid ${params[0]} has been stopped`);
                     _StdOut.advanceLine();
@@ -141,6 +146,8 @@ var TSOS;
                     break;
                 case FINISHED_PROC_QUEUE:
                     _CPU.isExecuting = false;
+                    this.updateProcViewer();
+                    _Scheduler.runningPID = -1;
                     _StdOut.putText("All processes have completed.");
                     _StdOut.advanceLine();
                     break;
@@ -204,14 +211,15 @@ var TSOS;
         }
         // used to update the memory viewer, as well as give an idea of where the program is in processing
         updateMemViewer() {
-            var realMemInd = 0;
+            let actualLocation = (parseInt(_CPU.PC, 16) + ((_MemoryManager.segAllocStatus.indexOf(_Scheduler.runningPID)) * 256)).toString(16);
+            let realMemInd = 0;
             for (let i = 0; i < 32; i++) {
                 for (let j = 1; j <= 8; j++) {
-                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].innerHTML = _MemoryManager.getMemory(realMemInd.toString(16)).toString(16).toUpperCase();
+                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].innerHTML = _MemoryManager.getMemoryPerSeg(realMemInd.toString(16), 0).toString(16);
+                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.backgroundColor = "lightgray";
                     document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.fontWeight = "normal";
                     document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.color = "black";
-                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.backgroundColor = "lightgray";
-                    if (realMemInd.toString(16).toUpperCase() == _CPU.PC) {
+                    if (realMemInd.toString(16).toUpperCase() == actualLocation) {
                         document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.fontWeight = "bold";
                         document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.color = "lightgreen";
                         document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.backgroundColor = "black";
@@ -219,6 +227,131 @@ var TSOS;
                     realMemInd++;
                 }
             }
+            realMemInd = 0;
+            for (let i = 32; i < 64; i++) {
+                for (let j = 1; j <= 8; j++) {
+                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].innerHTML = _MemoryManager.getMemoryPerSeg(realMemInd.toString(16), 1).toString(16);
+                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.backgroundColor = "lightgray";
+                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.fontWeight = "normal";
+                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.color = "black";
+                    if (realMemInd.toString(16).toUpperCase() == actualLocation) {
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.fontWeight = "bold";
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.color = "lightgreen";
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.backgroundColor = "black";
+                    }
+                    realMemInd++;
+                }
+            }
+            realMemInd = 0;
+            for (let i = 64; i < 96; i++) {
+                for (let j = 1; j <= 8; j++) {
+                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].innerHTML = _MemoryManager.getMemoryPerSeg(realMemInd.toString(16), 2).toString(16);
+                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.backgroundColor = "lightgray";
+                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.fontWeight = "normal";
+                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.color = "black";
+                    if (realMemInd.toString(16).toUpperCase() == actualLocation) {
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.fontWeight = "bold";
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.color = "lightgreen";
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.backgroundColor = "black";
+                    }
+                    realMemInd++;
+                }
+            }
+        }
+        updateProcViewer() {
+            let rTable = document.getElementById("pcbTable");
+            while (rTable.rows.length > 1) {
+                rTable.rows[rTable.rows.length - 1].remove();
+            }
+            if (_Scheduler.runningPID != -1 && _Scheduler.readyQueue.getSize() >= 1) {
+                let rRow = rTable.insertRow(-1);
+                for (let i = 0; i < 9; i++) {
+                    rRow.insertCell(i);
+                }
+                rRow.cells[0].innerHTML = _Scheduler.runningPID;
+                rRow.cells[1].innerHTML = _MemoryManager.segAllocStatus.indexOf(_Scheduler.runningPID);
+                rRow.cells[2].innerHTML = _CPU.PC;
+                rRow.cells[3].innerHTML = _CPU.IR;
+                rRow.cells[4].innerHTML = _CPU.Acc;
+                rRow.cells[5].innerHTML = _CPU.Xreg;
+                rRow.cells[6].innerHTML = _CPU.Yreg;
+                rRow.cells[7].innerHTML = _CPU.Zflag;
+                rRow.cells[8].innerHTML = "Running";
+            }
+            for (let pcb of _Scheduler.readyQueue.q) {
+                let table = document.getElementById("pcbTable");
+                let row = table.insertRow(-1);
+                for (let i = 0; i < 9; i++) {
+                    row.insertCell(i);
+                }
+                row.cells[0].innerHTML = pcb.pid;
+                row.cells[1].innerHTML = _MemoryManager.segAllocStatus.indexOf(pcb.pid);
+                row.cells[2].innerHTML = pcb.PC;
+                row.cells[3].innerHTML = pcb.IR;
+                row.cells[4].innerHTML = pcb.Acc;
+                row.cells[5].innerHTML = pcb.xReg;
+                row.cells[6].innerHTML = pcb.yReg;
+                row.cells[7].innerHTML = pcb.zFlag;
+                let state = "Ready";
+                switch (pcb.state) {
+                    case RESIDENT:
+                        state = "Resident";
+                        break;
+                    case READY:
+                        state = "Ready";
+                        break;
+                    case RUNNING:
+                        state = "Running";
+                        break;
+                    case WAITING:
+                        state = "Waiting";
+                        break;
+                    case TERMINATED:
+                        state = "Terminated";
+                        break;
+                    default:
+                    //
+                }
+                row.cells[8].innerHTML = state;
+            }
+            for (let nPcb of _Scheduler.residentSet.keys()) {
+                let pcb = _Scheduler.residentSet.get(nPcb);
+                let table = document.getElementById("pcbTable");
+                let row = table.insertRow(-1);
+                for (let i = 0; i < 9; i++) {
+                    row.insertCell(i);
+                }
+                row.cells[0].innerHTML = pcb.pid;
+                row.cells[1].innerHTML = "";
+                row.cells[2].innerHTML = pcb.PC;
+                row.cells[3].innerHTML = pcb.IR;
+                row.cells[4].innerHTML = pcb.Acc;
+                row.cells[5].innerHTML = pcb.xReg;
+                row.cells[6].innerHTML = pcb.yReg;
+                row.cells[7].innerHTML = pcb.zFlag;
+                let state = "Ready";
+                switch (pcb.state) {
+                    case RESIDENT:
+                        state = "Resident";
+                        break;
+                    case READY:
+                        state = "Ready";
+                        break;
+                    case RUNNING:
+                        state = "Running";
+                        break;
+                    case WAITING:
+                        state = "Waiting";
+                        break;
+                    case TERMINATED:
+                        state = "Terminated";
+                        break;
+                    default:
+                    //
+                }
+                row.cells[8].innerHTML = state;
+            }
+            //pcbTable
         }
         krnTrapError(msg) {
             TSOS.Control.hostLog("OS ERROR - TRAP: " + msg);

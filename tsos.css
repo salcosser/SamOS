@@ -51,11 +51,26 @@ h3 {
 .card{
   background-color:darkslategray !important;
   border: 1px solid #7ebdc2 !important;
+  color:#efe6dd;
 }
 #procVals{
   border:2px solid #7ebdc2;
   background-color: #efe6dd;
-  color: #231f20;
+  color: #efe6dd;
+  padding: 0px;
+  display:flex;
+  display: flex;
+	/* min-height: 100vh; */
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+  font-size: 2vh;
+  width:50vw;
+}
+#procVals .card-header{
+  align-content: flex;
+  text-align:center;
+  font-size:2.1vh;
 }
 th ,td{
   padding: 5px;
