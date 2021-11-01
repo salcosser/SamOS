@@ -69,7 +69,7 @@ module TSOS{
             }
             // console.log(_Scheduler.readyQueue.getSize() + ":>> size of ready queue now.");
             this.residentSet.delete(parseInt(pid));
-            _StdOut.putText(`PID ${pid[0]} has started.`);
+           // _StdOut.putText(`PID ${pid[0]} has started.`);
             _StdOut.advanceLine();
             _Kernel.updateProcViewer();
         }
@@ -93,6 +93,8 @@ module TSOS{
             let found = false;
             if(pid == this.runningPID){
                 _Dispatcher.remPcb();
+                let seg = _MemoryManager.segAllocStatus.indexOf(pid);
+                _MemoryManager.segAllocStatus[seg] = NOT_ALLOCATED;
                 _Kernel.updateProcViewer();
                 _StdOut.putText(`Process with pid ${pid} has been killed.`);
                 _StdOut.advanceLine();

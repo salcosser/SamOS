@@ -707,7 +707,19 @@ module TSOS {
        
     }
     public shKillAll(){
-
+        for(let i = 0;i< _Scheduler.readyQueue.q.length;i++){
+            if(_Scheduler.readyQueue.q[i].state != TERMINATED ){
+                let tPcb =  _Scheduler.readyQueue.q[i];
+                _KernelInterruptQueue.enqueue(new Interrupt(KILL_PROC_IRQ, [tPcb.pid])); 
+                
+            }
+        }
+        if(_Scheduler.runningPID != -1){
+            _KernelInterruptQueue.enqueue(new Interrupt(KILL_PROC_IRQ, [_Scheduler.runningPID])); 
+        }
+        _StdOut.putText("All running processes have been killed.");
+        _StdOut.advanceLine();
+        return;
     }
     public shQuant(quantum: string[]){
         const nQuant = parseInt(quantum[0]);
