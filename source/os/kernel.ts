@@ -89,11 +89,13 @@ module TSOS {
                 var interrupt = _KernelInterruptQueue.dequeue();
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             } else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is anything being processed.
+                _Mode = 0;
                 _Scheduler.recessDuty();
                if(_CPU.isExecuting){ // did anything change?
+                 _Mode = 1;
                  _CPU.cycle();
                }
-                
+                _Mode = 0;
                 this.updatePCBInfo();
                 this.updateMemViewer();
                 this.updateProcViewer();
@@ -307,7 +309,7 @@ module TSOS {
 
             public updateProcViewer(): void{
                 let pcbSet = new Map();
-                let rTable = document.getElementById("pcbTable");
+                let rTable = document.getElementById("pcbTable") as HTMLTableElement;
                     while(rTable.rows.length > 1){
                         rTable.rows[rTable.rows.length -1].remove();
                     }

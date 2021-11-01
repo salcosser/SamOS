@@ -137,6 +137,7 @@ var TSOS;
         }
         // Note: args is an optional parameter, ergo the ? which allows TypeScript to understand that.
         execute(fn, args) {
+            _Mode = 1;
             // We just got a command, so advance the line...
             _StdOut.advanceLine();
             // ... call the command function passing in the args with some über-cool functional programming ...
@@ -147,6 +148,7 @@ var TSOS;
             }
             // ... and finally write the prompt again.
             this.putPrompt();
+            _Mode = 0;
         }
         parseInput(buffer) {
             var retVal = new TSOS.UserCommand();
@@ -502,6 +504,11 @@ var TSOS;
         }
         shRunAll() {
             const resPids = _Scheduler.residentSet.keys();
+            // if(Array.from(resPids).length == 0){
+            //     _StdOut.putText("Nothing to run.");
+            //     _StdOut.advanceLine();
+            //     return;
+            // }
             for (let key of resPids) {
                 _Scheduler.runProcess(key);
                 _StdOut.putText("Process" + key + "has started.");

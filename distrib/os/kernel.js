@@ -73,10 +73,13 @@ var TSOS;
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             }
             else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is anything being processed.
+                _Mode = 0;
                 _Scheduler.recessDuty();
                 if (_CPU.isExecuting) { // did anything change?
+                    _Mode = 1;
                     _CPU.cycle();
                 }
+                _Mode = 0;
                 this.updatePCBInfo();
                 this.updateMemViewer();
                 this.updateProcViewer();
