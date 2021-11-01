@@ -138,7 +138,7 @@ module TSOS{
                 let cQuantVal = this.procTime.get(this.runningPID);
                 // console.log("I got in here");
 
-                if(this.procTime.get(this.runningPID) == this.quantum-1){
+                if(this.procTime.get(this.runningPID) >= this.quantum-1){
                    //finding if there is something to switch to
                     if(this.readyQueue.getSize() > 1){
                         let foundNewProc = false;
