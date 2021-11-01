@@ -39,10 +39,12 @@ var TSOS;
         }
         fetchDecodeExecute() {
             // the fetch part of the cycle
+            // console.log("about to pass "+ _CPU.PC);
             _CPU.IR = _MemoryAccessor.readByte(_CPU.PC).toUpperCase(); // normalizing the IR in case memory was not updated in upper case
-            console.log("pid " + _Scheduler.runningPID + "| cnt: " + ++this.cnt + " | instruction: " + this.IR + " | pc " + this.PC + " | acc:" + this.Acc + " | y:" + this.Yreg + " | x:" + this.Xreg + " | z:" + this.Zflag);
+            //  console.log("pid "+ _Scheduler.runningPID+"| cnt: "+ ++this.cnt + " | instruction: " + this.IR + " | pc "+ this.PC + " | acc:" + this.Acc + " | y:" + this.Yreg + " | x:" + this.Xreg + " | z:" + this.Zflag);
             switch (this.IR) { // the decode part of the cycle
                 case "A9":
+                    // console.log("33333");
                     this.loadConst();
                     break;
                 case "AD":
@@ -99,6 +101,7 @@ var TSOS;
         //loads a constant into the accumulator
         loadConst() {
             let constAddr16 = (parseInt((this.PC), 16) + 1).toString(16);
+            // console.log("looking for"+ constAddr16 );
             this.Acc = _MemoryAccessor.readByte(constAddr16).toUpperCase();
             if (this.Acc == "FF") {
                 throw "OUT OF RANGE ERROR";
@@ -179,17 +182,17 @@ var TSOS;
             if (this.Zflag === "00") {
                 this.incProgCnt();
                 this.PC = (parseInt(this.PC, 16) + bytes).toString(16);
-                if (parseInt(this.PC, 16) > MEM_LIMIT - 1) {
-                    let rem = parseInt(this.PC, 16) % (MEM_LIMIT - 1);
+                if (parseInt(this.PC, 16) > (MEM_LIMIT / 3) - 1) {
+                    let rem = parseInt(this.PC, 16) % ((MEM_LIMIT / 3) - 1);
                     this.PC = rem.toString(16);
                 }
                 else {
                     this.incProgCnt();
                 }
-                console.log("Branched " + bytes + " bytes to " + this.PC);
+                // console.log("Branched " +bytes+ " bytes to " + this.PC);
             }
             else {
-                console.log("skipped branch");
+                // console.log("skipped branch");
                 _CPU.incProgCnt();
                 _CPU.incProgCnt();
             }
@@ -217,6 +220,7 @@ var TSOS;
         }
         // tells the kernel to end execution
         break() {
+            console.log(`End of pid ${_Scheduler.runningPID}`);
             _KernelInterruptQueue.enqueue(new TSOS.Interrupt(END_PROC_IRQ, [_Scheduler.runningPID]));
         }
     }

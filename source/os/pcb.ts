@@ -14,13 +14,13 @@ module TSOS{
             this.base  = base;// both to be updated in the future
             this.limit = limit;
             this.pid   = pid;
-            this.PC    = base;
+            this.PC    = "00";
             this.Acc   = "00";
             this.xReg  = "00";
             this.yReg  = "00";
             this.zFlag = "00";
             this.state = RESIDENT;
-            this.IR    = _MemoryManager.getMemoryStrict(0,pid);
+            this.IR    = _MemoryManager.getMemoryPerSeg(0,(base / 256));
         }
     }
 }

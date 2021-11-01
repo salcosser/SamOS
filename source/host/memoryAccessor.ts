@@ -27,7 +27,7 @@ module TSOS{
 
        public writeByteStrict(addr, data, segment): void{
         let offset = (segment * 256);
-        console.log(`we got segment ${segment} tp work with`);
+        // console.log(`we got segment ${segment} tp work with`);
         let physAddr = parseInt(addr, 16) + offset;
            let deviation = physAddr - offset;
            if(deviation  > 255 || deviation < 0){
@@ -42,10 +42,12 @@ module TSOS{
        public readByte(addr16): string{ // takes in hex, but uses base 10 in the actual memory
         try{
             let cSeg = _MemoryManager.segAllocStatus.indexOf(_Scheduler.runningPID);
-            console.log("1seg"+cSeg);
+            // console.log("1seg"+cSeg);
             let offset = (cSeg * 256);
+            // console.log("offset "+ offset);
+            // console.log("add"+ parseInt(addr16,16));
            let physAddr = parseInt(addr16, 16) + offset;
-           console.log("PA:"+ physAddr);
+           // console.log("PA:"+ physAddr);
                let deviation = physAddr - offset;
                if(deviation  > 255 || deviation < 0){
                 _KernelInterruptQueue.enqueue(new Interrupt(MEM_BOUNDS_ERR_R, [_Scheduler.runningPID, physAddr, deviation]));
@@ -60,19 +62,21 @@ module TSOS{
                 return res.toString(16);
             }
         }catch(err){
-            console.log("An error has occured");
-            console.log(err.message);
+            // console.log("An error has occured");
+            // console.log(err.message);
         }
       
        }
 
        public readByteStrict(addr16, pid): string{
+           // console.log("pid passed "+ pid);
         let cSeg = _MemoryManager.segAllocStatus.indexOf(pid);
-    //    console.log("2seg"+cSeg);
+    //    // console.log("2seg"+cSeg);
         let offset = (cSeg * 256);
+        // console.log("offe "+ offset);
        let physAddr = parseInt(addr16, 16) + offset;
-    //    console.log("trying to get" +parseInt(addr16,16));
-    //    console.log("PA:"+ physAddr);
+    //    // console.log("trying to get" +parseInt(addr16,16));
+    //    // console.log("PA:"+ physAddr);
            let deviation = physAddr - offset;
            if(deviation  > 255 || deviation < 0){
             _KernelInterruptQueue.enqueue(new Interrupt(MEM_BOUNDS_ERR_R, [_Scheduler.runningPID, physAddr, deviation]));
@@ -88,11 +92,11 @@ module TSOS{
        
        public readByteBySegment(addr16,seg): string{
         
-   //     console.log("2seg"+seg);
+   //     // console.log("2seg"+seg);
         let offset = (seg * 256);
        let physAddr = parseInt(addr16, 16) + offset;
-    //   console.log("trying to get" +parseInt(addr16,16));
-    //   console.log("PA:"+ physAddr);
+    //   // console.log("trying to get" +parseInt(addr16,16));
+    //   // console.log("PA:"+ physAddr);
            let deviation = physAddr - offset;
            if(deviation  > 255 || deviation < 0){
             _KernelInterruptQueue.enqueue(new Interrupt(MEM_BOUNDS_ERR_R, [_Scheduler.runningPID, physAddr, deviation]));

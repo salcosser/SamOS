@@ -41,7 +41,7 @@ module TSOS{
             }
             // let nSpot = _MemoryManager.segAllocStatus.indexOf(ALLOC_AWAITING_PID);
              _MemoryManager.segAllocStatus[loadedSeg] = _Scheduler.pid;
-            console.log(`I assigned ${this.pid} to seg ${loadedSeg}: proof- seg:${_MemoryManager.segAllocStatus[loadedSeg]}`);
+           // // console.log(`I assigned ${this.pid} to seg ${loadedSeg}: proof- seg:${_MemoryManager.segAllocStatus[loadedSeg]}`);
             let base = (loadedSeg * 256);
             let memEnd = (inputCode.length).toString(16);
             let newPcb = new PCB(_Scheduler.pid,base, base+ 255);
@@ -67,35 +67,32 @@ module TSOS{
                _StdOut.putText("PCB with PID of " + pid + " was not found in the resident queue.");
                 return;
             }
-            console.log(_Scheduler.readyQueue.getSize() + ":>> size of ready queue now.");
+            // console.log(_Scheduler.readyQueue.getSize() + ":>> size of ready queue now.");
             this.residentSet.delete(parseInt(pid));
             _StdOut.putText(`PID ${pid[0]} has started.`);
             _StdOut.advanceLine();
-            
+            _Kernel.updateProcViewer();
         }
 
         public termProc(pid: number){
             let seg = _MemoryManager.segAllocStatus.indexOf(pid);
             let tempPcb = new PCB(pid, seg*255, (seg+1)*255);
+            tempPcb.state = TERMINATED;
             _MemoryManager.segAllocStatus[seg] = NOT_ALLOCATED;
-            console.log(`Mm seg ${seg} set to ${_MemoryManager.segAllocStatus[seg]}`);
-             tempPcb.PC = _CPU.PC;
-             tempPcb.IR = _CPU.IR;
-             tempPcb.xReg = _CPU.Xreg;
-             tempPcb.yReg = _CPU.Yreg;
-             tempPcb.zFlag    = _CPU.Zflag;
-             tempPcb.Acc = _CPU.Acc;
-             tempPcb.state = TERMINATED;
-             _Scheduler.readyQueue.enqueue(tempPcb);
-            console.log("lets see if theres anything else");
+            // console.log(`Mm seg ${seg} set to ${_MemoryManager.segAllocStatus[seg]}`);
+            _Dispatcher.remPcb();
+            //_Scheduler.readyQueue.enqueue(tempPcb);
+             _Kernel.updateProcViewer();
+             console.log("terminating a thing" + pid);
+            // console.log("lets see if theres anything else");
            // this.rrSync();
         }
 
         public recessDuty(): void{ // keeping track of the round robin scheduling
-           console.log("recTime");
+           // console.log("recTime");
             if(this.procTime.has(this.runningPID)){
                 let cQuantVal = this.procTime.get(this.runningPID);
-                console.log("I got in here");
+                // console.log("I got in here");
 
                 if(this.procTime.get(this.runningPID) == this.quantum-1){
                    //finding if there is something to switch to
@@ -105,18 +102,17 @@ module TSOS{
                         while(!foundNewProc){
                             let tProc = this.readyQueue.dequeue();
                             if(tProc.state == READY || tProc.state == WAITING){
+                                console.log("in here");
+                                this.procTime.set(this.runningPID,0);
                                 _Dispatcher.contextSwitch(tProc);
                                 tProc.state = RUNNING;
-                                if(this.procTime.has(this.runningPID)){
-                                    let nQuantVal = this.procTime.get(this.runningPID);
-                                    this.procTime.set(this.runningPID, ++nQuantVal);
-                                    break;
-                                }else{
-                                    this.procTime.set(this.runningPID,1);
-                                    break;
-                                }
-                            }else if(++procCount == this.readyQueue.getSize()){
-                                _KernelInterruptQueue.enqueue(new Interrupt(FINISHED_PROC_QUEUE, [_Scheduler.runningPID]));
+                                this.procTime.set(this.runningPID, 0);
+                                break;
+                            }else if(procCount == this.readyQueue.getSize()+1){
+                                this.procTime.set(this.runningPID, 0);
+                              //  console.log("beep boop should be 3: "+ procCount);
+                                 this.readyQueue.enqueue(tProc);
+                              //  _KernelInterruptQueue.enqueue(new Interrupt(FINISHED_PROC_QUEUE, [_Scheduler.runningPID]));
                                 break;                         
                             }else{
                                 this.readyQueue.enqueue(tProc);
@@ -149,14 +145,21 @@ module TSOS{
                     let tProc = _Scheduler.readyQueue.dequeue();
                     if(tProc.state == READY || tProc.state == WAITING){
                         let newProc = tProc;
-                        console.log("switching to "+ newProc.pid);
+                        // console.log("switching to "+ newProc.pid);
                         _Dispatcher.contextSwitch(newProc);
-                        console.log("Current PID is now: "+ this.runningPID);
+                        console.log("PID is now"+ this.runningPID);
+                        console.log("doing this now");
+                        // console.log("Current PID is now: "+ this.runningPID);
                         foundReady = true;
                        // this.recessDuty();
                        
                     }else{
-                        if(++procCount >= this.readyQueue.getSize()){
+                        procCount++;
+                        console.log("33k33k33");
+                        if(procCount >= this.readyQueue.getSize()+1){
+                            console.log("I checked" + procCount);
+                            _Scheduler.readyQueue.enqueue(tProc);
+                            _CPU.isExecuting = false;
                             _KernelInterruptQueue.enqueue(new Interrupt(FINISHED_PROC_QUEUE, [_Scheduler.runningPID]));
                             break;
                         }

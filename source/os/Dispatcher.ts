@@ -41,5 +41,24 @@ module TSOS{
             }
              
          }
+        public remPcb(): void{
+            if(_Scheduler.runningPID != -1){
+                _CPU.isExecuting = false;
+                let tempPcb = new PCB(_Scheduler.runningPID, _CurrentSeg*255, (_CurrentSeg+1)*255);
+                tempPcb.PC = _CPU.PC;
+                tempPcb.IR = _CPU.IR;
+                tempPcb.xReg = _CPU.Xreg;
+                tempPcb.yReg = _CPU.Yreg;
+                tempPcb.zFlag    = _CPU.Zflag;
+                tempPcb.Acc = _CPU.Acc;
+                tempPcb.state = TERMINATED;
+                _Scheduler.readyQueue.enqueue(tempPcb);
+                console.log("sched now has "+ _Scheduler.readyQueue.getSize() + "procs");
+                _Scheduler.runningPID = -1;
+                _CPU.isExecuting = true;
+        }else{
+            console.log("this shouldn't happen");
+        }
     }
+}
 }

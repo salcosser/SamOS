@@ -32,7 +32,7 @@ module TSOS{
             if(segment == -1){
                 return -1;
             }
-            console.log("got all the way to here");
+            // console.log("got all the way to here");
             var cAddr10 = 0;
             var cAddr16 = "00";
             for(let i = cAddr10; i< dataList.length;i++){
@@ -73,6 +73,45 @@ module TSOS{
             }
         }
 
+        public safeClearMem(): number[]{
+            let clearedSegs = [];
+            for(let i = 0;i<3;i++){
+                    let tPid = _MemoryManager.segAllocStatus[i];
+                if(tPid == _Scheduler.runningPID){
+                    continue;
+                }
+                else if(tPid != -1 && tPid != -2){
+                    let inQueueInd = -1;
+
+                    for(let n = 0;n<_Scheduler.readyQueue.q.length;n++){
+                        if(_Scheduler.readyQueue.q[n].pid == tPid){
+                            inQueueInd = n;
+                        }
+                    }
+
+                    if((inQueueInd == -1)){ // if the allocated pid is not in the ready queue
+                        clearedSegs[clearedSegs.length] = i;
+                        this.clearMemoryPerSeg(i);
+                        console.log("in111");
+                        
+                        
+                    }else if(inQueueInd != -1){
+                       let tPcb =   _Scheduler.readyQueue.q[inQueueInd];
+                        if(tPcb.state == TERMINATED){   // if its in there but its terminated
+                             clearedSegs[clearedSegs.length] = i;
+                            this.clearMemoryPerSeg(i);
+                            console.log("in222");
+                       
+                        }
+                    }
+                }else{ // if theres nothing in there
+                    clearedSegs[clearedSegs.length] = i;
+                    this.clearMemoryPerSeg(i);
+                    console.log("in333");
+                }
+            }
+            return clearedSegs;
+        }
         
         // really only here so the kernel doesnt directly touch the memory accessor
         public getMemory(addr16): string{
@@ -82,8 +121,14 @@ module TSOS{
             return _MemoryAccessor.readByteStrict(addr16,pid);
         } 
         public getMemoryPerSeg(addr16,seg): string{
-            // console.log("###"+seg);
+            // // console.log("###"+seg);
             return _MemoryAccessor.readByteBySegment(addr16,seg);
+        }
+
+        public clearMemoryPerSeg(seg): void{
+            for(let i = 0;i<256;i++){
+                _MemoryAccessor.writeByteStrict(i.toString(16),"00",seg );
+            }
         }
     }
 }

@@ -90,7 +90,10 @@ module TSOS {
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             } else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is anything being processed.
                 _Scheduler.recessDuty();
-                _CPU.cycle();
+               if(_CPU.isExecuting){ // did anything change?
+                 _CPU.cycle();
+               }
+                
                 this.updatePCBInfo();
                 this.updateMemViewer();
                 this.updateProcViewer();
@@ -136,7 +139,7 @@ module TSOS {
                     break;
                 case END_PROC_IRQ:  
                     _Scheduler.termProc(params[0]);
-                    _Scheduler.rrSync();
+                   // _Scheduler.rrSync();
                     this.updateProcViewer();
                     _StdOut.advanceLine();
                     _StdOut.putText(`Program with pid ${params[0]} has ended`);
@@ -169,11 +172,15 @@ module TSOS {
                     
                     break;
                 case FINISHED_PROC_QUEUE:
+                    console.log("called end processing");
                     _CPU.isExecuting = false;
-                    this.updateProcViewer();
+                    _Kernel.updateProcViewer();
                     _Scheduler.runningPID = -1;
+                    _Kernel.clearCPU();
+                    _Kernel.updatePCBInfo();
                     _StdOut.putText("All processes have completed.");
                     _StdOut.advanceLine();
+                    _OsShell.putPrompt();
                     break;
                 case MEM_BOUNDS_ERR_R:
                     _CPU.isExecuting = false;
@@ -301,85 +308,66 @@ module TSOS {
 
 
             public updateProcViewer(): void{
+                let pcbSet = new Map();
                 let rTable = document.getElementById("pcbTable");
                     while(rTable.rows.length > 1){
                         rTable.rows[rTable.rows.length -1].remove();
                     }
                 if(_Scheduler.runningPID != -1 && _Scheduler.readyQueue.getSize() >= 1){
+                    let rPcb = new Map();
+
+                    rPcb.set("pid", _Scheduler.runningPID);
+                    rPcb.set("seg",_MemoryManager.segAllocStatus.indexOf(_Scheduler.runningPID));
+                    rPcb.set("pc", _CPU.PC);
+                    rPcb.set("ir", _CPU.IR);
+                    rPcb.set("acc", _CPU.Acc);
+                    rPcb.set("xr", _CPU.Xreg);
+                    rPcb.set("yr", _CPU.Yreg);
+                    rPcb.set("zf", _CPU.Zflag);
+                    rPcb.set("st","Running");
                     
-                    let rRow = rTable.insertRow(-1);
+                    pcbSet.set(_Scheduler.runningPID, rPcb);
+
+
+
+                    // let rRow = rTable.insertRow(-1);
         
-                    for(let i = 0;i<9;i++){
-                            rRow.insertCell(i);
-                    }
-                    rRow.cells[0].innerHTML = _Scheduler.runningPID;
-                    rRow.cells[1].innerHTML = _MemoryManager.segAllocStatus.indexOf(_Scheduler.runningPID);
-                    rRow.cells[2].innerHTML = _CPU.PC;
-                    rRow.cells[3].innerHTML = _CPU.IR;
-                    rRow.cells[4].innerHTML = _CPU.Acc;
-                    rRow.cells[5].innerHTML = _CPU.Xreg;
-                    rRow.cells[6].innerHTML = _CPU.Yreg;
-                    rRow.cells[7].innerHTML = _CPU.Zflag;
-                    rRow.cells[8].innerHTML = "Running";
-                   
+                    // for(let i = 0;i<9;i++){
+                    //         rRow.insertCell(i);
+                    // }
+                    // rRow.cells[0].innerHTML = _Scheduler.runningPID;
+                    // rRow.cells[1].innerHTML = _MemoryManager.segAllocStatus.indexOf(_Scheduler.runningPID);
+                    // rRow.cells[2].innerHTML = _CPU.PC;
+                    // rRow.cells[3].innerHTML = _CPU.IR;
+                    // rRow.cells[4].innerHTML = _CPU.Acc;
+                    // rRow.cells[5].innerHTML = _CPU.Xreg;
+                    // rRow.cells[6].innerHTML = _CPU.Yreg;
+                    // rRow.cells[7].innerHTML = _CPU.Zflag;
+                    // rRow.cells[8].innerHTML = "Running";
+                    // rRow.style.backgroundColor = "rgba(230, 114, 100, 0.65)";
                 }
                
                
                 for(let pcb of _Scheduler.readyQueue.q){
-                    let table = document.getElementById("pcbTable");
-                    let row = table.insertRow(-1);
-                    for(let i = 0;i<9;i++){
-                        row.insertCell(i);
+                    // let table = document.getElementById("pcbTable");
+                    // let row = table.insertRow(-1);
+                    // for(let i = 0;i<9;i++){
+                    //     row.insertCell(i);
+                    // }
+                    let rdPcb = new Map();
+                    rdPcb.set("pid",pcb.pid);
+                    if(_MemoryManager.segAllocStatus.indexOf(pcb.pid) != -1){
+                        rdPcb.set("seg",_MemoryManager.segAllocStatus.indexOf(pcb.pid));
+                    }else{
+                        rdPcb.set("seg","N/A");
                     }
-                    row.cells[0].innerHTML = pcb.pid;
-                    row.cells[1].innerHTML = _MemoryManager.segAllocStatus.indexOf(pcb.pid);
-                    row.cells[2].innerHTML = pcb.PC;
-                    row.cells[3].innerHTML = pcb.IR;
-                    row.cells[4].innerHTML = pcb.Acc;
-                    row.cells[5].innerHTML = pcb.xReg;
-                    row.cells[6].innerHTML = pcb.yReg;
-                    row.cells[7].innerHTML = pcb.zFlag;
-                    let state = "Ready";
-                    switch(pcb.state){
-                        case RESIDENT:
-                            state = "Resident";
-                            break;
-                        case READY:
-                            state = "Ready";
-                            break;
-                        case RUNNING:
-                            state = "Running";
-                            break;
-                        case WAITING:
-                            state = "Waiting";
-                            break;
-                        case TERMINATED:
-                            state = "Terminated";
-                            break;
-                        default:
-                            //
-                    }
-    
-    
-                    row.cells[8].innerHTML = state;
                     
-    
-                }
-                for(let nPcb of _Scheduler.residentSet.keys()){
-                    let pcb = _Scheduler.residentSet.get(nPcb);
-                    let table = document.getElementById("pcbTable");
-                    let row = table.insertRow(-1);
-                    for(let i = 0;i<9;i++){
-                        row.insertCell(i);
-                    }
-                    row.cells[0].innerHTML = pcb.pid;
-                    row.cells[1].innerHTML = "";
-                    row.cells[2].innerHTML = pcb.PC;
-                    row.cells[3].innerHTML = pcb.IR;
-                    row.cells[4].innerHTML = pcb.Acc;
-                    row.cells[5].innerHTML = pcb.xReg;
-                    row.cells[6].innerHTML = pcb.yReg;
-                    row.cells[7].innerHTML = pcb.zFlag;
+                    rdPcb.set("pc",pcb.PC);
+                    rdPcb.set("ir",pcb.IR);
+                    rdPcb.set("acc",pcb.Acc);
+                    rdPcb.set("xr",pcb.xReg);
+                    rdPcb.set("yr",pcb.yReg);
+                    rdPcb.set("zf",pcb.zFlag);
                     let state = "Ready";
                     switch(pcb.state){
                         case RESIDENT:
@@ -402,9 +390,36 @@ module TSOS {
                     }
     
     
-                    row.cells[8].innerHTML = state;
-                }
+                    rdPcb.set("st",state);
+                    pcbSet.set(pcb.pid, rdPcb);
     
+                }
+              
+                let keySet = Array.from(pcbSet.keys());
+                keySet.sort();
+
+                for(let key of keySet){
+                    let nRowData = pcbSet.get(key);
+                     let rRow = rTable.insertRow(-1);
+        
+                    for(let i = 0;i<9;i++){
+                            rRow.insertCell(i);
+                    }
+                    rRow.cells[0].innerHTML = nRowData.get("pid");
+                    rRow.cells[1].innerHTML = nRowData.get("seg");
+                    rRow.cells[2].innerHTML = nRowData.get("pc");
+                    rRow.cells[3].innerHTML = nRowData.get("ir");
+                    rRow.cells[4].innerHTML = nRowData.get("acc");
+                    rRow.cells[5].innerHTML = nRowData.get("xr");
+                    rRow.cells[6].innerHTML = nRowData.get("yr");
+                    rRow.cells[7].innerHTML = nRowData.get("zf");
+                    rRow.cells[8].innerHTML = nRowData.get("st");
+                    if(nRowData.get("st") == "Running"){
+                        rRow.style.backgroundColor = "rgba(230, 114, 100, 0.65)";
+                    }
+                   
+                }
+
     
     
     
@@ -417,7 +432,15 @@ module TSOS {
 
 
 
-
+            public clearCPU(): void{
+                    _CPU.PC    = "00";
+                    _CPU.Acc   = "00";
+                    _CPU.Xreg  = "00";
+                    _CPU.Yreg  = "00";
+                    _CPU.IR    = "00";
+                    _CPU.Zflag = "00";
+                    _CPU.isExecuting = false;
+            }
 
 
 

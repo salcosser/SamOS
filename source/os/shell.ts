@@ -554,7 +554,7 @@ module TSOS {
                 }
 
                 let isSetup = _Scheduler.setupProcess(memList);
-                console.log("we did the stuffystuff");
+                // console.log("we did the stuffystuff");
                 if(!isSetup){
                     _StdOut.putText("File could not be loaded. No availible room in memory.");
                     _StdOut.advanceLine();
@@ -638,7 +638,14 @@ module TSOS {
        }
 
       public shellClearMem(){
-          
+          let cleared = _MemoryManager.safeClearMem();
+          _Kernel.updateMemViewer();
+          let resp = "";
+          for(let n of cleared){
+              resp+=  n + ", ";
+          }
+          _StdOut.putText(`cleared segment(s) ${resp} as they were safe to erase.`);
+          _StdOut.advanceLine();
       }
 
     public shRunAll(){
@@ -651,7 +658,9 @@ module TSOS {
     }
     public shPs(){
         _StdOut.putText("PID STATE");
+        _StdOut.advanceLine();
         _StdOut.putText(`${_Scheduler.runningPID} | RUNNING`);
+        _StdOut.advanceLine();
         let qCopy = _Scheduler.readyQueue.q;
         for(let i = 0;i<qCopy.length; i++){
             switch(qCopy[i].state){
