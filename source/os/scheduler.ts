@@ -26,12 +26,12 @@ module TSOS{
         public procTime = new Map();
 
         constructor(){
-           // this.readyQueue = new Queue();
+          
         }
         init(){
             
         }
-        public setupProcess(inputCode): boolean{
+        public setupProcess(inputCode): boolean{ 
             while(inputCode.length < 256){
                 inputCode[inputCode.length] = "00";
             }
@@ -39,16 +39,16 @@ module TSOS{
             if(loadedSeg == -1){
                 return false;
             }
-            // let nSpot = _MemoryManager.segAllocStatus.indexOf(ALLOC_AWAITING_PID);
+           
              _MemoryManager.segAllocStatus[loadedSeg] = _Scheduler.pid;
-           // // console.log(`I assigned ${this.pid} to seg ${loadedSeg}: proof- seg:${_MemoryManager.segAllocStatus[loadedSeg]}`);
+        
             let base = (loadedSeg * 256);
             let memEnd = (inputCode.length).toString(16);
             let newPcb = new PCB(_Scheduler.pid,base, base+ 255);
-           // _MemoryManager.segAllocStatus[loadedSeg] = _Scheduler.pid;
+           
             _StdOut.putText(`Loaded new program, PID ${_Scheduler.pid}`);
             _StdOut.advanceLine();
-            _Scheduler.residentSet.set(_Scheduler.pid, newPcb);
+            _Scheduler.residentSet.set(_Scheduler.pid, newPcb);// not ready yet
             _Scheduler.pid++;
             _Kernel.updateProcViewer();
             return true;
@@ -57,41 +57,40 @@ module TSOS{
         public runProcess(pid): void{
            
             let tempPCB: TSOS.PCB   = _Scheduler.residentSet.get(parseInt(pid));
-            if(tempPCB){
+            if(tempPCB){ // if that pcb is there
                 
                 tempPCB.state = READY;
                 _Scheduler.readyQueue.enqueue(tempPCB);// in later projects, more will be added to this process
                 _CPU.isExecuting = true;
              
-            }else{
+            }else{  // if cant find it
                _StdOut.putText("PCB with PID of " + pid + " was not found in the resident queue.");
                 return;
             }
-            // console.log(_Scheduler.readyQueue.getSize() + ":>> size of ready queue now.");
+            
             this.residentSet.delete(parseInt(pid));
-           // _StdOut.putText(`PID ${pid[0]} has started.`);
+          
             _StdOut.advanceLine();
             _Kernel.updateProcViewer();
         }
 
         public termProc(pid: number){
-            let seg = _MemoryManager.segAllocStatus.indexOf(pid);
+            let seg = _MemoryManager.segAllocStatus.indexOf(pid); // finding where this pcb is in memory
             let tempPcb = new PCB(pid, seg*255, (seg+1)*255);
             tempPcb.state = TERMINATED;
-            _MemoryManager.segAllocStatus[seg] = NOT_ALLOCATED;
-            // console.log(`Mm seg ${seg} set to ${_MemoryManager.segAllocStatus[seg]}`);
-            _Dispatcher.remPcb();
-            //_Scheduler.readyQueue.enqueue(tempPcb);
+            _MemoryManager.segAllocStatus[seg] = NOT_ALLOCATED; // freeing up the memory to be written over
+            
+            _Dispatcher.remPcb(); // pull out the running process
+           
              _Kernel.updateProcViewer();
              console.log("terminating a thing" + pid);
-            // console.log("lets see if theres anything else");
-           // this.rrSync();
+            
         }
 
-        public termRunningProc(pid: number): void{
+        public termRunningProc(pid: number): void{ // used by the Kill command
             let pCount = 0;
             let found = false;
-            if(pid == this.runningPID){
+            if(pid == this.runningPID){ // if we are trying to kill the running process
                 _Dispatcher.remPcb();
                 let seg = _MemoryManager.segAllocStatus.indexOf(pid);
                 _MemoryManager.segAllocStatus[seg] = NOT_ALLOCATED;
@@ -101,14 +100,14 @@ module TSOS{
                 return;
             }
 
-            while(!found){
-                if(pCount >= _Scheduler.readyQueue.getSize()){
+            while(!found){ // iterate until you find it
+                if(pCount >= _Scheduler.readyQueue.getSize()){ // it aint there
                     _StdOut.putText("Could not find a running process with PID "+ pid);
                     _StdOut.advanceLine();
                     return;
                 }
                 let tPcb = _Scheduler.readyQueue.dequeue();
-                if(tPcb.pid == pid){
+                if(tPcb.pid == pid){        // found the proc
                     tPcb.state = TERMINATED;
                     _Scheduler.readyQueue.enqueue(tPcb);
                     found = true;
@@ -124,82 +123,69 @@ module TSOS{
             }
 
 
-
-            for(let i = 0;i< _Scheduler.readyQueue.q.length;i++){
-                if(_Scheduler.readyQueue.q[i].pid == pid && _Scheduler.readyQueue.q[i].state != TERMINATED ){
-                   
-                }
-            }
         }
 
         public recessDuty(): void{ // keeping track of the round robin scheduling
-           // console.log("recTime");
-            if(this.procTime.has(this.runningPID)){
+           
+            if(this.procTime.has(this.runningPID)){ // if there is a tracker for it
                 let cQuantVal = this.procTime.get(this.runningPID);
-                // console.log("I got in here");
+                
 
                 if(this.procTime.get(this.runningPID) >= this.quantum-1){
                    //finding if there is something to switch to
-                    if(this.readyQueue.getSize() > 1){
+                    if(this.readyQueue.getSize() > 1){ // if there is more thna one thing in the queue
                         let foundNewProc = false;
                         let procCount = 0;
-                        while(!foundNewProc){
+                        while(!foundNewProc){ // iterate until the last proc, or the first waiting/ready one
                             let tProc = this.readyQueue.dequeue();
-                            if(tProc.state == READY || tProc.state == WAITING){
+                            if(tProc.state == READY || tProc.state == WAITING){ // found one ready to go
                                 console.log("in here");
                                 this.procTime.set(this.runningPID,0);
                                 _Dispatcher.contextSwitch(tProc);
                                 tProc.state = RUNNING;
                                 this.procTime.set(this.runningPID, 0);
                                 break;
-                            }else if(procCount == this.readyQueue.getSize()+1){
+                            }else if(procCount == this.readyQueue.getSize()+1){ // nothing else ready
                                 this.procTime.set(this.runningPID, 0);
-                              //  console.log("beep boop should be 3: "+ procCount);
                                  this.readyQueue.enqueue(tProc);
-                              //  _KernelInterruptQueue.enqueue(new Interrupt(FINISHED_PROC_QUEUE, [_Scheduler.runningPID]));
                                 break;                         
-                            }else{
+                            }else{ // nothing interesting
                                 this.readyQueue.enqueue(tProc);
                                 procCount++;
                             }    
                         } 
-                    }else{
+                    }else{// if the current thing is the only thing in the ready queue
                         this.procTime.set(this.runningPID, 0);
                     }
                          
-                }else{
+                }else{ // keep going
                     this.procTime.set(this.runningPID, ++cQuantVal);
                 }
 
                 
-            }else if(this.runningPID == -1){
+            }else if(this.runningPID == -1){ // if we get here, it means theres nothing running
 
                 this.rrSync();
             }else{
                 this.procTime.set(this.runningPID, 1);
             }          
         }
-            // code to handle what happens when a program terminates
+            // preemption code
         public rrSync(): void{
          
                 let foundReady = false;
                 
                 let procCount = 0;
-                while(!foundReady){
+                while(!foundReady){ // see if theres something else to do next
                     let tProc = _Scheduler.readyQueue.dequeue();
-                    if(tProc.state == READY || tProc.state == WAITING){
-                        let newProc = tProc;
-                        // console.log("switching to "+ newProc.pid);
+                    if(tProc.state == READY || tProc.state == WAITING){ // found something to do
+                        let newProc = tProc;    
                         _Dispatcher.contextSwitch(newProc);
                         console.log("PID is now"+ this.runningPID);
-                        console.log("doing this now");
-                        // console.log("Current PID is now: "+ this.runningPID);
                         foundReady = true;
-                       // this.recessDuty();
                        
-                    }else{
+                    }else{ // nothing left to do
                         procCount++;
-                        console.log("33k33k33");
                         if(procCount >= this.readyQueue.getSize()+1){
                             console.log("I checked" + procCount);
                             _Scheduler.readyQueue.enqueue(tProc);

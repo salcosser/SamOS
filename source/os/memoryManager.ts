@@ -80,7 +80,7 @@ module TSOS{
                 if(tPid == _Scheduler.runningPID){
                     continue;
                 }
-                else if(tPid != -1 && tPid != -2){
+                else if(tPid != -1 && tPid != -2){ // if its allocated
                     let inQueueInd = -1;
 
                     for(let n = 0;n<_Scheduler.readyQueue.q.length;n++){

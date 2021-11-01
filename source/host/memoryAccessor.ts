@@ -62,21 +62,19 @@ module TSOS{
                 return res.toString(16);
             }
         }catch(err){
-            // console.log("An error has occured");
-            // console.log(err.message);
+          
         }
       
        }
 
-       public readByteStrict(addr16, pid): string{
-           // console.log("pid passed "+ pid);
+       public readByteStrict(addr16, pid): string{ // read byte by pid
+      
         let cSeg = _MemoryManager.segAllocStatus.indexOf(pid);
-    //    // console.log("2seg"+cSeg);
+  
         let offset = (cSeg * 256);
-        // console.log("offe "+ offset);
+     
        let physAddr = parseInt(addr16, 16) + offset;
-    //    // console.log("trying to get" +parseInt(addr16,16));
-    //    // console.log("PA:"+ physAddr);
+   
            let deviation = physAddr - offset;
            if(deviation  > 255 || deviation < 0){
             _KernelInterruptQueue.enqueue(new Interrupt(MEM_BOUNDS_ERR_R, [_Scheduler.runningPID, physAddr, deviation]));
@@ -90,13 +88,12 @@ module TSOS{
         }
        }
        
-       public readByteBySegment(addr16,seg): string{
+       public readByteBySegment(addr16,seg): string{ // read byte by segment
         
-   //     // console.log("2seg"+seg);
+  
         let offset = (seg * 256);
        let physAddr = parseInt(addr16, 16) + offset;
-    //   // console.log("trying to get" +parseInt(addr16,16));
-    //   // console.log("PA:"+ physAddr);
+    
            let deviation = physAddr - offset;
            if(deviation  > 255 || deviation < 0){
             _KernelInterruptQueue.enqueue(new Interrupt(MEM_BOUNDS_ERR_R, [_Scheduler.runningPID, physAddr, deviation]));

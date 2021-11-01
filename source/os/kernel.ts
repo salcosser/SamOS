@@ -156,7 +156,6 @@ module TSOS {
                     break;
                 case PRINT_YREG_IRQ:
                      _StdOut.putText(parseInt(params[0],16).toString());
-                     
                      break;
                 case PRINT_FROM_MEM_IRQ:
                     let addr = params[0];
@@ -449,6 +448,7 @@ module TSOS {
             // TODO: Display error on console, perhaps in some sort of colored screen. (Maybe blue?)
             _StdOut.clearScreen();
             _StdOut.resetXY();
+            _DrawingContext.fillStyle = "white";
             document.getElementById("display").style.backgroundColor = "blue";  //putting the B in BSOD
             _StdOut.putText(msg + " - A Fatal Error has occured.");
             alert("What did you do!!!!!!");
