@@ -2,7 +2,7 @@ module TSOS{
     export class Dispatcher{
 
         public contextSwitch(newPcb): void{ // used to context switch to a "new" pcb
-            
+            Control.hostLog("Context Switching to PID "+ newPcb.pid);
             if(_Scheduler.runningPID != -1){ // if there is a running process
              _CPU.isExecuting = false;
              let tempPcb = new PCB(_Scheduler.runningPID, _CurrentSeg*255, (_CurrentSeg+1)*255);

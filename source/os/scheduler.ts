@@ -61,6 +61,7 @@ module TSOS{
                 
                 tempPCB.state = READY;
                 _Scheduler.readyQueue.enqueue(tempPCB);// in later projects, more will be added to this process
+                Control.hostLog("starting pid "+ pid);
                 _CPU.isExecuting = true;
              
             }else{  // if cant find it
@@ -78,6 +79,7 @@ module TSOS{
             let seg = _MemoryManager.segAllocStatus.indexOf(pid); // finding where this pcb is in memory
             let tempPcb = new PCB(pid, seg*255, (seg+1)*255);
             tempPcb.state = TERMINATED;
+            Control.hostLog("killed proc "+ pid);
             _MemoryManager.segAllocStatus[seg] = NOT_ALLOCATED; // freeing up the memory to be written over
             
             _Dispatcher.remPcb(); // pull out the running process
@@ -92,6 +94,7 @@ module TSOS{
             let found = false;
             if(pid == this.runningPID){ // if we are trying to kill the running process
                 _Dispatcher.remPcb();
+                Control.hostLog("killed proc "+ pid);
                 let seg = _MemoryManager.segAllocStatus.indexOf(pid);
                 _MemoryManager.segAllocStatus[seg] = NOT_ALLOCATED;
                 _Kernel.updateProcViewer();
@@ -111,6 +114,7 @@ module TSOS{
                     tPcb.state = TERMINATED;
                     _Scheduler.readyQueue.enqueue(tPcb);
                     found = true;
+                    Control.hostLog("killed proc "+ pid);
                     let seg = _MemoryManager.segAllocStatus.indexOf(pid);
                      _MemoryManager.segAllocStatus[seg] = NOT_ALLOCATED;
                      _StdOut.putText(`Process with pid ${pid} has been killed.`);
