@@ -630,7 +630,7 @@ module TSOS {
        public shellRun( pid: string[]){
            if(pid[0]){
             _Scheduler.runProcess(pid[0]);
-            _StdOut.putText("Process"+ pid[0] + "has started.");
+            _StdOut.putText("Process "+ pid[0] + " has started.");
             _StdOut.advanceLine();
            }else{
                _StdOut.putText("Please enter a pid to run. ex : run 0");
@@ -661,7 +661,7 @@ module TSOS {
         // }
         for(let key of resPids){
             _Scheduler.runProcess(key);
-            _StdOut.putText("Process"+ key + "has started.");
+            _StdOut.putText("Process "+ key + " has started.");
             _StdOut.advanceLine();
         }
 

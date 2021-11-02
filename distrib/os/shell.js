@@ -486,7 +486,7 @@ var TSOS;
         shellRun(pid) {
             if (pid[0]) {
                 _Scheduler.runProcess(pid[0]);
-                _StdOut.putText("Process" + pid[0] + "has started.");
+                _StdOut.putText("Process " + pid[0] + " has started.");
                 _StdOut.advanceLine();
             }
             else {
@@ -513,7 +513,7 @@ var TSOS;
             // }
             for (let key of resPids) {
                 _Scheduler.runProcess(key);
-                _StdOut.putText("Process" + key + "has started.");
+                _StdOut.putText("Process " + key + " has started.");
                 _StdOut.advanceLine();
             }
         }
