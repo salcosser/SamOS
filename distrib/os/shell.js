@@ -486,6 +486,8 @@ var TSOS;
         shellRun(pid) {
             if (pid[0]) {
                 _Scheduler.runProcess(pid[0]);
+                _StdOut.putText("Process" + pid[0] + "has started.");
+                _StdOut.advanceLine();
             }
             else {
                 _StdOut.putText("Please enter a pid to run. ex : run 0");
@@ -547,6 +549,10 @@ var TSOS;
             if (rPid > _Scheduler.pid) {
                 _StdOut.putText("Could not find process with PID " + rPid);
                 _StdOut.advanceLine();
+                return;
+            }
+            if (rPid == _Scheduler.runningPID) {
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(KILL_PROC_IRQ, [rPid]));
                 return;
             }
             let foundIt = false;

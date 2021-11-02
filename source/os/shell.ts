@@ -630,6 +630,8 @@ module TSOS {
        public shellRun( pid: string[]){
            if(pid[0]){
             _Scheduler.runProcess(pid[0]);
+            _StdOut.putText("Process"+ pid[0] + "has started.");
+            _StdOut.advanceLine();
            }else{
                _StdOut.putText("Please enter a pid to run. ex : run 0");
                _StdOut.advanceLine();
@@ -698,7 +700,10 @@ module TSOS {
             _StdOut.advanceLine();
             return;
         }
-
+        if(rPid == _Scheduler.runningPID){
+            _KernelInterruptQueue.enqueue(new Interrupt(KILL_PROC_IRQ, [rPid])); 
+            return;
+        }
         let foundIt = false;
         for(let i = 0;i< _Scheduler.readyQueue.q.length;i++){
             if(_Scheduler.readyQueue.q[i].pid == rPid && _Scheduler.readyQueue.q[i].state != TERMINATED ){

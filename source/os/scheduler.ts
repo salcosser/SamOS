@@ -92,6 +92,7 @@ module TSOS{
         public termRunningProc(pid: number): void{ // used by the Kill command
             let pCount = 0;
             let found = false;
+            console.log("got pid"+ pid + "back here");
             if(pid == this.runningPID){ // if we are trying to kill the running process
                 _Dispatcher.remPcb();
                 Control.hostLog("killed proc "+ pid);
