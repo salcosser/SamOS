@@ -89,7 +89,7 @@
 <body onload="onDocumentLoad()">
 
 
-   <div class="container">
+   <div class="container" style="margin:0rem 20rem 0rem 20rem!important">
       <div class=" row text-center">
 
          <div class="col-12">
@@ -126,46 +126,35 @@
 
 
       </div>
-      <div class="row">
-         <div id="divConsole" class="col-9">
+      <div class="row" style="margin-left: -18rem !important;width:100%">
+         <div id="divConsole" class="col-7">
             <canvas id="display" width="800px" height="500px" tabindex="3">
             </canvas>
          </div>
-         <div id="divLog" style="margin-top:-25px" class="col-3">
-            <label>
-               Host Log
-               <br>
-               <textarea name="taHostLog" id="taHostLog" rows="20" cols="48"></textarea>
-            </label>
-         </div>
-      </div>
-      <div class="row">
-         <div id="divUserProgramInput" class="col-6">
+
+         <div id="divUserProgramInput" class="col-2">
+
             <div class="row">
                <label>
                   User Program Input
                   <br>
-                  <textarea name="taProgramInput" id="taProgramInput" rows="8" cols="48"></textarea>
+                  <textarea name="taProgramInput" id="taProgramInput" rows="8" cols="20"></textarea>
                </label>
             </div>
             <div class="row">
-               <table class="card" id="pcbTable">
-                  <thead class="card-header">
-                     <th scope="col">PID</th>
-                     <th scope="col">SEG</th>
-                     <th scope="col">PC</th>
-                     <th scope="col">IR</th>
-                     <th scope="col">ACC</th>
-                     <th scope="col">X</th>
-                     <th scope="col">Y</th>
-                     <th scope="col">Z</th>
-                     <th scope="col">STATE</th>
-                  </thead>
-
-               </table>
+               <div id="divLog">
+                  <label>
+                     Host Log
+                     <br>
+                     <textarea name="taHostLog" id="taHostLog" rows="7" cols="35"></textarea>
+                  </label>
+               </div>
             </div>
+
          </div>
-         <div class="col-3" style="margin-left:-50px">
+         <div class="col-4" id="pcbData">
+
+
             <div class="row">
                <table class="card col-12" id="procVals">
                   <thead class="card-header">
@@ -193,11 +182,30 @@
                </table>
             </div>
             <div class="row">
+               <div class="col-12" id="pcbRecords">
+                  <table class="card" id="pcbTable">
+                     <thead class="card-header">
+                        <th scope="col">PID</th>
+                        <th scope="col">SEG</th>
+                        <th scope="col">PC</th>
+                        <th scope="col">IR</th>
+                        <th scope="col">ACC</th>
+                        <th scope="col">X</th>
+                        <th scope="col">Y</th>
+                        <th scope="col">Z</th>
+                        <th scope="col">STATE</th>
+                     </thead>
 
-
+                  </table>
+               </div>
             </div>
 
+
          </div>
+      </div>
+      <div class="row">
+
+
          <div class="col-3">
 
 
@@ -1291,6 +1299,8 @@
          <br>
          Reproduction is inhibited without the express written consent of
          Ted Codd, Stevie Ray Vaughan, and Ian Fleming.
+         <br>
+         <i>Respectfully updated and enhanced by Sam Alcosser in 2021.</i>
       </p>
    </div>
 </body>

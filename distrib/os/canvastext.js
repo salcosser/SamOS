@@ -48,9 +48,9 @@ var TSOS;
             var len = str.length;
             var mag = size / 25.0;
             ctx.save();
-            ctx.lineCap = "round";
+            ctx.lineCap = "butt";
             ctx.lineWidth = 2.0 * mag;
-            ctx.strokeStyle = "black";
+            ctx.strokeStyle = "white";
             for (var i = 0; i < len; i++) {
                 var c = CanvasTextFunctions.letter(str.charAt(i));
                 if (!c) {
