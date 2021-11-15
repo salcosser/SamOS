@@ -41,7 +41,10 @@ const WAITING = 3;
 const TERMINATED = 4;
 
 
-
+//used for hard disk
+const TRACK_COUNT = 4;
+const SECT_COUNT = 8;
+const BLOCK_COUNT = 8;
 
 
 //
@@ -55,6 +58,9 @@ var _CurrentSeg: number = 0;
 var _Scheduler: TSOS.Scheduler;
 var _MemoryManager: any = null;
 var _Dispatcher: TSOS.Dispatcher;
+
+
+var _HardDisk: TSOS.HardDisk;
 var _OSclock: number = 0;  // Page 23.
 
 var _Mode: number = 0;     // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
@@ -66,6 +72,9 @@ var _DefaultFontSize: number = 13;
 var _FontHeightMargin: number = 4;       // Additional space added to font size when advancing a line.
 
 var _Trace: boolean = true;              // Default the OS trace to be on.
+
+
+
 
 
 

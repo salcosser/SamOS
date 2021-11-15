@@ -33,6 +33,10 @@ const READY = 1;
 const RUNNING = 2;
 const WAITING = 3;
 const TERMINATED = 4;
+//used for hard disk
+const TRACK_COUNT = 4;
+const SECT_COUNT = 8;
+const BLOCK_COUNT = 8;
 //
 // Global Variables
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
@@ -44,6 +48,7 @@ var _CurrentSeg = 0;
 var _Scheduler;
 var _MemoryManager = null;
 var _Dispatcher;
+var _HardDisk;
 var _OSclock = 0; // Page 23.
 var _Mode = 0; // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
 var _Canvas; // Initialized in Control.hostInit().
