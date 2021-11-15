@@ -110,3 +110,7 @@ td{
 #memTable table tbody tr td:first-child{
   font-weight: bold !important;
 }
+#diskTable{
+  overflow-y: scroll;
+  height:300px;
+}
