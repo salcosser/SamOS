@@ -113,4 +113,26 @@ td{
 #diskTable{
   overflow-y: scroll;
   height:300px;
+  color: black;
+}
+.discGroup{
+  margin-left:18rem;
+}
+
+#dataHeader{
+  width:4rem !important;
+}
+
+#diskTable tr{
+  background-color: #7ebdc2;
+  border: 3px solid darkred;
+}
+#diskTable tr td{
+  border: 3px dotted darkred;
+}
+#diskTable tr th{
+  background-color:#3e6063;
+  color:lightgray;
+  border: 3px solid darkred;
+  font-weight: bold;
 }
