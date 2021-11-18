@@ -61,6 +61,8 @@ var _Dispatcher: TSOS.Dispatcher;
 
 
 var _HardDisk: TSOS.HardDisk;
+var _FileSystem: TSOS.FileSystem;
+var _DSDD: TSOS.DSDD;
 var _OSclock: number = 0;  // Page 23.
 
 var _Mode: number = 0;     // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.

@@ -111,12 +111,17 @@ td{
   font-weight: bold !important;
 }
 #diskTable{
-  overflow-y: scroll;
+ 
   height:300px;
   color: black;
+  
 }
 .discGroup{
   margin-left:18rem;
+  overflow-y: scroll;
+  overflow-x:hidden;
+  height:600px;
+  width:600px !important;
 }
 
 #dataHeader{

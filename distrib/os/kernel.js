@@ -24,6 +24,9 @@ var TSOS;
             // Initialize standard input and output to the _Console.
             _StdIn = _Console;
             _StdOut = _Console;
+            _HardDisk = new TSOS.HardDisk();
+            _FileSystem = new TSOS.FileSystem();
+            _DSDD = new TSOS.DSDD();
             _MemoryManager = new TSOS.MemoryManager();
             _Dispatcher = new TSOS.Dispatcher();
             // Load the Keyboard Device Driver

@@ -7,6 +7,33 @@ module TSOS{
 
         }
 
+        public getBlock(t,s,b): string{
+
+            if((t <= 3) && (s <= 7) && (b <= 7)){
+                const label = `${parseInt(t)}:${parseInt(s)}:${parseInt(b)}`;
+                return this.hardDiskSet.get(label);
+            }else{
+
+                return "";
+            }
+            
+        }
+
+        public setBlock(t,s,b, data): boolean{
+
+            if((t <= 3) && (s <= 7) && (b <= 7) && (data.length <= 128)){
+                const label = `${parseInt(t)}:${parseInt(s)}:${parseInt(b)}`;
+               this.hardDiskSet.set(label, data);
+               return true
+            }else{
+
+                return false;
+            }
+            
+        }
+
+        
+
         public init(): void{
            for(let addr of this.addrLabels){
                this.hardDiskSet.set(addr, "40404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040");

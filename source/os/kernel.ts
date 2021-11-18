@@ -29,6 +29,11 @@ module TSOS {
             _StdIn  = _Console;
             _StdOut = _Console;
             
+            
+            _HardDisk = new HardDisk();
+            _FileSystem = new FileSystem();
+            _DSDD = new DSDD();
+
             _MemoryManager = new MemoryManager();
 
             _Dispatcher = new Dispatcher();
