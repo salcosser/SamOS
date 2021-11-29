@@ -171,7 +171,15 @@ module TSOS {
                 "set the Round Robin quantum");
             this.commandList[this.commandList.length] = sc;
 
-            
+            sc = new ShellCommand(this.fCreate,
+                "create",
+                "creates new file");
+            this.commandList[this.commandList.length] = sc;
+             
+            sc = new ShellCommand(this.fWrite,
+                "write",
+                "writes to a file");
+            this.commandList[this.commandList.length] = sc;
             
 
             // Display the initial prompt.
@@ -439,6 +447,15 @@ module TSOS {
                         _StdOut.advanceLine();
                         _StdOut.putText("set the Round Robin Quantum");
                         break;
+                    case "create":
+                        _StdOut.putText("usage: create <filename>");
+                        _StdOut.advanceLine();
+                        _StdOut.putText("create a file");
+                        break;
+                    case "write":
+                        _StdOut.putText("usage: write <filename> <data>");
+                        _StdOut.advanceLine();
+                        _StdOut.putText("write to a file");
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -737,6 +754,41 @@ module TSOS {
             _StdOut.advanceLine();
         }else{
             _StdOut.putText("Invalid quantum. Please use an integer value greater than zero.");
+            _StdOut.advanceLine();
+        }
+    }
+
+    //fCreate
+
+    public fCreate(fname: string[]){
+        const nFname = fname[0];
+        let valid = _FileSystem.initFile(nFname);
+        if(valid){
+            _StdOut.putText("file created.");
+            _StdOut.advanceLine();
+        }else{
+            _StdOut.putText("An error occured while trying to initialize the file.");
+            _StdOut.advanceLine();
+        }
+    }
+
+    //fWrite
+    public fWrite(fStuff: string[]){
+        const fname = fStuff[0];
+        const data = fStuff[1];
+
+        const isAFile = _FileSystem.findFileDirRecord(fname);
+        if(isAFile){
+            const writeSuccess = _FileSystem.writeToFile(fname,data);
+            if(writeSuccess){
+                _StdOut.putText("Successfully wrote to the file.");
+                _StdOut.advanceLine();
+            }else{
+                _StdOut.putText("An error occurred when trying to write to the file.");
+                _StdOut.advanceLine();
+            }
+        }else{
+            _StdOut.putText("Could not find a file with that file name. Try using the create <filename> command to create that file.");
             _StdOut.advanceLine();
         }
     }
