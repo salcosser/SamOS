@@ -12,7 +12,7 @@ module TSOS{
              tempPcb.yReg = _CPU.Yreg;
              tempPcb.zFlag    = _CPU.Zflag;
              tempPcb.Acc = _CPU.Acc;
-             tempPcb.state = WAITING;
+             tempPcb.state = READY;
              _Scheduler.readyQueue.enqueue(tempPcb); //putting the old stuff to the back
          
              

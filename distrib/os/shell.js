@@ -523,8 +523,8 @@ var TSOS;
             let qCopy = _Scheduler.readyQueue.q;
             for (let i = 0; i < qCopy.length; i++) {
                 switch (qCopy[i].state) {
-                    case WAITING:
-                        _StdOut.putText(`${qCopy[i].pid} | WAITING IN READY QUEUE`);
+                    case READY:
+                        _StdOut.putText(`${qCopy[i].pid} | READY IN READY QUEUE`);
                         _StdOut.advanceLine();
                         break;
                     case TERMINATED:

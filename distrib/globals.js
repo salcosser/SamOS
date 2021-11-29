@@ -31,8 +31,8 @@ const ALLOC_AWAITING_PID = -1;
 const RESIDENT = 0;
 const READY = 1;
 const RUNNING = 2;
-const WAITING = 3;
-const TERMINATED = 4;
+// const WAITING = 3;
+const TERMINATED = 3;
 //used for hard disk
 const TRACK_COUNT = 4;
 const SECT_COUNT = 8;

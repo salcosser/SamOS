@@ -142,7 +142,7 @@ module TSOS{
                         let procCount = 0;
                         while(!foundNewProc){ // iterate until the last proc, or the first waiting/ready one
                             let tProc = this.readyQueue.dequeue();
-                            if(tProc.state == READY || tProc.state == WAITING){ // found one ready to go
+                            if(tProc.state == READY){ // found one ready to go
                                 console.log("in here");
                                 this.procTime.set(this.runningPID,0);
                                 _Dispatcher.contextSwitch(tProc);
@@ -183,7 +183,7 @@ module TSOS{
                 let procCount = 0;
                 while(!foundReady){ // see if theres something else to do next
                     let tProc = _Scheduler.readyQueue.dequeue();
-                    if(tProc.state == READY || tProc.state == WAITING){ // found something to do
+                    if(tProc.state == READY){ // found something to do
                         let newProc = tProc;    
                         _Dispatcher.contextSwitch(newProc);
                         console.log("PID is now"+ this.runningPID);

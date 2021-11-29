@@ -333,9 +333,6 @@ var TSOS;
                     case RUNNING:
                         state = "Running";
                         break;
-                    case WAITING:
-                        state = "Waiting";
-                        break;
                     case TERMINATED:
                         state = "Terminated";
                         break;
