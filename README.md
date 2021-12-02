@@ -48,3 +48,10 @@ This will be especially helpful for an OS or a Compiler that may need to run in 
 
 **Where can I get more info on TypeScript**
 [Right this way!](http://www.typescriptlang.org/)
+
+
+
+
+How do I write programs for it? 
+===============================
+Go to https://www.labouseur.com/commondocs/6502alan-instruction-set.pdf where Dr. Alan Labouseur shows the full documentation for the subset of 6502 op codes that work on this OS.
