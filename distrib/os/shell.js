@@ -12,7 +12,7 @@ var TSOS;
     class Shell {
         constructor() {
             // Properties
-            this.promptStr = "root@appl2~$ ";
+            this.promptStr = "root@sampc~$ ";
             this.commandList = [];
             this.curses = "[fuvg],[cvff],[shpx],[phag],[pbpxfhpxre],[zbgureshpxre],[gvgf]";
             this.apologies = "[sorry]";

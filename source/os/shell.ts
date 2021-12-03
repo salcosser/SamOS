@@ -12,7 +12,7 @@
 module TSOS {
     export class Shell {
         // Properties
-        public promptStr = "root@appl2~$ ";
+        public promptStr = "root@sampc~$ ";
         public commandList = [];
         public curses = "[fuvg],[cvff],[shpx],[phag],[pbpxfhpxre],[zbgureshpxre],[gvgf]";
         public apologies = "[sorry]";
