@@ -30,8 +30,8 @@ module TSOS {
             _StdOut = _Console;
             
             
-            _HardDisk = new HardDisk();
-            _FileSystem = new FileSystem();
+            // _HardDisk = new HardDisk();
+            // _FileSystem = new FileSystem();
             _DSDD = new DSDD();
 
             _MemoryManager = new MemoryManager();

@@ -73,7 +73,9 @@ var TSOS;
             _Memory.init();
             _HardDisk = new TSOS.HardDisk();
             _HardDisk.init();
+            console.log("did this thing");
             _FileSystem = new TSOS.FileSystem();
+            console.log("did this thing2");
             _MemoryAccessor = new TSOS.MemoryAccessor();
             _Scheduler = new TSOS.Scheduler();
             // ... then set the host clock pulse ...
