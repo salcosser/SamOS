@@ -2,12 +2,13 @@
 /* color pallete */
 /* 231f20-bb4430-7ebdc2-f3dfa2-efe6dd */
 body {
-  background: #bb4430 !important;
+  background: #70291d !important;
   font-family: 'IBM Plex Mono', monospace !important ;
   font-size: 12pt;
   font-weight: normal;
   font-style: normal;
   color: #7ebdc2 !important;
+  margin-left:10%;
 }
 
 h1 {
@@ -51,10 +52,11 @@ div{
   text-align: center;
 }
 .card{
-  background-color:darkslategray !important;
-  border: 1px solid #7ebdc2 !important;
+  background-color:transparent !important;
+  border: none !important;
   color:#efe6dd;
 }
+
 #pcbTable{
   width:25rem !important;
   padding-left:1%;
@@ -63,8 +65,8 @@ div{
   margin-left:11rem;
 }
 #procVals{
-  border:2px solid #7ebdc2;
-  background-color: #efe6dd;
+  /* border:2px solid #7ebdc2; */
+  /* background-color: #efe6dd; */
   color: #efe6dd;
   padding: 0px;
   /* display:flex;
@@ -117,11 +119,11 @@ td{
   
 }
 .discGroup{
-  margin-left:18rem;
+  
   overflow-y: scroll;
   overflow-x:hidden;
   height:600px;
-  width:600px !important;
+  
 }
 
 #dataHeader{
@@ -140,4 +142,21 @@ td{
   color:lightgray;
   border: 3px solid darkred;
   font-weight: bold;
+}
+
+
+#last{
+  border-right: 30px solid white;
+    margin: 0 auto;
+   
+   animation:
+    blink-caret .85s step-end infinite;
+}
+@keyframes blink-caret {
+  from, to { border-color: transparent }
+  50% { border-color: white; }
+}
+#title{
+  font-family: monospace;
+  font-size:4rem;
 }
