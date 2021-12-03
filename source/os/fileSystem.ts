@@ -1,12 +1,17 @@
 module TSOS{
     export class FileSystem{
 
-        public  findFileDirRecord(fname): number[]{
-            for(let s = 0;s<SECT_COUNT;s++){
-                for(let b = 0;b<BLOCK_COUNT;b++){
+        public  findFileDirRecord(fname:string): number[]{
+            for(let s:number = 0;s<SECT_COUNT;s++){
+                for(let b:number = 0;b<BLOCK_COUNT;b++){
                     if(s == 0 && b == 0){
                         continue;//dont check the mbr
                     }
+                    console.log(typeof s + "<s and b>" + typeof b);
+                   // console.log(_HardDisk.getBlock(0,s,b));
+                    // _HardDisk.init();
+
+                    // console.log("got past calling it");
                     if(_HardDisk.getBlock(0,s,b).substr(8) == fname){
                         
                         return [0,s,b];

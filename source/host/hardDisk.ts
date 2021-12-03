@@ -37,9 +37,10 @@ module TSOS{
         
 
         public init(): void{
-           for(let addr of this.addrLabels){
-               this.hardDiskSet.set(addr, DSDD.blankBlock );
-           }
+            for(let addr of this.addrLabels){
+                this.hardDiskSet.set(addr, DSDD.blankBlock );
+            }
+            console.log("Hard Disk initialized.");
         }
     }
 }
