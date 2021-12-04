@@ -98,6 +98,8 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.ls, "ls", "list all text files on disk.");
             this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.delete, "delete", "deletes a given file");
+            this.commandList[this.commandList.length] = sc;
             // Display the initial prompt.
             this.putPrompt();
         }
@@ -363,6 +365,12 @@ var TSOS;
                         _StdOut.putText("usage: ls");
                         _StdOut.advanceLine();
                         _StdOut.putText("lists out all user created files.");
+                        break;
+                    case "delete":
+                        _StdOut.putText("usage: delete <filename>");
+                        _StdOut.advanceLine();
+                        _StdOut.putText("deletes a given file.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -717,6 +725,23 @@ var TSOS;
                 // _StdOut.advanceLine();
                 for (let f of fNames) {
                     _StdOut.putText(`${f}.txt`);
+                    _StdOut.advanceLine();
+                }
+            }
+            else {
+                _StdOut.putText("Disk not formatted. Please format the disk first.");
+                _StdOut.advanceLine();
+            }
+        }
+        delete(fname) {
+            if (_DSDD.isFormatted) {
+                let resp = _FileSystem.deleteFile(fname[0]);
+                if (resp) {
+                    _StdOut.putText(`${fname[0]}.txt has been deleted.`);
+                    _StdOut.advanceLine();
+                }
+                else {
+                    _StdOut.putText(`Something went wrong when trying to delete ${fname[0]}.txt . Please ensure the filename given is accurate and try again.`);
                     _StdOut.advanceLine();
                 }
             }

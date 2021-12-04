@@ -34,10 +34,12 @@ module TSOS{
                break;
             }
         }
-        if(location != []){
+        if(FileSystem.validAddr(location)){
 
             let nameInHex = DSDD.strToHex(fname);
             _HardDisk.setBlock(location[0], location[1], location[2], `99999901${nameInHex}`);
+            _KernelInterruptQueue.enqueue(new TSOS.Interrupt(DISK_UPDATE, []));
+            return true;
         }else{
             //throw interrupt
             return false;
@@ -46,14 +48,14 @@ module TSOS{
      }   
 
      public writeToFile(fname,data): boolean{
-         if(this.findFileDirRecord(fname)  == []){
+         if(!FileSystem.validAddr(this.findFileDirRecord(fname))){
              return false;
              //throw error
          }else if(data == "" || data == null){
             return true;
          }else{
             let fStart = _DSDD.writeData(data);
-            if(fStart != []){
+            if(FileSystem.validAddr(fStart)){
                 console.log(fStart.toString()+ "<< first block of file data");
                 this.setFileStart(fname, fStart);
                 _KernelInterruptQueue.enqueue(new TSOS.Interrupt(DISK_UPDATE, []));
@@ -64,6 +66,31 @@ module TSOS{
          }
      }
     
+     public deleteFile(fname): boolean{
+        let dirStartAddr =  this.findFileDirRecord(fname);
+        if(!FileSystem.validAddr(dirStartAddr)){
+            return false;
+            //throw error
+        }else{
+            let cBlkAddr = this.getNextBlock(_DSDD.readBlock(dirStartAddr)); // stores the addr of the first real block
+            let eof = false;
+            let nPlace = [];
+            while(!eof){
+                let cBlock = _DSDD.readBlock(cBlkAddr);
+                nPlace = this.getNextBlock(cBlock);
+                if(!FileSystem.validAddr(nPlace)){
+                    eof = true;
+                }
+                _DSDD.clearBlock(cBlkAddr);
+                cBlkAddr = nPlace;//clear it
+                //set a new clBlock
+
+            }
+            _DSDD.clearBlock(dirStartAddr);
+            _KernelInterruptQueue.enqueue(new TSOS.Interrupt(DISK_UPDATE, []));
+            return true;
+        }
+     }
 
 
     public readFromFile(fName): string{
@@ -80,7 +107,7 @@ module TSOS{
             let cRData = cData.substr(8);
            // dataBuffer = dataBuffer + cRData;
             let nextPlace = this.getNextBlock(cData);
-            if(nextPlace != []){
+            if(FileSystem.validAddr(nextPlace)){
                 console.log("got in here next");
                 let hasNext = true;
                 while(hasNext){

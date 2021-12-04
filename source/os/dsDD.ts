@@ -41,7 +41,9 @@ module TSOS{
                 }
                 return "";
             }
-          
+            public clearBlock(blkAddr){
+                _HardDisk.setBlock(blkAddr[0],blkAddr[1],blkAddr[2],DSDD.blankBlock);
+            }
             public writeData(data): number[]{
                 let start = this.findOpenSpace();
                 if(start === ""){
