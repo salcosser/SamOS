@@ -1,12 +1,41 @@
 module TSOS{
-    export class DSDD{
+    export class DSDD extends DeviceDriver{
 
         public static blankBlock = "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
         public isFormatted = false;
+
+        constructor() {
+            // Override the base method pointers.
+
+            // The code below cannot run because "this" can only be
+            // accessed after calling super.
+            // super(this.krnKbdDriverEntry, this.krnKbdDispatchKeyPress);
+            // So instead...
+            super();
+            this.driverEntry = this.dskDriverEntry;
+            this.isr = this.krnDskAccess;
+        }
+
+
+        public dskDriverEntry() {
+            // Initialization routine for this, the kernel-mode Keyboard Device Driver.
+            this.status = "loaded";
+            // More?
+        }
+
+
+        public krnDskAccess(params){
+            // not used
+        }
+
+
+
+
+
             //findOpenSpace
             public findOpenSpace(): string{
                 for(let l of _HardDisk.realAddrs){
-                    if(_HardDisk.hardDiskSet.get(l).substr(7,1) == "0"){
+                    if(this.readBlock(DSDD.labelToArr(l)).substr(7,1) == "0"){
                         return l;
                     }
                 }
@@ -97,7 +126,8 @@ module TSOS{
 
             public formatDisk(): void{
                 for(let addr of _HardDisk.addrLabels){
-                    _HardDisk.hardDiskSet.set(addr, DSDD.blankBlock );
+                    let addrArr = DSDD.labelToArr(addr);
+                    _HardDisk.setBlock(addrArr[0],addrArr[1],addrArr[2], DSDD.blankBlock );
                 }
                 
                 _KernelInterruptQueue.enqueue(new TSOS.Interrupt(DISK_UPDATE, []));

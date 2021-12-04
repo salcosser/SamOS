@@ -30,19 +30,29 @@ module TSOS {
             _StdOut = _Console;
             
             
-            // _HardDisk = new HardDisk();
-            // _FileSystem = new FileSystem();
-            _DSDD = new DSDD();
+           
+            _HardDisk = new HardDisk();
+            _HardDisk.init();
+            _FileSystem = new FileSystem();
+
+           // 
 
             _MemoryManager = new MemoryManager();
 
             _Dispatcher = new Dispatcher();
+
 
             // Load the Keyboard Device Driver
             this.krnTrace("Loading the keyboard device driver.");
             _krnKeyboardDriver = new DeviceDriverKeyboard();     // Construct it.
             _krnKeyboardDriver.driverEntry();                    // Call the driverEntry() initialization routine.
             this.krnTrace(_krnKeyboardDriver.status);
+
+            this.krnTrace("Loading the disk device driver.");
+            _DSDD = new DSDD();     // Construct it.
+            _DSDD.driverEntry();                    // Call the driverEntry() initialization routine.
+            this.krnTrace(_DSDD.status);
+
 
             //
             // ... more?
@@ -199,7 +209,7 @@ module TSOS {
                     this.updateDiskViewer();
                     break;
                 case DSK_FORMAT:
-                    _HardDisk.formatDisk();
+                    _DSDD.formatDisk();
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");

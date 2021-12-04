@@ -89,11 +89,8 @@ module TSOS {
             _CPU.init();       //       There's more to do, like dealing with scheduling and such, but this would be a start. Pretty cool.
             _Memory = new Memory();
             _Memory.init();
-            _HardDisk = new HardDisk();
-            _HardDisk.init();
-            console.log("did this thing");
-            _FileSystem = new FileSystem();
-            console.log("did this thing2");
+          
+            
             _MemoryAccessor = new MemoryAccessor();
             _Scheduler = new Scheduler();
             // ... then set the host clock pulse ...

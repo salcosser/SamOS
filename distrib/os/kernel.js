@@ -24,9 +24,10 @@ var TSOS;
             // Initialize standard input and output to the _Console.
             _StdIn = _Console;
             _StdOut = _Console;
-            // _HardDisk = new HardDisk();
-            // _FileSystem = new FileSystem();
-            _DSDD = new TSOS.DSDD();
+            _HardDisk = new TSOS.HardDisk();
+            _HardDisk.init();
+            _FileSystem = new TSOS.FileSystem();
+            // 
             _MemoryManager = new TSOS.MemoryManager();
             _Dispatcher = new TSOS.Dispatcher();
             // Load the Keyboard Device Driver
@@ -34,6 +35,10 @@ var TSOS;
             _krnKeyboardDriver = new TSOS.DeviceDriverKeyboard(); // Construct it.
             _krnKeyboardDriver.driverEntry(); // Call the driverEntry() initialization routine.
             this.krnTrace(_krnKeyboardDriver.status);
+            this.krnTrace("Loading the disk device driver.");
+            _DSDD = new TSOS.DSDD(); // Construct it.
+            _DSDD.driverEntry(); // Call the driverEntry() initialization routine.
+            this.krnTrace(_DSDD.status);
             //
             // ... more?
             //
@@ -174,7 +179,7 @@ var TSOS;
                     this.updateDiskViewer();
                     break;
                 case DSK_FORMAT:
-                    _HardDisk.formatDisk();
+                    _DSDD.formatDisk();
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");

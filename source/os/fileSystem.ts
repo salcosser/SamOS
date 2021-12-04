@@ -29,7 +29,7 @@ module TSOS{
      public initFile(fname): boolean{
         let location = [];
         for(let l of _HardDisk.dirRecs){
-            if(_HardDisk.hardDiskSet.get(l) ==DSDD.blankBlock){
+            if(_DSDD.readBlock(DSDD.labelToArr(l)) ==DSDD.blankBlock){
                location = DSDD.labelToArr(l);
                break;
             }
@@ -56,6 +56,7 @@ module TSOS{
             if(fStart != []){
                 console.log(fStart.toString()+ "<< first block of file data");
                 this.setFileStart(fname, fStart);
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(DISK_UPDATE, []));
                 return true;
             }else{
                 return false;
