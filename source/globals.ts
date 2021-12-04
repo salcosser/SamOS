@@ -26,6 +26,8 @@ const PRINT_FROM_MEM_IRQ: number = 5;
 const FINISHED_PROC_QUEUE: number = 6;
 const MEM_BOUNDS_ERR_R: number = 32;
 const MEM_BOUNDS_ERR_W: number = 33;
+const DISK_UPDATE: number = 423;
+const DSK_FORMAT: number = 4040;
 const MEM_LIMIT = 768;
 
 //used in the mem mgr

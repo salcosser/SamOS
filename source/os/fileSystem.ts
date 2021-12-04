@@ -116,6 +116,19 @@ module TSOS{
             return  [t,s,b];
         }
     }
+
+    public listFiles():string[]{
+        let files = [];
+        for(let i = 0;i<_HardDisk.dirRecs.length;i++){
+            let blk = _DSDD.readBlock(DSDD.strToArr(_HardDisk.dirRecs[i]));
+            if(blk.substr(7,2) != "00"){
+                files[files.length] = FileSystem.hexToStr(blk.substr(8));
+            }
+        }
+        return files;
+    }
+
+
     public static validAddr(arr):boolean{
         return ((arr[0] + arr[1] + arr[2]) > -1);
     }

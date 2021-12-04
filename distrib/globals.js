@@ -23,6 +23,8 @@ const PRINT_FROM_MEM_IRQ = 5;
 const FINISHED_PROC_QUEUE = 6;
 const MEM_BOUNDS_ERR_R = 32;
 const MEM_BOUNDS_ERR_W = 33;
+const DISK_UPDATE = 423;
+const DSK_FORMAT = 4040;
 const MEM_LIMIT = 768;
 //used in the mem mgr
 const NOT_ALLOCATED = -2;

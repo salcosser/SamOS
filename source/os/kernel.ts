@@ -195,6 +195,12 @@ module TSOS {
                     _CPU.isExecuting = false;
                     this.krnTrapError(`Memory out of bounds error. proc with pid[${params[0]}] tried to write to memory address ${params[1]}, which is ${params[2]} bytes outside of it's memory bounds.`);
                     break;
+                case DISK_UPDATE:
+                    this.updateDiskViewer();
+                    break;
+                case DSK_FORMAT:
+                    _HardDisk.formatDisk();
+                    break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
             }
@@ -444,7 +450,18 @@ module TSOS {
                     _CPU.isExecuting = false;
             }
 
+        public updateDiskViewer(): void{
+            for(let i = 0;i< _HardDisk.addrLabels.length;i++){
+                let tadAr = DSDD.labelToArr(_HardDisk.addrLabels[i]);
+                let blk = _DSDD.readBlock(tadAr);
 
+                (<HTMLElement> document.getElementById("HDContainer").getElementsByTagName("tr")[i].cells[1]).innerHTML = blk.substr(0,2);
+                (<HTMLElement> document.getElementById("HDContainer").getElementsByTagName("tr")[i].cells[2]).innerHTML = blk.substr(2,2);
+                (<HTMLElement> document.getElementById("HDContainer").getElementsByTagName("tr")[i].cells[3]).innerHTML = blk.substr(4,2);
+                (<HTMLElement> document.getElementById("HDContainer").getElementsByTagName("tr")[i].cells[4]).innerHTML = blk.substr(6,2);
+                (<HTMLElement> document.getElementById("HDContainer").getElementsByTagName("tr")[i].cells[5]).innerHTML = blk.substr(8);
+            }
+        }
 
 
         public krnTrapError(msg) {

@@ -2,7 +2,7 @@ module TSOS{
     export class DSDD{
 
         public static blankBlock = "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-
+        public isFormatted = false;
             //findOpenSpace
             public findOpenSpace(): string{
                 for(let l of _HardDisk.realAddrs){
@@ -95,7 +95,16 @@ module TSOS{
             }
 
 
-
+            public formatDisk(): void{
+                for(let addr of _HardDisk.addrLabels){
+                    _HardDisk.hardDiskSet.set(addr, DSDD.blankBlock );
+                }
+                
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(DISK_UPDATE, []));
+                this.isFormatted = true;
+                console.log("Hard Disk Formatted.");
+              //  console.log(_HardDisk.hardDiskSet.size);
+            }
 
             public static strToHex(str){  
 	            var arr = [];

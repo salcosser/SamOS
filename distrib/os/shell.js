@@ -92,6 +92,12 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.fRead, "read", "reads a file out");
             this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.fRead, "cat", "reads a file out");
+            this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.format, "format", "formats the disk");
+            this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.ls, "ls", "list all text files on disk.");
+            this.commandList[this.commandList.length] = sc;
             // Display the initial prompt.
             this.putPrompt();
         }
@@ -343,6 +349,20 @@ var TSOS;
                         _StdOut.advanceLine();
                         _StdOut.putText("read from a file");
                         break;
+                    case "cat":
+                        _StdOut.putText("usage: cat <filename>");
+                        _StdOut.advanceLine();
+                        _StdOut.putText("it was annoying me that this didnt exist");
+                        break;
+                    case "format":
+                        _StdOut.putText("usage: format");
+                        _StdOut.advanceLine();
+                        _StdOut.putText("formats the disk for proper use.");
+                        break;
+                    case "ls":
+                        _StdOut.putText("usage: ls");
+                        _StdOut.advanceLine();
+                        _StdOut.putText("lists out all user created files.");
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -614,56 +634,94 @@ var TSOS;
         fCreate(fname) {
             const nFname = fname[0];
             let valid = _FileSystem.initFile(nFname);
-            if (valid) {
-                _StdOut.putText("file created.");
-                _StdOut.advanceLine();
+            if (_DSDD.isFormatted) {
+                if (valid) {
+                    _StdOut.putText("file created.");
+                    _StdOut.advanceLine();
+                }
+                else {
+                    _StdOut.putText("An error occured while trying to initialize the file.");
+                    _StdOut.advanceLine();
+                }
             }
             else {
-                _StdOut.putText("An error occured while trying to initialize the file.");
+                _StdOut.putText("Disk not formatted. Please format the disk first.");
                 _StdOut.advanceLine();
             }
         }
         //fWrite
         fWrite(fStuff) {
-            const fname = fStuff[0];
-            let data = fStuff[1];
-            if (fStuff.length > 2) {
-                for (let i = 2; i < fStuff.length; i++) {
-                    data = data + " " + fStuff[i];
+            if (_DSDD.isFormatted) {
+                const fname = fStuff[0];
+                let data = fStuff[1];
+                if (fStuff.length > 2) {
+                    for (let i = 2; i < fStuff.length; i++) {
+                        data = data + " " + fStuff[i];
+                    }
                 }
-            }
-            console.log("we got this as data" + data);
-            const isAFile = _FileSystem.findFileDirRecord(fname);
-            if (isAFile) {
-                const writeSuccess = _FileSystem.writeToFile(fname, data);
-                if (writeSuccess) {
-                    _StdOut.putText("Successfully wrote to the file.");
-                    _StdOut.advanceLine();
+                console.log("we got this as data" + data);
+                const isAFile = _FileSystem.findFileDirRecord(fname);
+                if (isAFile) {
+                    const writeSuccess = _FileSystem.writeToFile(fname, data);
+                    if (writeSuccess) {
+                        _StdOut.putText("Successfully wrote to the file.");
+                        _StdOut.advanceLine();
+                    }
+                    else {
+                        _StdOut.putText("An error occurred when trying to write to the file.");
+                        _StdOut.advanceLine();
+                    }
                 }
                 else {
-                    _StdOut.putText("An error occurred when trying to write to the file.");
+                    _StdOut.putText("Could not find a file with that file name. Try using the create <filename> command to create that file.");
                     _StdOut.advanceLine();
                 }
             }
             else {
-                _StdOut.putText("Could not find a file with that file name. Try using the create <filename> command to create that file.");
+                _StdOut.putText("Disk not formatted. Please format the disk first.");
                 _StdOut.advanceLine();
             }
         }
         fRead(fName) {
-            let fData = _FileSystem.readFromFile(fName[0]);
-            if (fData != "--") {
-                _StdOut.putText(`${fName[0]}.txt`);
-                _StdOut.advanceLine();
-                _StdOut.putText("---------------------------------");
-                _StdOut.advanceLine();
-                _StdOut.putText(fData);
-                _StdOut.advanceLine();
-                _StdOut.putText("------------EOF-------------------");
-                _StdOut.advanceLine();
+            if (_DSDD.isFormatted) {
+                let fData = _FileSystem.readFromFile(fName[0]);
+                if (fData != "--") {
+                    _StdOut.putText(`        ${fName[0]}.txt`);
+                    _StdOut.advanceLine();
+                    _StdOut.putText("---------------------------------");
+                    _StdOut.advanceLine();
+                    _StdOut.putText(fData);
+                    _StdOut.advanceLine();
+                    _StdOut.putText("------------EOF-------------------");
+                    _StdOut.advanceLine();
+                }
+                else {
+                    _StdOut.putText("File not found. Make sure that the file name you entered is correct and try again.");
+                    _StdOut.advanceLine();
+                }
             }
             else {
-                _StdOut.putText("File not found. Make sure that the file name you entered is correct and try again.");
+                _StdOut.putText("Disk not formatted. Please format the disk first.");
+                _StdOut.advanceLine();
+            }
+        }
+        format() {
+            _DSDD.formatDisk();
+            _StdOut.putText("Disk has been formatted.");
+            _StdOut.advanceLine();
+        }
+        ls() {
+            if (_DSDD.isFormatted) {
+                let fNames = _FileSystem.listFiles();
+                // _StdOut.putText("User created files on disk:");
+                // _StdOut.advanceLine();
+                for (let f of fNames) {
+                    _StdOut.putText(`${f}.txt`);
+                    _StdOut.advanceLine();
+                }
+            }
+            else {
+                _StdOut.putText("Disk not formatted. Please format the disk first.");
                 _StdOut.advanceLine();
             }
         }
