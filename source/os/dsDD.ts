@@ -1,12 +1,12 @@
 module TSOS{
     export class DSDD{
 
-        public static blankBlock = "40404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040";
+        public static blankBlock = "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
 
             //findOpenSpace
             public findOpenSpace(): string{
                 for(let l of _HardDisk.realAddrs){
-                    if(_HardDisk.hardDiskSet.get(l) ==DSDD.blankBlock){
+                    if(_HardDisk.hardDiskSet.get(l).substr(7,1) == "0"){
                         return l;
                     }
                 }
@@ -19,7 +19,7 @@ module TSOS{
                     return [];
                 }
                 
-                let tData = data;
+                let tData = DSDD.strToHex(data);
                 let lastPlace = [];
                 let wAddrs = [];
                 while(tData.length > 0){
@@ -28,7 +28,7 @@ module TSOS{
                     if(tData.length == data.length && tData.length > 120){
 
                       //  tBlock = "01"+ DSDD.labelToString(start) + tBlock ;
-                      tBlock = "99999901"+ tBlock;
+                      tBlock = DSDD.arrToString(start)+"01"+ tBlock;
                      
                       let lablArr = DSDD.labelToArr(start);   
                      _HardDisk.setBlock(lablArr[0], lablArr[1],lablArr[2], tBlock);
@@ -40,8 +40,12 @@ module TSOS{
                             this.writeRollback(wAddrs);
                             return [];
                         }
+                        let lBlock = _HardDisk.getBlock(lastPlace[0],lastPlace[1],lastPlace[2]).substr(8);
+                        lBlock = DSDD.labelToString(next) + "01"+ lBlock;
+                        _HardDisk.setBlock(lastPlace[0],lastPlace[1],lastPlace[2],lBlock);
+                        
                         tBlock = "99999901"+ tBlock;
-                        let lablArr = DSDD.labelToArr(start);   
+                        let lablArr = DSDD.labelToArr(next);   
                         _HardDisk.setBlock(lablArr[0], lablArr[1],lablArr[2], tBlock);
                         wAddrs[wAddrs.length] = DSDD.arrToString(lablArr);
                         let uBlock = _HardDisk.getBlock(lastPlace[0], lastPlace[1], lastPlace[2]);
@@ -56,8 +60,14 @@ module TSOS{
                             this.writeRollback(wAddrs);
                             return [];
                         }
+                        let lBlock = _HardDisk.getBlock(lastPlace[0],lastPlace[1],lastPlace[2]).substr(8);
+                        lBlock = DSDD.labelToString(next) + "01"+ lBlock;
+                        _HardDisk.setBlock(lastPlace[0],lastPlace[1],lastPlace[2],lBlock);
+
+
+
                         tBlock = "99999901"+ tBlock;
-                        let lablArr = DSDD.labelToArr(start);   
+                        let lablArr = DSDD.labelToArr(next);   
                         _HardDisk.setBlock(lablArr[0], lablArr[1],lablArr[2], tBlock);
                         wAddrs[wAddrs.length] = DSDD.arrToString(lablArr);
                         break;
@@ -78,6 +88,14 @@ module TSOS{
 
                 }
             }
+
+            
+            public readBlock(blkAddr: number[]):string{
+                return _HardDisk.getBlock(blkAddr[0],blkAddr[1],blkAddr[2]);
+            }
+
+
+
 
             public static strToHex(str){  
 	            var arr = [];

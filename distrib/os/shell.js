@@ -90,6 +90,8 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.fWrite, "write", "writes to a file");
             this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.fRead, "read", "reads a file out");
+            this.commandList[this.commandList.length] = sc;
             // Display the initial prompt.
             this.putPrompt();
         }
@@ -335,6 +337,12 @@ var TSOS;
                         _StdOut.putText("usage: write <filename> <data>");
                         _StdOut.advanceLine();
                         _StdOut.putText("write to a file");
+                        break;
+                    case "read":
+                        _StdOut.putText("usage: read <filename>");
+                        _StdOut.advanceLine();
+                        _StdOut.putText("read from a file");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -618,7 +626,13 @@ var TSOS;
         //fWrite
         fWrite(fStuff) {
             const fname = fStuff[0];
-            const data = fStuff[1];
+            let data = fStuff[1];
+            if (fStuff.length > 2) {
+                for (let i = 2; i < fStuff.length; i++) {
+                    data = data + " " + fStuff[i];
+                }
+            }
+            console.log("we got this as data" + data);
             const isAFile = _FileSystem.findFileDirRecord(fname);
             if (isAFile) {
                 const writeSuccess = _FileSystem.writeToFile(fname, data);
@@ -633,6 +647,23 @@ var TSOS;
             }
             else {
                 _StdOut.putText("Could not find a file with that file name. Try using the create <filename> command to create that file.");
+                _StdOut.advanceLine();
+            }
+        }
+        fRead(fName) {
+            let fData = _FileSystem.readFromFile(fName[0]);
+            if (fData != "--") {
+                _StdOut.putText(`${fName[0]}.txt`);
+                _StdOut.advanceLine();
+                _StdOut.putText("---------------------------------");
+                _StdOut.advanceLine();
+                _StdOut.putText(fData);
+                _StdOut.advanceLine();
+                _StdOut.putText("------------EOF-------------------");
+                _StdOut.advanceLine();
+            }
+            else {
+                _StdOut.putText("File not found. Make sure that the file name you entered is correct and try again.");
                 _StdOut.advanceLine();
             }
         }

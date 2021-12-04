@@ -41,7 +41,7 @@
    <!-- Other Routines -->
    <script type="text/javascript" src="distrib/utils.js"></script>
    <!-- Uncomment the line below to enable GLaDOS testing. -->
-   <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip3.js"></script>
+   <!-- <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip3.js"></script> -->
 
 
    <!-- bootstrap stuff -->
@@ -99,8 +99,9 @@
 
          <div class="col-12">
             <span>
-               <h1 id="title" class="  display-4 ">SamO<span id="last">S</span></h1>
-               <h3 class="dislpay-5">An Operating System Based on TSOS</h3>
+               <h1 id="title" class="  display-4 ">SamOS</h1>
+               <h3 class="dislpay-5" id="dispHead">root@sampc~$ An Operating System Based on TSO<span id="last">S</span>
+               </h3>
             </span>
          </div>
 
@@ -194,9 +195,9 @@
                </div>
                <div class="row">
 
-                  <div class="col-12 card" id="pcbRecords">
+                  <div class="col-12 card">
                      <div class="card-header">Ready Queue</div>
-                     <div class="card-body">
+                     <div id="pcbRecords" class="card-body">
                         <table id="pcbTable">
                            <thead class="card-header">
                               <th scope="col">PID</th>

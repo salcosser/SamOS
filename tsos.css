@@ -42,9 +42,7 @@ h3 {
 .normal_button {
   width: 100px;
 }
-div{
-  /* margin:0px!important; */
-}
+
 .footerText {
   color: white;
   font-family: Arial, Helvetica, sans-serif;
@@ -146,7 +144,8 @@ td{
 
 
 #last{
-  border-right: 30px solid white;
+  border-right: 10px solid white;
+ 
     margin: 0 auto;
    
    animation:
@@ -159,4 +158,14 @@ td{
 #title{
   font-family: monospace;
   font-size:4rem;
+}
+#dispHead{
+  background-color:rgb(19, 32, 32);
+  text-align:left;
+}
+
+#pcbRecords{
+  overflow-y:scroll;
+  overflow-x:hidden;
+  height:300px;
 }
