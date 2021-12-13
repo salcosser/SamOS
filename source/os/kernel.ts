@@ -40,7 +40,7 @@ module TSOS {
             _MemoryManager = new MemoryManager();
 
             _Dispatcher = new Dispatcher();
-
+            
 
             // Load the Keyboard Device Driver
             this.krnTrace("Loading the keyboard device driver.");

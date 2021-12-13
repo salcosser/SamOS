@@ -44,13 +44,17 @@ module TSOS{
             public clearBlock(blkAddr){
                 _HardDisk.setBlock(blkAddr[0],blkAddr[1],blkAddr[2],DSDD.blankBlock);
             }
-            public writeData(data): number[]{
+            public writeData(data, rawData): number[]{
                 let start = this.findOpenSpace();
                 if(start === ""){
                     return [];
                 }
-                
-                let tData = DSDD.strToHex(data);
+                let tData = data;
+                if(!rawData){
+                  tData  = DSDD.strToHex(data);
+                }
+                console.log("the data writer got the following");
+                console.log(tData);
                 let lastPlace = [];
                 let wAddrs = [];
                 while(tData.length > 0){

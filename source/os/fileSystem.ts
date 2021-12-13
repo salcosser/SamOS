@@ -1,6 +1,12 @@
 module TSOS{
     export class FileSystem{
 
+
+
+    public swpCnt = 1;
+    public swpMap = new Map();
+
+
     public  findFileDirRecord(fname:string): number[]{
             for(let s:number = 0;s<SECT_COUNT;s++){
                 for(let b:number = 0;b<BLOCK_COUNT;b++){
@@ -38,6 +44,7 @@ module TSOS{
 
             let nameInHex = DSDD.strToHex(fname);
             _HardDisk.setBlock(location[0], location[1], location[2], `99999901${nameInHex}`);
+            
             _KernelInterruptQueue.enqueue(new TSOS.Interrupt(DISK_UPDATE, []));
             return true;
         }else{
@@ -47,14 +54,14 @@ module TSOS{
         return true;
      }   
 
-     public writeToFile(fname,data): boolean{
+     public writeToFile(fname,data, rawData): boolean{
          if(!FileSystem.validAddr(this.findFileDirRecord(fname))){
              return false;
              //throw error
          }else if(data == "" || data == null){
             return true;
          }else{
-            let fStart = _DSDD.writeData(data);
+            let fStart = _DSDD.writeData(data, rawData);
             if(FileSystem.validAddr(fStart)){
                 console.log(fStart.toString()+ "<< first block of file data");
                 this.setFileStart(fname, fStart);
@@ -93,11 +100,11 @@ module TSOS{
      }
 
 
-    public readFromFile(fName): string{
+    public readFromFile(fName, rawData): string{
         let fListing = this.findFileDirRecord(fName);
        // console.log("got to fs");
        // return "12345";
-        console.log("yo im getting"+ fListing.toString());
+       
         if(!FileSystem.validAddr(fListing)){
             return "--";
         }else{
@@ -126,7 +133,12 @@ module TSOS{
                     
                 }
             }
-            return FileSystem.hexToStr(dataBuffer);
+            if(rawData){
+                return dataBuffer;
+            }else{
+                return FileSystem.hexToStr(dataBuffer);
+            }
+            
         }
     }
 
@@ -154,6 +166,52 @@ module TSOS{
             }
         }
         return files;
+    }
+
+
+    public makeSwapFile(inputCode, pid: number): boolean{
+        let fName = "."+ (++this.swpCnt).toString();
+        console.log("original sqp data");
+        //console.log(inputCode.join(''));
+       // let jCode = inputCode.join('');
+        let isInit = this.initFile(fName);
+        if(isInit){
+            let didWrite;
+            if(Array.isArray(inputCode)){
+                console.log("got in here");
+                let jIn = inputCode.join('');
+               didWrite = this.writeToFile(fName,jIn, true);
+            } else{
+                didWrite = this.writeToFile(fName,inputCode, true);
+
+            }
+            
+            if(didWrite){
+                this.swpMap.set(pid,fName);
+                return true;
+            }
+                      
+        }
+        return false;
+    }
+    public swapIn(nPcb: TSOS.PCB, oPcb: TSOS.PCB): boolean{
+        console.log("old pcb" + oPcb.pid);
+        let oldPcbLoc = _MemoryManager.segAllocStatus.indexOf(oPcb.pid);
+        let oldPcbData = _MemoryManager.dumpFullSeg(oldPcbLoc).join('');
+       // console.log("original sqp data");
+        //console.log(oldPcbData.join(''));
+        let isSwappedOut = this.makeSwapFile(oldPcbData, oPcb.pid);
+        if(isSwappedOut){
+            let newData = this.readFromFile(this.swpMap.get(nPcb.pid), true);
+            _MemoryManager.loadMemoryStrict(newData, oldPcbLoc);
+            _MemoryManager.segAllocStatus[oldPcbLoc] = nPcb.pid;
+            nPcb.base = (oldPcbLoc * 256).toString(16);
+            nPcb.limit = ((oldPcbLoc * 256)+ 255).toString(16);
+            _Scheduler.pcbLocSet.set(oPcb.pid, ON_DISK);
+            _Scheduler.pcbLocSet.set(nPcb.pid, IN_MEM);
+            return true;
+        }
+        return false;
     }
 
 

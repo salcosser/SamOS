@@ -41,6 +41,8 @@ const READY = 1;
 const RUNNING = 2;
 const TERMINATED = 3;
 
+const ON_DISK = 22;
+const IN_MEM = 33;
 
 //used for hard disk
 const TRACK_COUNT = 4;

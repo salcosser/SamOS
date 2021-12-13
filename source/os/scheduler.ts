@@ -18,7 +18,7 @@ module TSOS{
         public readyQueue: TSOS.Queue = new Queue();
         public residentSet = new Map();
         public pid = 0;
-      
+        public pcbLocSet=  new Map();
         
         public runningPID: number = -1;
         public quantum: number = 6;
@@ -36,21 +36,46 @@ module TSOS{
                 inputCode[inputCode.length] = "00";
             }
             let loadedSeg = _MemoryManager.loadMemory(inputCode);
-            if(loadedSeg == -1){
-                return false;
-            }
-           
-             _MemoryManager.segAllocStatus[loadedSeg] = _Scheduler.pid;
+            
+            
+            
+            if(loadedSeg != -1){
+               // return false;
+               _MemoryManager.segAllocStatus[loadedSeg] = _Scheduler.pid;
         
-            let base = (loadedSeg * 256);
-            let memEnd = (inputCode.length).toString(16);
-            let newPcb = new PCB(_Scheduler.pid,base, base+ 255);
+               let base = (loadedSeg * 256);
+               let memEnd = (inputCode.length).toString(16);
+               let newPcb = new PCB(_Scheduler.pid,base, base+ 255);
+               _StdOut.putText(`Loaded new program, PID ${_Scheduler.pid}`);
+               _StdOut.advanceLine();
+               _Scheduler.residentSet.set(_Scheduler.pid, newPcb);// not ready yet
+               this.pcbLocSet.set(_Scheduler.pid, IN_MEM);
+               _Scheduler.pid++;
+               _Kernel.updateProcViewer();
+                
+            }else{
+                let base = -1;
+                
+                let newPcb = new PCB(_Scheduler.pid,11,11);
+                let resp = _FileSystem.makeSwapFile(inputCode, _Scheduler.pid);
+                if(resp){
+                    _StdOut.putText(`Loaded new program, PID ${_Scheduler.pid}`);
+                    _StdOut.advanceLine();
+                    _Scheduler.residentSet.set(_Scheduler.pid, newPcb);// not ready yet
+                    this.pcbLocSet.set(_Scheduler.pid, ON_DISK);
+                    _Scheduler.pid++;
+                    _Kernel.updateProcViewer();
+                    _Kernel.updateDiskViewer();
+                }else{
+                    _StdOut.putText("Something Went Wrong setting up that proc.");
+                    return false;
+                }
+               
+            }
+            
+             
            
-            _StdOut.putText(`Loaded new program, PID ${_Scheduler.pid}`);
-            _StdOut.advanceLine();
-            _Scheduler.residentSet.set(_Scheduler.pid, newPcb);// not ready yet
-            _Scheduler.pid++;
-            _Kernel.updateProcViewer();
+            
             return true;
         }
 
@@ -58,11 +83,33 @@ module TSOS{
            
             let tempPCB: TSOS.PCB   = _Scheduler.residentSet.get(parseInt(pid));
             if(tempPCB){ // if that pcb is there
+                if(this.pcbLocSet.get(tempPCB.pid) == ON_DISK){
+                    for(let p of _MemoryManager.segAllocStatus){
+                        let pc = this.readyQueue.q.find(Pcb => Pcb.pid == p);
+                        if(!pc){
+                            pc = this.residentSet.get(p);
+                        }
+                        if(!pc){
+                            console.log("Couldnt find that one");
+                            return;
+                        }
+                        if(pc.status != RUNNING){
+                            console.log("this pid"+ pc.pid);
+                            _FileSystem.swapIn(tempPCB, pc);
+                            break;
+                        }
+                    }
+                    tempPCB.state = READY;
+                    _Scheduler.readyQueue.enqueue(tempPCB);// in later projects, more will be added to this process
+                    Control.hostLog("starting pid "+ pid);
+                    _CPU.isExecuting = true;
+                }else{
+                    tempPCB.state = READY;
+                    _Scheduler.readyQueue.enqueue(tempPCB);// in later projects, more will be added to this process
+                    Control.hostLog("starting pid "+ pid);
+                    _CPU.isExecuting = true;
+                }
                 
-                tempPCB.state = READY;
-                _Scheduler.readyQueue.enqueue(tempPCB);// in later projects, more will be added to this process
-                Control.hostLog("starting pid "+ pid);
-                _CPU.isExecuting = true;
              
             }else{  // if cant find it
                _StdOut.putText("PCB with PID of " + pid + " was not found in the resident queue.");

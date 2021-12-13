@@ -44,6 +44,41 @@ module TSOS{
             }
             return segment;
         }
+
+        public loadMemoryStrict(dataList, seg): void{
+             // console.log("got all the way to here");
+             var cAddr10 = 0;
+             var cAddr16 = "00";
+             for(let i = cAddr10; i< dataList.length;i++){
+                  _MemoryAccessor.writeByteStrict(cAddr16, dataList[i].toUpperCase(), seg);
+                  cAddr16 = (++cAddr10).toString(16);
+                 if(cAddr10<16){
+                     cAddr16 = "0"+cAddr16;
+                 }
+             }
+            
+        }
+
+        public dumpFullSeg(segNum: number): string[]{
+           
+            // console.log("got all the way to here");
+            var cAddr10 = 0;
+            var cAddr16 = "00";
+            let out = [];
+            for(let i = cAddr10; i< MEM_LIMIT/3;i++){
+                 out[out.length] =  _MemoryAccessor.readByteStrict(cAddr16, segNum);
+                 cAddr16 = (++cAddr10).toString(16);
+                if(cAddr10<16){
+                    cAddr16 = "0"+cAddr16;
+                }
+            }
+            
+            return out;
+        }
+
+
+
+
         // not used much
         public clearMemory(){
            

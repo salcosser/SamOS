@@ -10,6 +10,7 @@ module TSOS{
         public zFlag: string;
         public Acc: string;
         public state: number;
+        public swapped: boolean;
         constructor(pid, base, limit){
             this.base  = base;// both to be updated in the future
             this.limit = limit;
@@ -21,6 +22,7 @@ module TSOS{
             this.zFlag = "00";
             this.state = RESIDENT;
             this.IR    = _MemoryManager.getMemoryPerSeg(0,(base / 256));
+            this.swapped = false;
         }
     }
 }

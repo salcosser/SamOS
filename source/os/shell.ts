@@ -813,6 +813,11 @@ module TSOS {
 
     public fCreate(fname: string[]){
         const nFname = fname[0];
+        if(nFname.substr(0,1) == "."){
+            _StdOut.putText("File names cannot begin with a period. Please rewrite the filename and try again.");
+            _StdOut.advanceLine();
+            return;
+        }
         let valid = _FileSystem.initFile(nFname);
         if(_DSDD.isFormatted){
             if(valid){
@@ -842,7 +847,7 @@ module TSOS {
             console.log("we got this as data"+ data);           
             const isAFile = _FileSystem.findFileDirRecord(fname);
             if(isAFile){
-                const writeSuccess = _FileSystem.writeToFile(fname,data);
+                const writeSuccess = _FileSystem.writeToFile(fname,data, false);
                 if(writeSuccess){
                     _StdOut.putText("Successfully wrote to the file.");
                     _StdOut.advanceLine();
@@ -864,7 +869,7 @@ module TSOS {
     public fRead(fName: string[]){
         if(_DSDD.isFormatted){
        
-            let fData = _FileSystem.readFromFile(fName[0]);
+            let fData = _FileSystem.readFromFile(fName[0], false);
             if(fData != "--"){
                 _StdOut.putText(`        ${fName[0]}.txt`);
                 _StdOut.advanceLine();
@@ -875,7 +880,7 @@ module TSOS {
                 _StdOut.putText("------------EOF-------------------");
                 _StdOut.advanceLine();
             }else{
-                _StdOut.putText("File not found. Make sure that the file name you entered is correct and try again.");
+                _StdOut.putText("File not found. Make sure that the file name that you entered is correct and try again.");
                 _StdOut.advanceLine();
             }
         }else{
