@@ -32,9 +32,11 @@ module TSOS{
             
         }
         public setupProcess(inputCode): boolean{ 
+
             while(inputCode.length < 256){
                 inputCode[inputCode.length] = "00";
             }
+
             let loadedSeg = _MemoryManager.loadMemory(inputCode);
             
             
@@ -93,7 +95,7 @@ module TSOS{
                             console.log("Couldnt find that one");
                             return;
                         }
-                        if(pc.status != RUNNING){
+                        if(pc.state != RUNNING){
                             console.log("this pid"+ pc.pid);
                             _FileSystem.swapIn(tempPCB, pc);
                             break;
@@ -192,9 +194,35 @@ module TSOS{
                             if(tProc.state == READY){ // found one ready to go
                                 console.log("in here");
                                 this.procTime.set(this.runningPID,0);
+                                // check if it is on disk
+                                let nProcLoc = this.pcbLocSet.get(tProc.pid);
+                                if(nProcLoc == ON_DISK){
+                                    //do stuff
+                                    console.log("in heheheheh");
+                                    for(let p of _MemoryManager.segAllocStatus){
+                                        if(p == _Scheduler.runningPID){
+                                            continue;
+                                        }
+                                         let pc = this.readyQueue.q.find(Pcb=> Pcb.pid == p);
+                                         console.log("gonna swap with "+ pc.pid);
+                                         if(pc.state != RUNNING){
+                                             console.log("found one, time to swap");
+                                             _FileSystem.swapIn(tProc, pc);
+                                             break;
+                                         }
+                                        
+                                    }
+                                    
+                                    
+                                    //_FileSystem.swapIn()
+                                }
                                 _Dispatcher.contextSwitch(tProc);
+                                    
+                                
+
                                 tProc.state = RUNNING;
                                 this.procTime.set(this.runningPID, 0);
+                                
                                 break;
                             }else if(procCount == this.readyQueue.getSize()+1){ // nothing else ready
                                 this.procTime.set(this.runningPID, 0);

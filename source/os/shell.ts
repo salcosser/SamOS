@@ -615,7 +615,7 @@ module TSOS {
            var strippedCode = inputtedCode.replace(/\s/g, ''); // removing spaces
            if(/^[A-F0-9]+$/i.test(strippedCode)){ // testing against a regex
                
-              if(strippedCode.length <= 512){ //saving a computation by not dividing length by 2
+              if(strippedCode.length <= 512 && (strippedCode.length / 2 % 2 == 0)){ //saving a computation by not dividing length by 2
                 var memList = [];
                 var memInd = 0;
                 while(memInd < strippedCode.length){

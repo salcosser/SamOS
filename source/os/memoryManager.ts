@@ -49,8 +49,14 @@ module TSOS{
              // console.log("got all the way to here");
              var cAddr10 = 0;
              var cAddr16 = "00";
-             for(let i = cAddr10; i< dataList.length;i++){
-                  _MemoryAccessor.writeByteStrict(cAddr16, dataList[i].toUpperCase(), seg);
+             console.log("got here " +seg);
+
+             for(let i = cAddr10; i< dataList.length / 2;i++){
+                    let nBit = dataList.substr(i*2,2).toUpperCase();
+                    if(nBit == ""){
+                        nBit = "00";
+                    }
+                  _MemoryAccessor.writeByteStrict(cAddr16, nBit, seg);
                   cAddr16 = (++cAddr10).toString(16);
                  if(cAddr10<16){
                      cAddr16 = "0"+cAddr16;

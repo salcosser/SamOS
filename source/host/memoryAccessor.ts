@@ -28,6 +28,7 @@ module TSOS{
        public writeByteStrict(addr, data, segment): void{
         let offset = (segment * 256);
         // console.log(`we got segment ${segment} tp work with`);
+        
         let physAddr = parseInt(addr, 16) + offset;
            let deviation = physAddr - offset;
            if(deviation  > 255 || deviation < 0){

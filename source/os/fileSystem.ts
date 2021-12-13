@@ -125,7 +125,7 @@ module TSOS{
                     cRData = cData.substr(8);
                     // console.log(cData);
                     dataBuffer = dataBuffer + cRData;
-                    console.log("current buffer: "+FileSystem.hexToStr(dataBuffer))
+                   // console.log("current buffer: "+FileSystem.hexToStr(dataBuffer))
                     nextPlace = this.getNextBlock(cData);
                     if(nextPlace == []){
                         hasNext = false;
@@ -202,7 +202,14 @@ module TSOS{
         //console.log(oldPcbData.join(''));
         let isSwappedOut = this.makeSwapFile(oldPcbData, oPcb.pid);
         if(isSwappedOut){
+
             let newData = this.readFromFile(this.swpMap.get(nPcb.pid), true);
+            let del = this.deleteFile(this.swpMap.get(nPcb.pid));
+            this.swpMap.delete(nPcb.pid);
+            if(!del){
+                return false;
+            }
+            _MemoryManager.clearMemoryPerSeg(oldPcbLoc);
             _MemoryManager.loadMemoryStrict(newData, oldPcbLoc);
             _MemoryManager.segAllocStatus[oldPcbLoc] = nPcb.pid;
             nPcb.base = (oldPcbLoc * 256).toString(16);
