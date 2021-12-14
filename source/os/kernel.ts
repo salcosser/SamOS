@@ -108,7 +108,7 @@ module TSOS {
                 if(_Scheduler.cAlgo == RR || _Scheduler.cAlgo == FCFS){
                     _Scheduler.preemptive();
                 }else{
-                   // _Scheduler.priority();
+                    _Scheduler.priority();
                 }
 
 
@@ -163,7 +163,7 @@ module TSOS {
                     break;
                 case END_PROC_IRQ:  
                     _Scheduler.termProc(params[0]);
-                   // _Scheduler.rrSync();
+                   // _Scheduler.sync();
                     this.updateProcViewer();
                     _StdOut.advanceLine();
                     _StdOut.putText(`Program with pid ${params[0]} has ended`);
@@ -341,7 +341,7 @@ module TSOS {
                     while(rTable.rows.length > 1){
                         rTable.rows[rTable.rows.length -1].remove();
                     }
-                if(_Scheduler.runningPID != -1 && _Scheduler.readyQueue.getSize() >= 1){
+                if(_Scheduler.runningPID != -1){
                     let rPcb = new Map();
 
                     rPcb.set("pid", _Scheduler.runningPID);

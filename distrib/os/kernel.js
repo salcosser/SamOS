@@ -86,7 +86,7 @@ var TSOS;
                     _Scheduler.preemptive();
                 }
                 else {
-                    // _Scheduler.priority();
+                    _Scheduler.priority();
                 }
                 if (_CPU.isExecuting) { // did anything change?
                     _Mode = 1;
@@ -132,7 +132,7 @@ var TSOS;
                     break;
                 case END_PROC_IRQ:
                     _Scheduler.termProc(params[0]);
-                    // _Scheduler.rrSync();
+                    // _Scheduler.sync();
                     this.updateProcViewer();
                     _StdOut.advanceLine();
                     _StdOut.putText(`Program with pid ${params[0]} has ended`);
@@ -291,7 +291,7 @@ var TSOS;
             while (rTable.rows.length > 1) {
                 rTable.rows[rTable.rows.length - 1].remove();
             }
-            if (_Scheduler.runningPID != -1 && _Scheduler.readyQueue.getSize() >= 1) {
+            if (_Scheduler.runningPID != -1) {
                 let rPcb = new Map();
                 rPcb.set("pid", _Scheduler.runningPID);
                 rPcb.set("seg", _MemoryManager.segAllocStatus.indexOf(_Scheduler.runningPID));

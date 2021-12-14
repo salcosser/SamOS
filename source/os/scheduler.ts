@@ -95,11 +95,13 @@ module TSOS{
                             console.log("Couldnt find that one");
                             return;
                         }
-                        if(pc.state != RUNNING){
+                        console.log("pc: "+ this.pcbLocSet.get(pc.pid));
+                        if(pc.state != RUNNING && pc.state != TERMINATED && this.pcbLocSet.get(pc.pid) == IN_MEM){
                             console.log("this pid"+ pc.pid);
                             _FileSystem.swapIn(tempPCB, pc);
                             break;
                         }
+
                     }
                     tempPCB.state = READY;
                     _Scheduler.readyQueue.enqueue(tempPCB);// in later projects, more will be added to this process
@@ -244,7 +246,7 @@ module TSOS{
                 
             }else if(this.runningPID == -1){ // if we get here, it means theres nothing running
 
-                this.rrSync();
+                this.sync();
             }else{
                 this.procTime.set(this.runningPID, 1);
             }          
@@ -259,7 +261,7 @@ module TSOS{
 
 
             // preemption code
-        public rrSync(): void{
+        public sync(): void{
          
                 let foundReady = false;
                 
@@ -286,8 +288,17 @@ module TSOS{
                 }
            }
 
+        public priority(){
+            //
         }
+        
+    
+    
+    }
 
+
+
+        
        
        
     }

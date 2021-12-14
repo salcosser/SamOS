@@ -68,11 +68,12 @@ module TSOS{
         public dumpFullSeg(segNum: number): string[]{
            
             // console.log("got all the way to here");
+            console.log("WE ARE GETTING SEGMENT NUMBER" + segNum);
             var cAddr10 = 0;
             var cAddr16 = "00";
             let out = [];
             for(let i = cAddr10; i< MEM_LIMIT/3;i++){
-                 out[out.length] =  _MemoryAccessor.readByteStrict(cAddr16, segNum);
+                 out[out.length] =  _MemoryAccessor.readByteBySegment(cAddr16, segNum);
                  cAddr16 = (++cAddr10).toString(16);
                 if(cAddr10<16){
                     cAddr16 = "0"+cAddr16;
