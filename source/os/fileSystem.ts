@@ -227,6 +227,24 @@ module TSOS{
     }
 
 
+    public onlySwapIn(nPcb:TSOS.PCB, segPlace: number):boolean{
+        let newData = this.readFromFile(this.swpMap.get(nPcb.pid), true);
+        let del = this.deleteFile(this.swpMap.get(nPcb.pid));
+        this.swpMap.delete(nPcb.pid);
+        if(!del){
+            return false;
+        }
+        _MemoryManager.clearMemoryPerSeg(segPlace);
+        _MemoryManager.loadMemoryStrict(newData, segPlace);
+        _MemoryManager.segAllocStatus[segPlace] = nPcb.pid;
+        nPcb.base = (segPlace * 256).toString(16);
+        nPcb.limit = ((segPlace * 256)+ 255).toString(16);
+        // _Scheduler.pcbLocSet.set(oPcb.pid, ON_DISK);
+        _Scheduler.pcbLocSet.set(nPcb.pid, IN_MEM);
+        return true;
+    }
+
+
     public static validAddr(arr):boolean{
         return ((arr[0] + arr[1] + arr[2]) > -1);
     }

@@ -54,7 +54,19 @@ module TSOS{
                 tempPcb.Acc = _CPU.Acc;
                 tempPcb.state = TERMINATED;
                 _Scheduler.readyQueue.enqueue(tempPcb); // terminating the running pid and putting the terminated pcb on the back of the queue
+                for(let i = 0;i<_Scheduler.priArr.length;i++){
+                    if(_Scheduler.priArr[i].pid == _Scheduler.runningPID){
+                        _Scheduler.priArr[i].pri = Number.POSITIVE_INFINITY;
+                        _Scheduler.updatePriorityArray();
+                        console.log("got to here");
+                        break;
+                    }
+                }
+
+
+
                 _Scheduler.runningPID = -1;
+                
                 _CPU.isExecuting = true; // used with the assumption that something else will find what to do next
         }else{
             console.log("this shouldn't happen");

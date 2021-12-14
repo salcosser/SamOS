@@ -479,7 +479,7 @@ var TSOS;
             var inputtedCode = document.getElementById("taProgramInput").value; // casting necessary to get .value
             var strippedCode = inputtedCode.replace(/\s/g, ''); // removing spaces
             if (/^[A-F0-9]+$/i.test(strippedCode)) { // testing against a regex
-                if (strippedCode.length <= 512 && (strippedCode.length / 2 % 2 == 0)) { //saving a computation by not dividing length by 2
+                if (strippedCode.length <= 512 && (strippedCode.length % 2 == 0)) { //saving a computation by not dividing length by 2
                     var memList = [];
                     var memInd = 0;
                     while (memInd < strippedCode.length) {
@@ -804,6 +804,10 @@ var TSOS;
                     // _Scheduler.quantum = Number.MAX_SAFE_INTEGER;
                     _Scheduler.cAlgo = PRI;
                     _StdOut.putText("Scheduling set to non-preemptive priority.");
+                    break;
+                default:
+                    _StdOut.putText("Please enter either rr, fcfs, or priority as the scheduling algorithm");
+                    _StdOut.advanceLine();
                     break;
             }
         }
