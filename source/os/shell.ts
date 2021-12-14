@@ -212,6 +212,11 @@ module TSOS {
                 "set the cpu scheduling algorithm");
             this.commandList[this.commandList.length] = sc;
 
+            sc = new ShellCommand(this.gtSched,
+                "getschedule",
+                "returns the current scheduling algorithm being used by the CPU.");
+            this.commandList[this.commandList.length] = sc;
+
 
             // Display the initial prompt.
             this.putPrompt();
@@ -518,6 +523,10 @@ module TSOS {
                         _StdOut.putText("usage: setschedule [rr, fcfs, priority]");
                         _StdOut.advanceLine();
                         _StdOut.putText("sets the cpu scheduling algorithm.");
+                        break;
+                    case "getschedule":
+                        _StdOut.putText("usage: getschedule");
+                        _StdOut.advanceLine();
                         break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
@@ -996,7 +1005,30 @@ module TSOS {
                 break;
         }
     }
+    public gtSched(){
+        switch(_Scheduler.cAlgo){
+            case RR:
+                _StdOut.putText("CPU currently using round robin scheduling.");
+                _StdOut.advanceLine();
+                _StdOut.putText("Meaning, each process gets a certain number of cylces before it is another's turn.");
+                _StdOut.advanceLine();
+                break;
+            case FCFS:
+                _StdOut.putText("CPU currently using first come, first served scheduling.");
+                _StdOut.advanceLine();
+                _StdOut.putText("Meaning, processes run in order of their arrival to the ready queue, and each process runs until it completes.");
+                _StdOut.advanceLine();
+                break;
+            case PRI:
+                _StdOut.putText("CPU currently using priority scheduling.");
+                _StdOut.advanceLine();
+                _StdOut.putText("Meaning, the next process is chosen based on it's user given priority. Any ties are broken with first come first served rules.");
+                _StdOut.advanceLine();
+                break;
+        }
 
+        }
+    }
 
 
     }
