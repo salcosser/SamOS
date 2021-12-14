@@ -100,6 +100,8 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.delete, "delete", "deletes a given file");
             this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.stSched, "setschedule", "set the cpu scheduling algorithm");
+            this.commandList[this.commandList.length] = sc;
             // Display the initial prompt.
             this.putPrompt();
         }
@@ -370,6 +372,11 @@ var TSOS;
                         _StdOut.putText("usage: delete <filename>");
                         _StdOut.advanceLine();
                         _StdOut.putText("deletes a given file.");
+                        break;
+                    case "setschedule":
+                        _StdOut.putText("usage: setschedule [rr, fcfs, priority]");
+                        _StdOut.advanceLine();
+                        _StdOut.putText("sets the cpu scheduling algorithm.");
                         break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
@@ -672,6 +679,12 @@ var TSOS;
                         data = data + " " + fStuff[i];
                     }
                 }
+                if (data.charAt(0) != "\"" || data.charAt(data.length - 1) != "\"") {
+                    _StdOut.putText("file data must be enclosed within double quotes.");
+                    _StdOut.advanceLine();
+                    return;
+                }
+                data = data.substr(1, data.length - 2);
                 console.log("we got this as data" + data);
                 const isAFile = _FileSystem.findFileDirRecord(fname);
                 if (isAFile) {
@@ -753,6 +766,31 @@ var TSOS;
             else {
                 _StdOut.putText("Disk not formatted. Please format the disk first.");
                 _StdOut.advanceLine();
+            }
+        }
+        stSched(s) {
+            let schedule = s[0];
+            switch (schedule) {
+                case "rr":
+                    //do stuff
+                    _Scheduler.quantum = RR_QUANT;
+                    _Scheduler.cAlgo = RR;
+                    _StdOut.putText("Scheduling set to round robin.");
+                    _StdOut.advanceLine();
+                    break;
+                case "fcfs":
+                    //do other stuff
+                    _Scheduler.quantum = FCFS_QUANT;
+                    _Scheduler.cAlgo = FCFS;
+                    _StdOut.putText("Scheduling set to first come, first served.");
+                    _StdOut.advanceLine();
+                    break;
+                case "priority":
+                    //do more stuff
+                    // _Scheduler.quantum = Number.MAX_SAFE_INTEGER;
+                    _Scheduler.cAlgo = PRI;
+                    _StdOut.putText("Scheduling set to non-preemptive priority.");
+                    break;
             }
         }
     }

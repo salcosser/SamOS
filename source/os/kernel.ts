@@ -40,7 +40,7 @@ module TSOS {
             _MemoryManager = new MemoryManager();
 
             _Dispatcher = new Dispatcher();
-            
+
 
             // Load the Keyboard Device Driver
             this.krnTrace("Loading the keyboard device driver.");
@@ -105,7 +105,14 @@ module TSOS {
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             } else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is anything being processed.
                 _Mode = 0;
-                _Scheduler.recessDuty();
+                if(_Scheduler.cAlgo == RR || _Scheduler.cAlgo == FCFS){
+                    _Scheduler.preemptive();
+                }else{
+                   // _Scheduler.priority();
+                }
+
+
+                
                if(_CPU.isExecuting){ // did anything change?
                  _Mode = 1;
                  _CPU.cycle();
@@ -346,9 +353,9 @@ module TSOS {
                     rPcb.set("yr", _CPU.Yreg);
                     rPcb.set("zf", _CPU.Zflag);
                     rPcb.set("st","Running");
-                    
+                    rPcb.set("dsk", "N/A");
                     pcbSet.set(_Scheduler.runningPID, rPcb);
-
+                    
 
 
                     // let rRow = rTable.insertRow(-1);
@@ -383,6 +390,12 @@ module TSOS {
                         rdPcb.set("seg","N/A");
                     }
                     
+                    if(_FileSystem.swpMap.get(pcb.pid) != null){
+                        rdPcb.set("dsk", "0");
+                    }else{
+                        rdPcb.set("dsk","N/A")
+                    }
+
                     rdPcb.set("pc",pcb.PC);
                     rdPcb.set("ir",pcb.IR);
                     rdPcb.set("acc",pcb.Acc);
@@ -420,18 +433,19 @@ module TSOS {
                     let nRowData = pcbSet.get(key);
                      let rRow = rTable.insertRow(-1);
         
-                    for(let i = 0;i<9;i++){
+                    for(let i = 0;i<10;i++){
                             rRow.insertCell(i);
                     }
                     rRow.cells[0].innerHTML = nRowData.get("pid");
                     rRow.cells[1].innerHTML = nRowData.get("seg");
-                    rRow.cells[2].innerHTML = nRowData.get("pc");
-                    rRow.cells[3].innerHTML = nRowData.get("ir");
-                    rRow.cells[4].innerHTML = nRowData.get("acc");
-                    rRow.cells[5].innerHTML = nRowData.get("xr");
-                    rRow.cells[6].innerHTML = nRowData.get("yr");
-                    rRow.cells[7].innerHTML = nRowData.get("zf");
-                    rRow.cells[8].innerHTML = nRowData.get("st");
+                    rRow.cells[2].innerHTML = nRowData.get("dsk");
+                    rRow.cells[3].innerHTML = nRowData.get("pc");
+                    rRow.cells[4].innerHTML = nRowData.get("ir");
+                    rRow.cells[5].innerHTML = nRowData.get("acc");
+                    rRow.cells[6].innerHTML = nRowData.get("xr");
+                    rRow.cells[7].innerHTML = nRowData.get("yr");
+                    rRow.cells[8].innerHTML = nRowData.get("zf");
+                    rRow.cells[9].innerHTML = nRowData.get("st");
                     if(nRowData.get("st") == "Running"){
                         rRow.style.backgroundColor = "rgba(230, 114, 100, 0.65)";
                     }

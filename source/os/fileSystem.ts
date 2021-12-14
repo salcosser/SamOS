@@ -162,7 +162,12 @@ module TSOS{
         for(let i = 0;i<_HardDisk.dirRecs.length;i++){
             let blk = _DSDD.readBlock(DSDD.strToArr(_HardDisk.dirRecs[i]));
             if(blk.substr(7,2) != "00"){
-                files[files.length] = FileSystem.hexToStr(blk.substr(8));
+                
+                
+                let fName = FileSystem.hexToStr(blk.substr(8));
+                if(fName.substr(0,1) != "."){
+                    files[files.length] = fName;
+                }
             }
         }
         return files;

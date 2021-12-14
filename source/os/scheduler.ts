@@ -24,7 +24,7 @@ module TSOS{
         public quantum: number = 6;
         public cQuant: number = -1;
         public procTime = new Map();
-
+        public cAlgo = RR;
         constructor(){
           
         }
@@ -178,7 +178,7 @@ module TSOS{
 
         }
 
-        public recessDuty(): void{ // keeping track of the round robin scheduling
+        public preemptive(): void{ // keeping track of the round robin scheduling
            
             if(this.procTime.has(this.runningPID)){ // if there is a tracker for it
                 let cQuantVal = this.procTime.get(this.runningPID);
@@ -249,6 +249,14 @@ module TSOS{
                 this.procTime.set(this.runningPID, 1);
             }          
         }
+
+
+        
+
+
+
+
+
 
             // preemption code
         public rrSync(): void{

@@ -29,6 +29,10 @@ const MEM_LIMIT = 768;
 //used in the mem mgr
 const NOT_ALLOCATED = -2;
 const ALLOC_AWAITING_PID = -1;
+//sched algos
+const RR = 13;
+const FCFS = 33;
+const PRI = 44;
 //states
 const RESIDENT = 0;
 const READY = 1;
@@ -40,6 +44,8 @@ const IN_MEM = 33;
 const TRACK_COUNT = 4;
 const SECT_COUNT = 8;
 const BLOCK_COUNT = 8;
+const RR_QUANT = 6;
+const FCFS_QUANT = Number.POSITIVE_INFINITY;
 //
 // Global Variables
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
