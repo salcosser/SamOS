@@ -34,13 +34,19 @@ module TSOS{
             
         }
 
-        public sortPri(prObj1, prObj2){
+        public sortPri(prObj1, prObj2){ // priority sorting algorithm
             if(prObj1.pri > prObj2.pri){
                 return 1;
             }else if(prObj1.pri< prObj2.pri){
                 return -1;
+            }else if(prObj1.arrive != Number.POSITIVE_INFINITY && prObj2.arrive != Number.POSITIVE_INFINITY){
+                if(prObj1.arrive < prObj2.arrive){
+                    return 1;
+                }else{
+                    return -1;
+                }
             }else{
-                if(prObj1.pid < prObj2.pri){
+                if(prObj1.pid < prObj2.pid){
                     return 1;
                 }else{
                     return -1;
@@ -48,7 +54,7 @@ module TSOS{
             }
         }
 
-        public updatePriorityArray(){
+        public updatePriorityArray(){ // sorting the priority array so we can just iterate through it
             this.priArr = this.priArr.sort((a,b) => this.sortPri(a,b));
         }
 
@@ -63,7 +69,7 @@ module TSOS{
             
             
             if(loadedSeg != -1){
-               // return false;
+               
                _MemoryManager.segAllocStatus[loadedSeg] = _Scheduler.pid;
         
                let base = (loadedSeg * 256);
@@ -73,7 +79,7 @@ module TSOS{
                _StdOut.advanceLine();
                _Scheduler.residentSet.set(_Scheduler.pid, newPcb);// not ready yet
                this.pcbLocSet.set(_Scheduler.pid, IN_MEM);
-               console.log("&&&&&");
+               //console.log("&&&&&");
                lPid = _Scheduler.pid;
 
                _Scheduler.pid++;
@@ -89,7 +95,7 @@ module TSOS{
                     _StdOut.advanceLine();
                     _Scheduler.residentSet.set(_Scheduler.pid, newPcb);// not ready yet
                     this.pcbLocSet.set(_Scheduler.pid, ON_DISK);
-                    console.log("&&^^&&&");
+                    //console.log("&&^^&&&");
                     lPid = _Scheduler.pid;
                     _Scheduler.pid++;
                     _Kernel.updateProcViewer();
@@ -103,10 +109,10 @@ module TSOS{
             
              
            if(priority != -1){
-               this.priArr[this.priArr.length] = {pid: lPid,pri:  priority};
+               this.priArr[this.priArr.length] = {pid: lPid,pri:  priority, arrive: Number.POSITIVE_INFINITY};
                
            }else{
-                this.priArr[this.priArr.length] = {pid: lPid,pri:  DEFAULT_PRIORITY};
+                this.priArr[this.priArr.length] = {pid: lPid,pri:  DEFAULT_PRIORITY, arrive: Number.POSITIVE_INFINITY};
            }
             this.updatePriorityArray();
             return lPid;
@@ -123,18 +129,24 @@ module TSOS{
                             pc = this.residentSet.get(p);
                         }
                         if(!pc){
-                            console.log("Couldnt find that one");
+                            //console.log("Couldnt find that one");
                             return;
                         }
-                        console.log("pc: "+ this.pcbLocSet.get(pc.pid));
+                        //console.log("pc: "+ this.pcbLocSet.get(pc.pid));
                         if(pc.state != RUNNING && pc.state != TERMINATED && this.pcbLocSet.get(pc.pid) == IN_MEM){
-                            console.log("this pid"+ pc.pid);
+                            //console.log("this pid"+ pc.pid);
                             _FileSystem.swapIn(tempPCB, pc);
                             break;
                         }
 
                     }
                     tempPCB.state = READY;
+                    for(let i = 0;i<this.priArr.length;i++){
+                        if(this.priArr[i].pid == pid){
+                            this.priArr[i].arrive = _OSclock;
+                            break;
+                        }
+                    }
                     _Scheduler.readyQueue.enqueue(tempPCB);// in later projects, more will be added to this process
                     Control.hostLog("starting pid "+ pid);
                     _CPU.isExecuting = true;
@@ -162,14 +174,14 @@ module TSOS{
             let seg = _MemoryManager.segAllocStatus.indexOf(pid); // finding where this pcb is in memory
             let tempPcb = new PCB(pid, seg*255, (seg+1)*255);
             tempPcb.state = TERMINATED;
-           // this.readyQueue.enqueue(tempPcb);
+           /// this.readyQueue.enqueue(tempPcb);
             Control.hostLog("killed proc "+ pid);
             _MemoryManager.segAllocStatus[seg] = NOT_ALLOCATED; // freeing up the memory to be written over
             
             _Dispatcher.remPcb(); // pull out the running process
            
              _Kernel.updateProcViewer();
-             console.log("terminating a thing" + pid);
+             //console.log("terminating a thing" + pid);
             
         }
 
@@ -227,30 +239,17 @@ module TSOS{
                         while(!foundNewProc){ // iterate until the last proc, or the first waiting/ready one
                             let tProc = this.readyQueue.dequeue();
                             if(tProc.state == READY){ // found one ready to go
-                                console.log("in here");
+                               
                                 this.procTime.set(this.runningPID,0);
                                 // check if it is on disk
                                 let nProcLoc = this.pcbLocSet.get(tProc.pid);
                                 if(nProcLoc == ON_DISK){
-                                    //do stuff
-                                    console.log("in heheheheh");
-                                    for(let p of _MemoryManager.segAllocStatus){
-                                        if(p == _Scheduler.runningPID){
-                                            continue;
-                                        }
-                                         let pc = this.readyQueue.q.find(Pcb=> Pcb.pid == p);
-                                         console.log("gonna swap with "+ pc.pid);
-                                         if(pc.state != RUNNING){
-                                             console.log("found one, time to swap");
-                                             _FileSystem.swapIn(tProc, pc);
-                                             break;
-                                         }
-                                        
-                                    }
                                     
                                     
-                                    //_FileSystem.swapIn()
+                                    let triedSwap = this.ensureInMemory(tProc);
+                                    
                                 }
+                                
                                 _Dispatcher.contextSwitch(tProc);
                                     
                                 
@@ -300,17 +299,20 @@ module TSOS{
                 
                 let procCount = 0;
                 while(!foundReady){ // see if theres something else to do next
+                    console.log("proc count"+ procCount);
                     let tProc = _Scheduler.readyQueue.dequeue();
                     if(tProc.state == READY){ // found something to do
                         let newProc = tProc;    
+                        let triedSwap = this.ensureInMemory(tProc); // ensure that the thing is in memory
+                        //if(_MemoryManager.segAllocS)
                         _Dispatcher.contextSwitch(newProc);
-                        console.log("PID is now"+ this.runningPID);
+                        //console.log("PID is now"+ this.runningPID);
                         foundReady = true;
                        
                     }else{ // nothing left to do
                         procCount++;
                         if(procCount >= this.readyQueue.getSize()+1){
-                            console.log("I checked" + procCount);
+                            //console.log("I checked" + procCount);
                             _Scheduler.readyQueue.enqueue(tProc);
                             _CPU.isExecuting = false;
                             _KernelInterruptQueue.enqueue(new Interrupt(FINISHED_PROC_QUEUE, [_Scheduler.runningPID]));
@@ -321,19 +323,19 @@ module TSOS{
                 }
            }
 
-        public priority(){
+        public priority(){ // priority scheduling
 
             if(this.runningPID == -1){
-                this.priSync();
+                this.priSync(); // call switcher
                 
             
             }else{
                 if(this.pendingSwitch){
-                    console.log("switching");
+                
                     this.priSync();
                     this.pendingSwitch = false;
                 }else if(this.runningPID == 0){
-                    console.log("beep boop");
+                    //console.log("beep boop");
                 }
             }
 
@@ -342,73 +344,17 @@ module TSOS{
         }
 
 
-        public priSync1(){
-            console.log(this.priArr);
-            for(let i = 0;i< this.priArr.length;i++){
-                console.log("lookiing at "+ this.priArr[i].pid);
-                console.log("current pid: "+ this.runningPID);
-                if(this.priArr[i].pri != Number.POSITIVE_INFINITY){
-                    console.log("looking for pid"+ this.priArr[i].pid);
-                    let found = false;
-                    let procCount = 0;
-                    while(!found){
-                      let tProc = _Scheduler.readyQueue.dequeue();  
-                      if(tProc.state == READY && tProc.pid == this.priArr[i].pid){
-
-                        
-                        let nProcLoc = this.pcbLocSet.get(tProc.pid);
-                        if(nProcLoc == ON_DISK){
-                            //do stuff
-                            console.log("in heheheheh");
-                            for(let p of _MemoryManager.segAllocStatus){
-                                if(p == _Scheduler.runningPID){
-                                    continue;
-                                }
-                                 let pc = this.readyQueue.q.find(Pcb=> Pcb.pid == p);
-                                 console.log("gonna swap with "+ pc.pid);
-                                 if(pc.state != RUNNING){
-                                     console.log("found one, time to swap");
-                                     _FileSystem.swapIn(tProc, pc);
-                                     break;
-                                 }
-                                
-                            }
-                        }
-
-                        _Dispatcher.contextSwitch(tProc);
-                        console.log("Should be ending now");
-                        found = true;
-                        return;
-                      }else{
-                          procCount++;
-                          console.log(procCount);
-                          console.log("pid"+ tProc.pid + " is not "+ this.priArr[i].pid+ "tproc state is "+tProc.state);
-                          if(procCount >= this.readyQueue.getSize()+1){
-                            console.log("I checked" + procCount);
-                            _Scheduler.readyQueue.enqueue(tProc);
-                          
-                            break;
-                        }
-                        _Scheduler.readyQueue.enqueue(tProc);
-                      }
-                    }
-                    
-                    
-                }
-            }
-            _CPU.isExecuting = false;
-            _KernelInterruptQueue.enqueue(new Interrupt(FINISHED_PROC_QUEUE, [_Scheduler.runningPID]));
-        }
+     
         
         public priSync(){
             for(let i = 0;i<this.priArr.length;i++){
                 let pc = this.priArr[i];
-                if(pc.pri != Number.POSITIVE_INFINITY){
+                if(pc.pri != Number.POSITIVE_INFINITY){ // find something that isnt terminated
                     let tProc = this.readyQueue.dequeue();
-                    if(tProc.pid == pc.pri){ // if we found the right proc
+                    if(tProc.pid == pc.pri){ // if we found the right proc at the first index
                         if(tProc.state ==READY){
                             let nProcLoc = this.pcbLocSet.get(tProc.pid);
-                            let triedSwap = this.doSwap(tProc);
+                            let triedSwap = this.ensureInMemory(tProc); // ensure it is in memory before context switching to it
                             _Dispatcher.contextSwitch(tProc);
                             _Scheduler.pendingSwitch = false;
                             return;
@@ -418,10 +364,10 @@ module TSOS{
                         this.readyQueue.enqueue(tProc);
                         let found = false;
                         let pCount = 1;
-                        while(!found){
+                        while(!found){ // iterate over the readyQueue until you get to a good candidate
                             tProc = this.readyQueue.dequeue();
                             if(tProc.pid == pc.pid && tProc.state == READY){
-                                let triedSwap = this.doSwap(tProc);
+                                let triedSwap = this.ensureInMemory(tProc); // ensure it is in memory before context switching to it
                                 _Dispatcher.contextSwitch(tProc);
                                 _Scheduler.pendingSwitch = false;
                                 return;
@@ -442,47 +388,30 @@ module TSOS{
             _CPU.isExecuting = false;
             _KernelInterruptQueue.enqueue(new Interrupt(FINISHED_PROC_QUEUE, [_Scheduler.runningPID]));
         }
-        public doSwap(pcb): boolean{
+        public ensureInMemory(pcb): boolean{ // used to make sure that the thing about to be used is actually in memory, and if not, swapping to it
             let nProcLoc = this.pcbLocSet.get(pcb.pid);
             if(nProcLoc == ON_DISK){
-                // for(let p of _MemoryManager.segAllocStatus){
-                //     if(p == _Scheduler.runningPID){
-                //         continue;
-                //     }else if(p < 0){
-                //         //swap in without putting something back
-                //     }else{
-                //         console.log("looking for pid"+ p);
-                //         let pp = this.readyQueue.q.find(oldPcb=> oldPcb.pid == p);
-                //         if(pp.state != RUNNING){
-                //             _FileSystem.swapIn(pcb,pp);
-                //             console.log("swapped in"+ pcb.pid);
-                //             return true;
-                //         }
-                //     }
-                // }
-
-
                 for(let i = 0; i<_MemoryManager.segAllocStatus.length;i++){
                     let p = _MemoryManager.segAllocStatus[i];
                     if(p == _Scheduler.runningPID){
                         continue;
                     }else if(p < 0){
                         _FileSystem.onlySwapIn(pcb, i);
-                        console.log("swapped in: "+ pcb.pid);
+                        
                         return true;
                         //swap in without putting something back
                     }else{
-                        console.log("looking for pid"+ p);
-                        let pp = this.readyQueue.q.find(oldPcb=> oldPcb.pid == p);
-                        if(pp.state != RUNNING){
-                            _FileSystem.swapIn(pcb,pp);
-                            console.log("swapped in"+ pcb.pid);
+                       // find something old to swap out
+                        let oPcb = this.readyQueue.q.find(oldPcb=> oldPcb.pid == p);
+                        if(oPcb.state != RUNNING){
+                            _FileSystem.swapIn(pcb,oPcb);
+                           
                             return true;
                         }
                     }
                 }
             }
-            console.log("didnt need to swap in "+ pcb.pid);
+           
             return false;
         }
     

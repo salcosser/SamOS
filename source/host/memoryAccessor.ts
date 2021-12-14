@@ -27,7 +27,7 @@ module TSOS{
 
        public writeByteStrict(addr, data, segment): void{
         let offset = (segment * 256);
-        // console.log(`we got segment ${segment} tp work with`);
+        // //console.log(`we got segment ${segment} tp work with`);
         
         let physAddr = parseInt(addr, 16) + offset;
            let deviation = physAddr - offset;
@@ -43,12 +43,12 @@ module TSOS{
        public readByte(addr16): string{ // takes in hex, but uses base 10 in the actual memory
         try{
             let cSeg = _MemoryManager.segAllocStatus.indexOf(_Scheduler.runningPID);
-            // console.log("1seg"+cSeg);
+            // //console.log("1seg"+cSeg);
             let offset = (cSeg * 256);
-            // console.log("offset "+ offset);
-            // console.log("add"+ parseInt(addr16,16));
+            // //console.log("offset "+ offset);
+            // //console.log("add"+ parseInt(addr16,16));
            let physAddr = parseInt(addr16, 16) + offset;
-           // console.log("PA:"+ physAddr);
+           // //console.log("PA:"+ physAddr);
                let deviation = physAddr - offset;
                if(deviation  > 255 || deviation < 0){
                 _KernelInterruptQueue.enqueue(new Interrupt(MEM_BOUNDS_ERR_R, [_Scheduler.runningPID, physAddr, deviation]));

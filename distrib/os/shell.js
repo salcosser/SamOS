@@ -298,6 +298,7 @@ var TSOS;
                         _StdOut.putText("sets the status of the current user.");
                         break;
                     case "load":
+                        _StdOut.putText("usage: load | load <priority, lower is better>");
                         _StdOut.putText("Loads and validates hex machine code from input.");
                         break;
                     case "testbsod":
@@ -501,7 +502,7 @@ var TSOS;
                     else {
                         loadedPid = _Scheduler.setupProcess(memList, -1);
                     }
-                    // console.log("we did the stuffystuff");
+                    // //console.log("we did the stuffystuff");
                     if (loadedPid == -1) {
                         _StdOut.putText("File could not be loaded. No availible room in memory.");
                         _StdOut.advanceLine();
@@ -699,7 +700,7 @@ var TSOS;
                     return;
                 }
                 data = data.substr(1, data.length - 2);
-                console.log("we got this as data" + data);
+                //console.log("we got this as data"+ data);           
                 const isAFile = _FileSystem.findFileDirRecord(fname);
                 if (isAFile) {
                     const writeSuccess = _FileSystem.writeToFile(fname, data, false);

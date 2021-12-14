@@ -53,8 +53,7 @@ module TSOS{
                 if(!rawData){
                   tData  = DSDD.strToHex(data);
                 }
-                console.log("the data writer got the following");
-                console.log(tData);
+               
                 let lastPlace = [];
                 let wAddrs = [];
                 while(tData.length > 0){
@@ -113,9 +112,7 @@ module TSOS{
                 
                 return DSDD.strToArr(start);
             }
-            //readSpace(start)
-            //clearSpace
-            //format
+           
             public writeRollback(addrArr){
                 for(let addr  of addrArr){
                     let tAddr = DSDD.strToArr(addr);
@@ -138,8 +135,8 @@ module TSOS{
                 
                 _KernelInterruptQueue.enqueue(new TSOS.Interrupt(DISK_UPDATE, []));
                 this.isFormatted = true;
-                console.log("Hard Disk Formatted.");
-              //  console.log(_HardDisk.hardDiskSet.size);
+                //console.log("Hard Disk Formatted.");
+              //  //console.log(_HardDisk.hardDiskSet.size);
             }
 
             public static strToHex(str){  

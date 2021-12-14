@@ -58,7 +58,7 @@ module TSOS{
                     if(_Scheduler.priArr[i].pid == _Scheduler.runningPID){
                         _Scheduler.priArr[i].pri = Number.POSITIVE_INFINITY;
                         _Scheduler.updatePriorityArray();
-                        console.log("got to here");
+                        //console.log("got to here");
                         break;
                     }
                 }
@@ -69,7 +69,7 @@ module TSOS{
                 
                 _CPU.isExecuting = true; // used with the assumption that something else will find what to do next
         }else{
-            console.log("this shouldn't happen");
+            //console.log("this shouldn't happen");
         }
     }
 }

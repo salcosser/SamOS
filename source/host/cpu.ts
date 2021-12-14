@@ -49,12 +49,12 @@ module TSOS {
 
 
             // the fetch part of the cycle
-            // console.log("about to pass "+ _CPU.PC);
+            // //console.log("about to pass "+ _CPU.PC);
             _CPU.IR = _MemoryAccessor.readByte(_CPU.PC).toUpperCase(); // normalizing the IR in case memory was not updated in upper case
-            //  console.log("pid "+ _Scheduler.runningPID+"| cnt: "+ ++this.cnt + " | instruction: " + this.IR + " | pc "+ this.PC + " | acc:" + this.Acc + " | y:" + this.Yreg + " | x:" + this.Xreg + " | z:" + this.Zflag);
+            //  //console.log("pid "+ _Scheduler.runningPID+"| cnt: "+ ++this.cnt + " | instruction: " + this.IR + " | pc "+ this.PC + " | acc:" + this.Acc + " | y:" + this.Yreg + " | x:" + this.Xreg + " | z:" + this.Zflag);
             switch(this.IR){ // the decode part of the cycle
                 case "A9":
-                    // console.log("33333");
+                    // //console.log("33333");
                     this.loadConst();
                     break;
                 case "AD":
@@ -119,7 +119,7 @@ module TSOS {
         public loadConst(): void{
            
            let constAddr16 = (parseInt((this.PC),16) + 1).toString(16);
-           // console.log("looking for"+ constAddr16 );
+           // //console.log("looking for"+ constAddr16 );
            this.Acc = _MemoryAccessor.readByte(constAddr16).toUpperCase();
            if(this.Acc == "FF"){
             throw "OUT OF RANGE ERROR";
@@ -242,10 +242,10 @@ module TSOS {
                 }
                 
                
-            // console.log("Branched " +bytes+ " bytes to " + this.PC);
+            // //console.log("Branched " +bytes+ " bytes to " + this.PC);
             
             }else{
-                // console.log("skipped branch");
+                // //console.log("skipped branch");
                 _CPU.incProgCnt();
                 _CPU.incProgCnt();
             }
@@ -287,7 +287,7 @@ module TSOS {
 
         // tells the kernel to end execution
         public break(): void{
-            console.log(`End of pid ${_Scheduler.runningPID}`);
+            //console.log(`End of pid ${_Scheduler.runningPID}`);
             _KernelInterruptQueue.enqueue(new Interrupt(END_PROC_IRQ, [_Scheduler.runningPID]));
         }
        

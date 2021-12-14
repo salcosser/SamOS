@@ -32,7 +32,7 @@ module TSOS{
             if(segment == -1){
                 return -1;
             }
-            // console.log("got all the way to here");
+            // //console.log("got all the way to here");
             var cAddr10 = 0;
             var cAddr16 = "00";
             for(let i = cAddr10; i< dataList.length;i++){
@@ -46,10 +46,10 @@ module TSOS{
         }
 
         public loadMemoryStrict(dataList, seg): void{
-             // console.log("got all the way to here");
+             // //console.log("got all the way to here");
              var cAddr10 = 0;
              var cAddr16 = "00";
-             console.log("got here " +seg);
+             //console.log("got here " +seg);
 
              for(let i = cAddr10; i< dataList.length / 2;i++){
                     let nBit = dataList.substr(i*2,2).toUpperCase();
@@ -67,8 +67,8 @@ module TSOS{
 
         public dumpFullSeg(segNum: number): string[]{
            
-            // console.log("got all the way to here");
-            console.log("WE ARE GETTING SEGMENT NUMBER" + segNum);
+            // //console.log("got all the way to here");
+            //console.log("WE ARE GETTING SEGMENT NUMBER" + segNum);
             var cAddr10 = 0;
             var cAddr16 = "00";
             let out = [];
@@ -134,7 +134,7 @@ module TSOS{
                     if((inQueueInd == -1)){ // if the allocated pid is not in the ready queue
                         clearedSegs[clearedSegs.length] = i;
                         this.clearMemoryPerSeg(i);
-                        console.log("in111");
+                        //console.log("in111");
                         
                         
                     }else if(inQueueInd != -1){
@@ -142,14 +142,14 @@ module TSOS{
                         if(tPcb.state == TERMINATED){   // if its in there but its terminated
                              clearedSegs[clearedSegs.length] = i;
                             this.clearMemoryPerSeg(i);
-                            console.log("in222");
+                            //console.log("in222");
                        
                         }
                     }
                 }else{ // if theres nothing in there
                     clearedSegs[clearedSegs.length] = i;
                     this.clearMemoryPerSeg(i);
-                    console.log("in333");
+                    //console.log("in333");
                 }
             }
             return clearedSegs;
@@ -163,7 +163,7 @@ module TSOS{
             return _MemoryAccessor.readByteStrict(addr16,pid);
         } 
         public getMemoryPerSeg(addr16,seg): string{
-            // // console.log("###"+seg);
+            // // //console.log("###"+seg);
             return _MemoryAccessor.readByteBySegment(addr16,seg);
         }
 

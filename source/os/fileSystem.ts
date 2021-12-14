@@ -7,16 +7,14 @@ module TSOS{
     public swpMap = new Map();
 
 
-    public  findFileDirRecord(fname:string): number[]{
+    public  findFileDirRecord(fname:string): number[]{ // finding a file by filename
             for(let s:number = 0;s<SECT_COUNT;s++){
                 for(let b:number = 0;b<BLOCK_COUNT;b++){
                     if(s == 0 && b == 0){continue}
                    
-                   // console.log(typeof _HardDisk.getBlock );
-                   // console.log(_HardDisk.hardDiskSet.size);
-                    // console.log("got past calling it");
+                   
                     if(_HardDisk.getBlock(0,s,b).substr(8) == DSDD.strToHex(fname)){
-                        console.log("returned a real place");
+                        
                         return [0,s,b];
                     }
                 }
@@ -24,15 +22,15 @@ module TSOS{
             return [-1,-1,-1];
         
     }
-    public setFileStart(fname, addrLbl): void{
+    public setFileStart(fname, addrLbl): void{ // setting the beginning of a file
         let dList = this.findFileDirRecord(fname);
         let uBlock = _HardDisk.getBlock(dList[0],dList[1], dList[2]);
         uBlock = DSDD.arrToString(addrLbl) + "01"+ DSDD.strToHex(fname);
         _HardDisk.setBlock(dList[0],dList[1],dList[2],uBlock);
-        console.log("set the start of the file to "+ dList.toString());
+      
         
     }
-     public initFile(fname): boolean{
+     public initFile(fname): boolean{ // creating the file listing
         let location = [];
         for(let l of _HardDisk.dirRecs){
             if(_DSDD.readBlock(DSDD.labelToArr(l)) ==DSDD.blankBlock){
@@ -40,7 +38,7 @@ module TSOS{
                break;
             }
         }
-        if(FileSystem.validAddr(location)){
+        if(FileSystem.validAddr(location)){ // checking that the file is going to a valid place
 
             let nameInHex = DSDD.strToHex(fname);
             _HardDisk.setBlock(location[0], location[1], location[2], `99999901${nameInHex}`);
@@ -63,7 +61,7 @@ module TSOS{
          }else{
             let fStart = _DSDD.writeData(data, rawData);
             if(FileSystem.validAddr(fStart)){
-                console.log(fStart.toString()+ "<< first block of file data");
+                
                 this.setFileStart(fname, fStart);
                 _KernelInterruptQueue.enqueue(new TSOS.Interrupt(DISK_UPDATE, []));
                 return true;
@@ -100,9 +98,9 @@ module TSOS{
      }
 
 
-    public readFromFile(fName, rawData): string{
+    public readFromFile(fName, rawData): string{ // iterativley reading out file contents from all blocks
         let fListing = this.findFileDirRecord(fName);
-       // console.log("got to fs");
+       // //console.log("got to fs");
        // return "12345";
        
         if(!FileSystem.validAddr(fListing)){
@@ -110,12 +108,12 @@ module TSOS{
         }else{
             let cData = _DSDD.readBlock(fListing);
             let dataBuffer = "";
-            console.log("Befff"+ cData);
+            //console.log("Befff"+ cData);
             let cRData = cData.substr(8);
            // dataBuffer = dataBuffer + cRData;
             let nextPlace = this.getNextBlock(cData);
             if(FileSystem.validAddr(nextPlace)){
-                console.log("got in here next");
+                //console.log("got in here next");
                 let hasNext = true;
                 while(hasNext){
                     cData = _DSDD.readBlock(nextPlace);
@@ -123,9 +121,9 @@ module TSOS{
                         break;
                     }
                     cRData = cData.substr(8);
-                    // console.log(cData);
+                    // //console.log(cData);
                     dataBuffer = dataBuffer + cRData;
-                   // console.log("current buffer: "+FileSystem.hexToStr(dataBuffer))
+                   // //console.log("current buffer: "+FileSystem.hexToStr(dataBuffer))
                     nextPlace = this.getNextBlock(cData);
                     if(nextPlace == []){
                         hasNext = false;
@@ -142,22 +140,22 @@ module TSOS{
         }
     }
 
-    public getNextBlock(blk):number[] {
+    public getNextBlock(blk):number[] { // helper function to file reading
         let nAddr = blk.substr(0,6);
-        console.log("jumping to "+ nAddr);
+        //console.log("jumping to "+ nAddr);
         if(nAddr == "999999" || nAddr == "000000"){
             return [];
         }else{
             let t = parseInt(nAddr.substr(0,2),16);
             let s = parseInt(nAddr.substr(2,2),16);
             let b = parseInt(nAddr.substr(4,2),16);
-            console.log("jumping to" + [t,s,b].toString());
+            //console.log("jumping to" + [t,s,b].toString());
             
             return  [t,s,b];
         }
     }
 
-    public listFiles():string[]{
+    public listFiles():string[]{ // used by the ls command
         let files = [];
         for(let i = 0;i<_HardDisk.dirRecs.length;i++){
             let blk = _DSDD.readBlock(DSDD.strToArr(_HardDisk.dirRecs[i]));
@@ -174,16 +172,16 @@ module TSOS{
     }
 
 
-    public makeSwapFile(inputCode, pid: number): boolean{
+    public makeSwapFile(inputCode, pid: number): boolean{ // generate a swap file for memory swap
         let fName = "."+ (++this.swpCnt).toString();
-        console.log("original sqp data");
-        //console.log(inputCode.join(''));
+        //console.log("original sqp data");
+        ////console.log(inputCode.join(''));
        // let jCode = inputCode.join('');
         let isInit = this.initFile(fName);
         if(isInit){
             let didWrite;
             if(Array.isArray(inputCode)){
-                console.log("got in here");
+                //console.log("got in here");
                 let jIn = inputCode.join('');
                didWrite = this.writeToFile(fName,jIn, true);
             } else{
@@ -199,12 +197,12 @@ module TSOS{
         }
         return false;
     }
-    public swapIn(nPcb: TSOS.PCB, oPcb: TSOS.PCB): boolean{
-        console.log("old pcb" + oPcb.pid);
+    public swapIn(nPcb: TSOS.PCB, oPcb: TSOS.PCB): boolean{ // grabbing a pcb's data by pid and replacing it with the thing it is taking the place of
+        //console.log("old pcb" + oPcb.pid);
         let oldPcbLoc = _MemoryManager.segAllocStatus.indexOf(oPcb.pid);
         let oldPcbData = _MemoryManager.dumpFullSeg(oldPcbLoc).join('');
-       // console.log("original sqp data");
-        //console.log(oldPcbData.join(''));
+       // //console.log("original sqp data");
+        ////console.log(oldPcbData.join(''));
         let isSwappedOut = this.makeSwapFile(oldPcbData, oPcb.pid);
         if(isSwappedOut){
 
@@ -227,7 +225,7 @@ module TSOS{
     }
 
 
-    public onlySwapIn(nPcb:TSOS.PCB, segPlace: number):boolean{
+    public onlySwapIn(nPcb:TSOS.PCB, segPlace: number):boolean{ // used at the start of processes to simply grab something from storage
         let newData = this.readFromFile(this.swpMap.get(nPcb.pid), true);
         let del = this.deleteFile(this.swpMap.get(nPcb.pid));
         this.swpMap.delete(nPcb.pid);
@@ -248,7 +246,7 @@ module TSOS{
     public static validAddr(arr):boolean{
         return ((arr[0] + arr[1] + arr[2]) > -1);
     }
-    public static hexToStr(hx):string{
+    public static hexToStr(hx):string{ // helper function
         let hex  = hx.toString();
 	    let str = '';
 	    for (let n = 0; n < hex.length; n += 2) {

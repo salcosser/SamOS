@@ -194,7 +194,7 @@ module TSOS {
                     
                     break;
                 case FINISHED_PROC_QUEUE:
-                    console.log("called end processing");
+                    //console.log("called end processing");
                     _CPU.isExecuting = false;
                     _Kernel.updateProcViewer();
                     _Scheduler.runningPID = -1;

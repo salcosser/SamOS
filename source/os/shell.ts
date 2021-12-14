@@ -438,6 +438,7 @@ module TSOS {
                         _StdOut.putText("sets the status of the current user.");
                         break;
                     case "load":
+                        _StdOut.putText("usage: load | load <priority, lower is better>");
                         _StdOut.putText("Loads and validates hex machine code from input.");
                         break;
                     case "testbsod":
@@ -654,7 +655,7 @@ module TSOS {
 
 
                  
-                // console.log("we did the stuffystuff");
+                // //console.log("we did the stuffystuff");
                 if(loadedPid == -1){
                     _StdOut.putText("File could not be loaded. No availible room in memory.");
                     _StdOut.advanceLine();
@@ -882,7 +883,7 @@ module TSOS {
             data = data.substr(1,data.length-2);
             
 
-            console.log("we got this as data"+ data);           
+            //console.log("we got this as data"+ data);           
             const isAFile = _FileSystem.findFileDirRecord(fname);
             if(isAFile){
                 const writeSuccess = _FileSystem.writeToFile(fname,data, false);
