@@ -621,7 +621,7 @@ module TSOS {
             _StdOut.advanceLine();
         }
       //loading in the program code and checking it for valid hex
-       public shellLoadProg(){
+       public shellLoadProg(priority: string[]){
            var inputtedCode = (<HTMLInputElement>document.getElementById("taProgramInput")).value; // casting necessary to get .value
            var strippedCode = inputtedCode.replace(/\s/g, ''); // removing spaces
            if(/^[A-F0-9]+$/i.test(strippedCode)){ // testing against a regex
@@ -633,10 +633,29 @@ module TSOS {
                     memList[memList.length] = strippedCode.substring(memInd, (memInd+2));
                     memInd+=2;
                 }
+                let loadedPid;
 
-                let isSetup = _Scheduler.setupProcess(memList);
+                
+                if(priority[0] != null){
+                    let prior = parseInt(priority[0]);
+                    if(prior  < 0 || isNaN(prior)){
+                        _StdOut.putText("Priority assignment must be a non-negative number.");
+                        _StdOut.advanceLine();
+                        return;
+                    }else{
+                        loadedPid = _Scheduler.setupProcess(memList, prior);
+                    }
+
+
+                    
+                }else{
+                    loadedPid = _Scheduler.setupProcess(memList, -1);
+                }
+
+
+                 
                 // console.log("we did the stuffystuff");
-                if(!isSetup){
+                if(loadedPid == -1){
                     _StdOut.putText("File could not be loaded. No availible room in memory.");
                     _StdOut.advanceLine();
                     return;

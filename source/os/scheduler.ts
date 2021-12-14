@@ -25,18 +25,39 @@ module TSOS{
         public cQuant: number = -1;
         public procTime = new Map();
         public cAlgo = RR;
+        public priArr = [];
+        public pendingSwitch = false;
         constructor(){
           
         }
         init(){
             
         }
-        public setupProcess(inputCode): boolean{ 
+
+        public sortPri(prObj1, prObj2){
+            if(prObj1.pri > prObj2.pri){
+                return 1;
+            }else if(prObj1.pri< prObj2.pri){
+                return -1;
+            }else{
+                if(prObj1.pid < prObj2.pri){
+                    return 1;
+                }else{
+                    return -1;
+                }
+            }
+        }
+
+        public updatePriorityArray(){
+            this.priArr = this.priArr.sort((a,b) => this.sortPri(a,b));
+        }
+
+        public setupProcess(inputCode, priority): number{ 
 
             while(inputCode.length < 256){
                 inputCode[inputCode.length] = "00";
             }
-
+            let lPid = -1;
             let loadedSeg = _MemoryManager.loadMemory(inputCode);
             
             
@@ -52,6 +73,9 @@ module TSOS{
                _StdOut.advanceLine();
                _Scheduler.residentSet.set(_Scheduler.pid, newPcb);// not ready yet
                this.pcbLocSet.set(_Scheduler.pid, IN_MEM);
+               console.log("&&&&&");
+               lPid = _Scheduler.pid;
+
                _Scheduler.pid++;
                _Kernel.updateProcViewer();
                 
@@ -65,20 +89,27 @@ module TSOS{
                     _StdOut.advanceLine();
                     _Scheduler.residentSet.set(_Scheduler.pid, newPcb);// not ready yet
                     this.pcbLocSet.set(_Scheduler.pid, ON_DISK);
+                    console.log("&&^^&&&");
+                    lPid = _Scheduler.pid;
                     _Scheduler.pid++;
                     _Kernel.updateProcViewer();
                     _Kernel.updateDiskViewer();
                 }else{
                     _StdOut.putText("Something Went Wrong setting up that proc.");
-                    return false;
+                    //return lPid;
                 }
                
             }
             
              
-           
-            
-            return true;
+           if(priority != -1){
+               this.priArr[this.priArr.length] = {pid: lPid,pri:  priority};
+               
+           }else{
+                this.priArr[this.priArr.length] = {pid: lPid,pri:  DEFAULT_PRIORITY};
+           }
+            this.updatePriorityArray();
+            return lPid;
         }
 
         public runProcess(pid): void{
@@ -127,6 +158,7 @@ module TSOS{
         }
 
         public termProc(pid: number){
+            this.pendingSwitch = true;
             let seg = _MemoryManager.segAllocStatus.indexOf(pid); // finding where this pcb is in memory
             let tempPcb = new PCB(pid, seg*255, (seg+1)*255);
             tempPcb.state = TERMINATED;
@@ -289,7 +321,56 @@ module TSOS{
            }
 
         public priority(){
-            //
+
+            if(this.runningPID == -1){
+                this.priSync();
+                
+            
+            }else{
+                if(this.pendingSwitch){
+                    for(let i = 0;i<this.priArr.length;i++){
+                        if(this.priArr[i].pid == this.runningPID){
+                            this.priArr[i].pri = Number.POSITIVE_INFINITY;
+                            break;
+                        }
+                    }
+                    this.priSync();
+                    this.pendingSwitch = false;
+                }
+            }
+
+            
+
+        }
+
+
+        public priSync(){
+            for(let i = 0;i< this.priArr.length;i++){
+                if(this.priArr[i].pri != Number.POSITIVE_INFINITY){
+                    let found = false;
+                    let procCount = 0;
+                    while(!found){
+                      let tProc = _Scheduler.readyQueue.dequeue();  
+                      if(tProc.state == READY && tProc.pid == this.priArr[i].pid){
+                        _Dispatcher.contextSwitch(tProc);
+                        found = true;
+                        break;
+                      }else{
+                          procCount++;
+                          if(procCount >= this.readyQueue.getSize()+1){
+                            console.log("I checked" + procCount);
+                            _Scheduler.readyQueue.enqueue(tProc);
+                           _CPU.isExecuting = false;
+                            _KernelInterruptQueue.enqueue(new Interrupt(FINISHED_PROC_QUEUE, [_Scheduler.runningPID]));
+                            break;
+                        }
+                        _Scheduler.readyQueue.enqueue(tProc);
+                      }
+                    }
+                    
+                    
+                }
+            }
         }
         
     

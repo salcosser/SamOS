@@ -3,7 +3,7 @@
 /* 231f20-bb4430-7ebdc2-f3dfa2-efe6dd */
 body {
   background: #70291d !important;
-  font-family: 'IBM Plex Mono', monospace !important ;
+  
   font-size: 12pt;
   font-weight: normal;
   font-style: normal;
@@ -38,7 +38,9 @@ h3 {
   border: 2px solid #f3dfa2;
   cursor: default;
 }
-
+.card-header{
+  font-family: 'Assistant', sans-serif !important;
+}
 .normal_button {
   width: 100px;
 }
@@ -80,6 +82,7 @@ h3 {
   align-content: flex;
   text-align:center;
   font-size:2.1vh;
+     
 }
 #pcbData{
   margin-left:75rem!important;
@@ -145,8 +148,8 @@ td{
 
 
 #last{
-  border-right: 10px solid white;
- 
+  border-right: 3px solid white;
+  
     margin: 0 auto;
    
    animation:
@@ -162,6 +165,7 @@ td{
 }
 #dispHead{
   background-color:rgb(19, 32, 32);
+  font-family: 'Courier Prime', monospace !important;
   text-align:left;
 }
 
