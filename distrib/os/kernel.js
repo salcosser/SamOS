@@ -394,7 +394,7 @@ var TSOS;
                 if (blk.substr(6, 2) == "01") {
                     document.getElementById("HDContainer").getElementsByTagName("tr")[i].style.backgroundColor = "limegreen";
                 }
-                else if (blk.substr(6, 2) != "01" && parseInt(blk.substr(8)) > 0) {
+                else if (blk.substr(6, 2) != "01" && parseInt(blk.substr(8), 16) > 0) {
                     document.getElementById("HDContainer").getElementsByTagName("tr")[i].style.backgroundColor = "salmon";
                 }
                 else {

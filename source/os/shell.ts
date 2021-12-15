@@ -842,7 +842,13 @@ module TSOS {
     }
     public shQuant(quantum: string[]){
         const nQuant = parseInt(quantum[0]);
-        if(nQuant > 0){
+        if(_Scheduler.cAlgo != RR){
+            _StdOut.putText("selectable quantum feature is only available when round robin scheduling is being utilized.");
+            _StdOut.advanceLine();
+            return;
+        }
+
+        if(nQuant > 0 && _Scheduler.cAlgo == RR){
             _Scheduler.quantum = nQuant;
             _StdOut.putText("Quantum for RR has been updated to " + nQuant + " cycles.");
             _StdOut.advanceLine();

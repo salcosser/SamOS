@@ -469,7 +469,7 @@ module TSOS {
                 let blk = _DSDD.readBlock(tadAr);
                 if(blk.substr(6,2) == "01"){
                     (<HTMLElement> document.getElementById("HDContainer").getElementsByTagName("tr")[i]).style.backgroundColor = "limegreen";
-                }else if(blk.substr(6,2) != "01" && parseInt(blk.substr(8)) > 0){
+                }else if(blk.substr(6,2) != "01" && parseInt(blk.substr(8),16) > 0){
                     (<HTMLElement> document.getElementById("HDContainer").getElementsByTagName("tr")[i]).style.backgroundColor = "salmon";
                 }else{
                     (<HTMLElement> document.getElementById("HDContainer").getElementsByTagName("tr")[i]).style.backgroundColor = "#7ebdc2";
