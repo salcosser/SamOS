@@ -117,14 +117,21 @@ td{
  
   height:300px;
   color: black;
+  position: relative;
+}
+#diskTable thead{
+  position: sticky;
+  top: 0;
+  height:2rem;
   
 }
 .discGroup{
   
   overflow-y: scroll;
-  overflow-x:scroll;
-  height:600px;
-  
+  /* overflow-x:scroll; */
+  font-size:.7rem;
+  height:500px;
+  width: 1000px !important;
 }
 
 #dataHeader{

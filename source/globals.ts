@@ -40,7 +40,7 @@ const RR = 13;
 const FCFS = 33;
 const PRI = 44;
 
-const DEFAULT_PRIORITY = 3;
+const DEFAULT_PRIORITY = 5;
 
 
 //states

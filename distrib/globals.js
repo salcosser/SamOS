@@ -33,7 +33,7 @@ const ALLOC_AWAITING_PID = -1;
 const RR = 13;
 const FCFS = 33;
 const PRI = 44;
-const DEFAULT_PRIORITY = 3;
+const DEFAULT_PRIORITY = 5;
 //states
 const RESIDENT = 0;
 const READY = 1;

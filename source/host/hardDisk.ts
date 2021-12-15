@@ -33,6 +33,17 @@ module TSOS{
             
         }
 
+        public clearRef(t:number,s:number,b:number): void{
+            if((t <= 3) && (s <= 7) && (b <= 7)){
+                let cleanRef = "00000000";
+                let cBlock = this.getBlock(t,s,b);
+                let nBlock = cleanRef + cBlock.substr(8);
+                this.setBlock(t,s,b,nBlock);
+            }
+           
+
+        }
+
         
 
         public init(): void{

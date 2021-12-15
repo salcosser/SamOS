@@ -140,6 +140,13 @@ var TSOS;
                     _OsShell.putPrompt();
                     break;
                 case KILL_PROC_IRQ:
+                    if (params[0] == -1) {
+                        _StdOut.advanceLine();
+                        _StdOut.putText(`No running process to kill.`);
+                        _StdOut.advanceLine();
+                        _OsShell.putPrompt();
+                        break;
+                    }
                     _Scheduler.termRunningProc(params[0]);
                     this.updateProcViewer();
                     _StdOut.advanceLine();
@@ -304,27 +311,8 @@ var TSOS;
                 rPcb.set("st", "Running");
                 rPcb.set("dsk", "N/A");
                 pcbSet.set(_Scheduler.runningPID, rPcb);
-                // let rRow = rTable.insertRow(-1);
-                // for(let i = 0;i<9;i++){
-                //         rRow.insertCell(i);
-                // }
-                // rRow.cells[0].innerHTML = _Scheduler.runningPID;
-                // rRow.cells[1].innerHTML = _MemoryManager.segAllocStatus.indexOf(_Scheduler.runningPID);
-                // rRow.cells[2].innerHTML = _CPU.PC;
-                // rRow.cells[3].innerHTML = _CPU.IR;
-                // rRow.cells[4].innerHTML = _CPU.Acc;
-                // rRow.cells[5].innerHTML = _CPU.Xreg;
-                // rRow.cells[6].innerHTML = _CPU.Yreg;
-                // rRow.cells[7].innerHTML = _CPU.Zflag;
-                // rRow.cells[8].innerHTML = "Running";
-                // rRow.style.backgroundColor = "rgba(230, 114, 100, 0.65)";
             }
             for (let pcb of _Scheduler.readyQueue.q) {
-                // let table = document.getElementById("pcbTable");
-                // let row = table.insertRow(-1);
-                // for(let i = 0;i<9;i++){
-                //     row.insertCell(i);
-                // }
                 let rdPcb = new Map();
                 rdPcb.set("pid", pcb.pid);
                 if (_MemoryManager.segAllocStatus.indexOf(pcb.pid) != -1) {
@@ -366,6 +354,7 @@ var TSOS;
                 pcbSet.set(pcb.pid, rdPcb);
             }
             let keySet = Array.from(pcbSet.keys());
+            keySet = keySet.map(x => parseInt(x));
             keySet.sort();
             for (let key of keySet) {
                 let nRowData = pcbSet.get(key);
@@ -402,6 +391,15 @@ var TSOS;
             for (let i = 0; i < _HardDisk.addrLabels.length; i++) {
                 let tadAr = TSOS.DSDD.labelToArr(_HardDisk.addrLabels[i]);
                 let blk = _DSDD.readBlock(tadAr);
+                if (blk.substr(6, 2) == "01") {
+                    document.getElementById("HDContainer").getElementsByTagName("tr")[i].style.backgroundColor = "limegreen";
+                }
+                else if (blk.substr(6, 2) != "01" && parseInt(blk.substr(8)) > 0) {
+                    document.getElementById("HDContainer").getElementsByTagName("tr")[i].style.backgroundColor = "salmon";
+                }
+                else {
+                    document.getElementById("HDContainer").getElementsByTagName("tr")[i].style.backgroundColor = "#7ebdc2";
+                }
                 document.getElementById("HDContainer").getElementsByTagName("tr")[i].cells[1].innerHTML = blk.substr(0, 2);
                 document.getElementById("HDContainer").getElementsByTagName("tr")[i].cells[2].innerHTML = blk.substr(2, 2);
                 document.getElementById("HDContainer").getElementsByTagName("tr")[i].cells[3].innerHTML = blk.substr(4, 2);

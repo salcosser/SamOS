@@ -148,11 +148,13 @@ module TSOS{
                         }
                     }
                     _Scheduler.readyQueue.enqueue(tempPCB);// in later projects, more will be added to this process
+                    this.setTimeStamp(tempPCB.pid);
                     Control.hostLog("starting pid "+ pid);
                     _CPU.isExecuting = true;
                 }else{
                     tempPCB.state = READY;
                     _Scheduler.readyQueue.enqueue(tempPCB);// in later projects, more will be added to this process
+                    this.setTimeStamp(tempPCB.pid);
                     Control.hostLog("starting pid "+ pid);
                     _CPU.isExecuting = true;
                 }
@@ -208,11 +210,17 @@ module TSOS{
                 let tPcb = _Scheduler.readyQueue.dequeue();
                 if(tPcb.pid == pid){        // found the proc
                     tPcb.state = TERMINATED;
+                    this.setToPosInf(pid);
                     _Scheduler.readyQueue.enqueue(tPcb);
                     found = true;
                     Control.hostLog("killed proc "+ pid);
-                    let seg = _MemoryManager.segAllocStatus.indexOf(pid);
-                     _MemoryManager.segAllocStatus[seg] = NOT_ALLOCATED;
+                    if(this.pcbLocSet.get(pid)== IN_MEM){ // clearing it out depending on where it is
+                        let seg = _MemoryManager.segAllocStatus.indexOf(pid);
+                        _MemoryManager.segAllocStatus[seg] = NOT_ALLOCATED;
+                    }else{
+                        this.deleteFromDisk(pid);
+                    }
+                   
                      _StdOut.putText(`Process with pid ${pid} has been killed.`);
                      _StdOut.advanceLine();
                      return ;
@@ -335,7 +343,7 @@ module TSOS{
                     this.priSync();
                     this.pendingSwitch = false;
                 }else if(this.runningPID == 0){
-                    //console.log("beep boop");
+                    
                 }
             }
 
@@ -414,7 +422,34 @@ module TSOS{
            
             return false;
         }
+
+        public deleteFromDisk(pcb){
+            _FileSystem.deleteSwpFile(pcb.pid);
+        }
     
+        public setToPosInf(PID: number){ // effectivley making it unviewable
+            for(let i = 0;i<_Scheduler.priArr.length;i++){
+                if(_Scheduler.priArr[i].pid == PID){
+                    _Scheduler.priArr[i].pri = Number.POSITIVE_INFINITY;
+                    _Scheduler.updatePriorityArray();
+                    //console.log("got to here");
+                    break;
+                }
+            }
+        }
+
+        public setTimeStamp(PID: number){ // used to break ties with fcfs
+            for(let i = 0;i<_Scheduler.priArr.length;i++){
+                if(_Scheduler.priArr[i].pid == PID){
+                    _Scheduler.priArr[i].arrive = _OSclock;
+                    _Scheduler.updatePriorityArray();
+                    //console.log("got to here");
+                    break;
+                }
+            }
+        }
+
+
     }
 
   

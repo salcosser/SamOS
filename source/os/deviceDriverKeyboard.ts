@@ -31,7 +31,7 @@ module TSOS {
             // Parse the params.  TODO: Check that the params are valid and osTrapError if not.
             var keyCode = params[0];
             var isShifted = params[1];
-            
+            var isCtrl = params[2];
             //map of the keycodes for symbols when the shift key is down
             var shiftedSpecialChars = {48: ')', 
                                       49: '!',
@@ -73,8 +73,12 @@ module TSOS {
             // Check to see if we even want to deal with the key that was pressed.
             
             if ((keyCode >= 65) && (keyCode <= 90)) { // letter
+
+
                 if (isShifted === true) { 
                     chr = String.fromCharCode(keyCode); // Uppercase A-Z
+                }else if(isCtrl && keyCode == 67){
+                    _KernelInterruptQueue.enqueue(new Interrupt(KILL_PROC_IRQ, [_Scheduler.runningPID]));
                 } else {
                     chr = String.fromCharCode(keyCode + 32); // Lowercase a-z
                 }

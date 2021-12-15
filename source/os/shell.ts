@@ -520,7 +520,7 @@ module TSOS {
                         _StdOut.putText("deletes a given file.");
                         break;
                     case "setschedule":
-                        _StdOut.putText("usage: setschedule [rr, fcfs, priority]");
+                        _StdOut.putText("usage: setschedule <rr | fcfs | priority>");
                         _StdOut.advanceLine();
                         _StdOut.putText("sets the cpu scheduling algorithm.");
                         break;
@@ -767,7 +767,7 @@ module TSOS {
         // }
         for(let key of resPids){
             _Scheduler.runProcess(key);
-            _StdOut.putText("Process"+ key + "has started.");
+            _StdOut.putText("Process "+ key + " has started.");
             _StdOut.advanceLine();
         }
 
@@ -805,6 +805,9 @@ module TSOS {
             _StdOut.putText("Could not find process with PID "+ rPid);
             _StdOut.advanceLine();
             return;
+        }
+        if(rPid == _Scheduler.runningPID){
+            _KernelInterruptQueue.enqueue(new Interrupt(KILL_PROC_IRQ, [_Scheduler.runningPID])); 
         }
 
         let foundIt = false;
@@ -998,6 +1001,12 @@ module TSOS {
                // _Scheduler.quantum = Number.MAX_SAFE_INTEGER;
                 _Scheduler.cAlgo = PRI;
                 _StdOut.putText("Scheduling set to non-preemptive priority.");
+                _StdOut.advanceLine();
+                _StdOut.putText("To fully utilize this, when loading programs into SamOS also give a desired priority.");
+                _StdOut.advanceLine();
+                _StdOut.putText("example usage: \"load 2\" means load with priority of 2.");
+                _StdOut.advanceLine();
+                _StdOut.putText("NOTE: Default priority is 5 and lower numbers mean higher priority.");
                 break;
             default:
                 _StdOut.putText("Please enter either rr, fcfs, or priority as the scheduling algorithm");

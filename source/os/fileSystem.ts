@@ -86,7 +86,7 @@ module TSOS{
                 if(!FileSystem.validAddr(nPlace)){
                     eof = true;
                 }
-                _DSDD.clearBlock(cBlkAddr);
+                _DSDD.deleteBlock(cBlkAddr); // emphasis on delete and not clear. When things get deleted, they dont really go away
                 cBlkAddr = nPlace;//clear it
                 //set a new clBlock
 
@@ -242,7 +242,9 @@ module TSOS{
         return true;
     }
 
-
+    public deleteSwpFile(pid: number){
+        this.deleteFile(this.swpMap.get(pid));
+    }
     public static validAddr(arr):boolean{
         return ((arr[0] + arr[1] + arr[2]) > -1);
     }
