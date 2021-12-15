@@ -155,7 +155,7 @@
                   <label>
                      Host Log
                      <br>
-                     <textarea name="taHostLog" id="taHostLog" rows="7" cols="35"></textarea>
+                     <textarea name="taHostLog" id="taHostLog" rows="7" cols="35" readonly></textarea>
                   </label>
                </div>
             </div>
@@ -1299,7 +1299,8 @@
          <div class="col-6  card">
             <div class="card-header">
                <h3>Storage (HDD)</h3>
-               <p>Red: deleted, Green: allocated file</p>
+               <p>Red: deleted file block</p>
+               <p>Green: allocated file</p>
             </div>
             <div class="card-body discGroup">
                <table id="diskTable">
