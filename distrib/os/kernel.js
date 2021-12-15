@@ -24,11 +24,21 @@ var TSOS;
             // Initialize standard input and output to the _Console.
             _StdIn = _Console;
             _StdOut = _Console;
+            _HardDisk = new TSOS.HardDisk();
+            _HardDisk.init();
+            _FileSystem = new TSOS.FileSystem();
+            // 
+            _MemoryManager = new TSOS.MemoryManager();
+            _Dispatcher = new TSOS.Dispatcher();
             // Load the Keyboard Device Driver
             this.krnTrace("Loading the keyboard device driver.");
             _krnKeyboardDriver = new TSOS.DeviceDriverKeyboard(); // Construct it.
             _krnKeyboardDriver.driverEntry(); // Call the driverEntry() initialization routine.
             this.krnTrace(_krnKeyboardDriver.status);
+            this.krnTrace("Loading the disk device driver.");
+            _DSDD = new TSOS.DSDD(); // Construct it.
+            _DSDD.driverEntry(); // Call the driverEntry() initialization routine.
+            this.krnTrace(_DSDD.status);
             //
             // ... more?
             //
@@ -55,6 +65,7 @@ var TSOS;
             // More?
             //
             this.krnTrace("end shutdown OS");
+            clearInterval(_hardwareClockID);
         }
         krnOnCPUClockPulse() {
             /* This gets called from the host hardware simulation every time there is a hardware clock pulse.
@@ -70,7 +81,21 @@ var TSOS;
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             }
             else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is anything being processed.
-                _CPU.cycle();
+                _Mode = 0;
+                if (_Scheduler.cAlgo == RR || _Scheduler.cAlgo == FCFS) {
+                    _Scheduler.preemptive();
+                }
+                else {
+                    _Scheduler.priority();
+                }
+                if (_CPU.isExecuting) { // did anything change?
+                    _Mode = 1;
+                    _CPU.cycle();
+                }
+                _Mode = 0;
+                this.updatePCBInfo();
+                this.updateMemViewer();
+                this.updateProcViewer();
             }
             else { // If there are no interrupts and there is nothing being executed then just be idle.
                 this.krnTrace("Idle");
@@ -104,6 +129,69 @@ var TSOS;
                 case KEYBOARD_IRQ:
                     _krnKeyboardDriver.isr(params); // Kernel mode device driver
                     _StdIn.handleInput();
+                    break;
+                case END_PROC_IRQ:
+                    _Scheduler.termProc(params[0]);
+                    // _Scheduler.sync();
+                    this.updateProcViewer();
+                    _StdOut.advanceLine();
+                    _StdOut.putText(`Program with pid ${params[0]} has ended`);
+                    _StdOut.advanceLine();
+                    _OsShell.putPrompt();
+                    break;
+                case KILL_PROC_IRQ:
+                    if (params[0] == -1) {
+                        _StdOut.advanceLine();
+                        _StdOut.putText(`No running process to kill.`);
+                        _StdOut.advanceLine();
+                        _OsShell.putPrompt();
+                        break;
+                    }
+                    _Scheduler.termRunningProc(params[0]);
+                    this.updateProcViewer();
+                    _StdOut.advanceLine();
+                    _StdOut.putText(`Program with pid ${params[0]} has been stopped`);
+                    _StdOut.advanceLine();
+                    _OsShell.putPrompt();
+                    break;
+                case PRINT_YREG_IRQ:
+                    _StdOut.putText(parseInt(params[0], 16).toString());
+                    break;
+                case PRINT_FROM_MEM_IRQ:
+                    let addr = params[0];
+                    let memVal = _MemoryManager.getMemory(addr);
+                    let res = "";
+                    while (memVal !== "00") {
+                        res += String.fromCharCode(parseInt(memVal, 16));
+                        addr = (parseInt(addr, 16) + 1).toString(16);
+                        memVal = _MemoryManager.getMemory(addr).toString(16);
+                    }
+                    _StdOut.putText(res);
+                    break;
+                case FINISHED_PROC_QUEUE:
+                    //console.log("called end processing");
+                    _CPU.isExecuting = false;
+                    _Kernel.updateProcViewer();
+                    _Scheduler.runningPID = -1;
+                    _Kernel.clearCPU();
+                    _Kernel.updatePCBInfo();
+                    _StdOut.putText("All processes have completed.");
+                    _StdOut.advanceLine();
+                    _OsShell.putPrompt();
+                    break;
+                case MEM_BOUNDS_ERR_R:
+                    _CPU.isExecuting = false;
+                    this.krnTrapError(`Memory out of bounds error. proc with pid[${params[0]}] tried to read memory address ${params[1]}, which is ${params[2]} bytes outside of it's memory bounds.`);
+                    break;
+                case MEM_BOUNDS_ERR_W:
+                    _CPU.isExecuting = false;
+                    this.krnTrapError(`Memory out of bounds error. proc with pid[${params[0]}] tried to write to memory address ${params[1]}, which is ${params[2]} bytes outside of it's memory bounds.`);
+                    break;
+                case DISK_UPDATE:
+                    this.updateDiskViewer();
+                    break;
+                case DSK_FORMAT:
+                    _DSDD.formatDisk();
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
@@ -147,10 +235,188 @@ var TSOS;
                 }
             }
         }
+        updatePCBInfo() {
+            document.getElementById("PC").innerHTML = _CPU.PC;
+            document.getElementById("IR").innerHTML = _CPU.IR;
+            document.getElementById("ACC").innerHTML = _CPU.Acc;
+            document.getElementById("xReg").innerHTML = _CPU.Xreg;
+            document.getElementById("yReg").innerHTML = _CPU.Yreg;
+            document.getElementById("zFlg").innerHTML = _CPU.Zflag;
+        }
+        // used to update the memory viewer, as well as give an idea of where the program is in processing
+        updateMemViewer() {
+            let actualLocation = (parseInt(_CPU.PC, 16) + ((_MemoryManager.segAllocStatus.indexOf(_Scheduler.runningPID)) * 256)).toString(16);
+            let realMemInd = 0;
+            for (let i = 0; i < 32; i++) {
+                for (let j = 1; j <= 8; j++) {
+                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].innerHTML = _MemoryManager.getMemoryPerSeg(realMemInd.toString(16), 0).toString(16);
+                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.backgroundColor = "lightgray";
+                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.fontWeight = "normal";
+                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.color = "black";
+                    if (realMemInd.toString(16).toUpperCase() == actualLocation) {
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.fontWeight = "bold";
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.color = "lightgreen";
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.backgroundColor = "black";
+                    }
+                    realMemInd++;
+                }
+            }
+            realMemInd = 0;
+            for (let i = 32; i < 64; i++) {
+                for (let j = 1; j <= 8; j++) {
+                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].innerHTML = _MemoryManager.getMemoryPerSeg(realMemInd.toString(16), 1).toString(16);
+                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.backgroundColor = "lightgray";
+                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.fontWeight = "normal";
+                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.color = "black";
+                    if (realMemInd.toString(16).toUpperCase() == actualLocation) {
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.fontWeight = "bold";
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.color = "lightgreen";
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.backgroundColor = "black";
+                    }
+                    realMemInd++;
+                }
+            }
+            realMemInd = 0;
+            for (let i = 64; i < 96; i++) {
+                for (let j = 1; j <= 8; j++) {
+                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].innerHTML = _MemoryManager.getMemoryPerSeg(realMemInd.toString(16), 2).toString(16);
+                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.backgroundColor = "lightgray";
+                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.fontWeight = "normal";
+                    document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.color = "black";
+                    if (realMemInd.toString(16).toUpperCase() == actualLocation) {
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.fontWeight = "bold";
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.color = "lightgreen";
+                        document.getElementById("memTableRows").getElementsByTagName("tr")[i].cells[j].style.backgroundColor = "black";
+                    }
+                    realMemInd++;
+                }
+            }
+        }
+        updateProcViewer() {
+            let pcbSet = new Map();
+            let rTable = document.getElementById("pcbTable");
+            while (rTable.rows.length > 1) {
+                rTable.rows[rTable.rows.length - 1].remove();
+            }
+            if (_Scheduler.runningPID != -1) {
+                let rPcb = new Map();
+                rPcb.set("pid", _Scheduler.runningPID);
+                rPcb.set("seg", _MemoryManager.segAllocStatus.indexOf(_Scheduler.runningPID));
+                rPcb.set("pc", _CPU.PC);
+                rPcb.set("ir", _CPU.IR);
+                rPcb.set("acc", _CPU.Acc);
+                rPcb.set("xr", _CPU.Xreg);
+                rPcb.set("yr", _CPU.Yreg);
+                rPcb.set("zf", _CPU.Zflag);
+                rPcb.set("st", "Running");
+                rPcb.set("dsk", "N/A");
+                pcbSet.set(_Scheduler.runningPID, rPcb);
+            }
+            for (let pcb of _Scheduler.readyQueue.q) {
+                let rdPcb = new Map();
+                rdPcb.set("pid", pcb.pid);
+                if (_MemoryManager.segAllocStatus.indexOf(pcb.pid) != -1) {
+                    rdPcb.set("seg", _MemoryManager.segAllocStatus.indexOf(pcb.pid));
+                }
+                else {
+                    rdPcb.set("seg", "N/A");
+                }
+                if (_FileSystem.swpMap.get(pcb.pid) != null) {
+                    rdPcb.set("dsk", "0");
+                }
+                else {
+                    rdPcb.set("dsk", "N/A");
+                }
+                rdPcb.set("pc", pcb.PC);
+                rdPcb.set("ir", pcb.IR);
+                rdPcb.set("acc", pcb.Acc);
+                rdPcb.set("xr", pcb.xReg);
+                rdPcb.set("yr", pcb.yReg);
+                rdPcb.set("zf", pcb.zFlag);
+                let state = "Ready";
+                switch (pcb.state) {
+                    case RESIDENT:
+                        state = "Resident";
+                        break;
+                    case READY:
+                        state = "Ready";
+                        break;
+                    case RUNNING:
+                        state = "Running";
+                        break;
+                    case TERMINATED:
+                        state = "Terminated";
+                        break;
+                    default:
+                    //
+                }
+                rdPcb.set("st", state);
+                pcbSet.set(pcb.pid, rdPcb);
+            }
+            let keySet = Array.from(pcbSet.keys());
+            keySet = keySet.map(x => parseInt(x));
+            keySet.sort();
+            for (let key of keySet) {
+                let nRowData = pcbSet.get(key);
+                let rRow = rTable.insertRow(-1);
+                for (let i = 0; i < 10; i++) {
+                    rRow.insertCell(i);
+                }
+                rRow.cells[0].innerHTML = nRowData.get("pid");
+                rRow.cells[1].innerHTML = nRowData.get("seg");
+                rRow.cells[2].innerHTML = nRowData.get("dsk");
+                rRow.cells[3].innerHTML = nRowData.get("pc");
+                rRow.cells[4].innerHTML = nRowData.get("ir");
+                rRow.cells[5].innerHTML = nRowData.get("acc");
+                rRow.cells[6].innerHTML = nRowData.get("xr");
+                rRow.cells[7].innerHTML = nRowData.get("yr");
+                rRow.cells[8].innerHTML = nRowData.get("zf");
+                rRow.cells[9].innerHTML = nRowData.get("st");
+                if (nRowData.get("st") == "Running") {
+                    rRow.style.backgroundColor = "rgba(230, 114, 100, 0.65)";
+                }
+            }
+            //pcbTable
+        }
+        clearCPU() {
+            _CPU.PC = "00";
+            _CPU.Acc = "00";
+            _CPU.Xreg = "00";
+            _CPU.Yreg = "00";
+            _CPU.IR = "00";
+            _CPU.Zflag = "00";
+            _CPU.isExecuting = false;
+        }
+        updateDiskViewer() {
+            for (let i = 0; i < _HardDisk.addrLabels.length; i++) {
+                let tadAr = TSOS.DSDD.labelToArr(_HardDisk.addrLabels[i]);
+                let blk = _DSDD.readBlock(tadAr);
+                if (blk.substr(6, 2) == "01") {
+                    document.getElementById("HDContainer").getElementsByTagName("tr")[i].style.backgroundColor = "limegreen";
+                }
+                else if (blk.substr(6, 2) != "01" && parseInt(blk.substr(8)) > 0) {
+                    document.getElementById("HDContainer").getElementsByTagName("tr")[i].style.backgroundColor = "salmon";
+                }
+                else {
+                    document.getElementById("HDContainer").getElementsByTagName("tr")[i].style.backgroundColor = "#7ebdc2";
+                }
+                document.getElementById("HDContainer").getElementsByTagName("tr")[i].cells[1].innerHTML = blk.substr(0, 2);
+                document.getElementById("HDContainer").getElementsByTagName("tr")[i].cells[2].innerHTML = blk.substr(2, 2);
+                document.getElementById("HDContainer").getElementsByTagName("tr")[i].cells[3].innerHTML = blk.substr(4, 2);
+                document.getElementById("HDContainer").getElementsByTagName("tr")[i].cells[4].innerHTML = blk.substr(6, 2);
+                document.getElementById("HDContainer").getElementsByTagName("tr")[i].cells[5].innerHTML = blk.substr(8);
+            }
+        }
         krnTrapError(msg) {
             TSOS.Control.hostLog("OS ERROR - TRAP: " + msg);
             // TODO: Display error on console, perhaps in some sort of colored screen. (Maybe blue?)
-            this.krnShutdown();
+            _StdOut.clearScreen();
+            _StdOut.resetXY();
+            _DrawingContext.fillStyle = "white";
+            document.getElementById("display").style.backgroundColor = "blue"; //putting the B in BSOD
+            _StdOut.putText(msg + " - A Fatal Error has occured.");
+            alert("What did you do!!!!!!");
+            _Kernel.krnShutdown();
         }
     }
     TSOS.Kernel = Kernel;

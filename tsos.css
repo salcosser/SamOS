@@ -1,16 +1,18 @@
 /* TSOS.css */
-
+/* color pallete */
+/* 231f20-bb4430-7ebdc2-f3dfa2-efe6dd */
 body {
-  background: darkslategray !important;
-  font-family: 'IBM Plex Mono', monospace !important ;
+  background: #70291d !important;
+  
   font-size: 12pt;
   font-weight: normal;
   font-style: normal;
-  color: lightgreen !important;
+  color: #7ebdc2 !important;
+  margin-left:10%;
 }
 
 h1 {
-  color: lightgreen;
+  color: #7ebdc2;
   font-size: 24pt;
   font-weight: normal;
   font-style: normal;
@@ -18,7 +20,7 @@ h1 {
 }
 
 h2 {
-  color: lightgreen;
+  color: #7ebdc2;
   font-size: 20pt;
   font-weight: normal;
   font-style: normal;
@@ -26,17 +28,19 @@ h2 {
 
 h3 {
   /* font-family: Helvetica, Verdana, Arial, sans-serif; */
-  font-size: 16pt;
+  font-size: 16px;
   font-weight: normal;
   font-style: normal;
 }
 
 #display {
-  background-color:lightblue;
-  border: 2px solid red;
+  background-color:black;
+  border: 2px solid #f3dfa2;
   cursor: default;
 }
-
+.card-header{
+  font-family: 'Assistant', sans-serif !important;
+}
 .normal_button {
   width: 100px;
 }
@@ -48,6 +52,132 @@ h3 {
   text-align: center;
 }
 .card{
-  background-color:darkslategray !important;
-  border: 1px solid lightgreen !important;
+  background-color:transparent !important;
+  border: none !important;
+  color:#efe6dd;
+}
+
+#pcbTable{
+  width:25rem !important;
+  padding-left:1%;
+}
+#divUserProgramInput{
+  margin-left:11rem;
+}
+#procVals{
+  /* border:2px solid #7ebdc2; */
+  /* background-color: #efe6dd; */
+  color: #efe6dd;
+  padding: 0px;
+  /* display:flex;
+  display: flex; */
+	/* min-height: 100vh; */
+	/* flex-direction: column; */
+	justify-content: center;
+	align-items: center;
+  font-size: 1.8vh;
+  width:2px!important;
+}
+#procVals .card-header{
+  align-content: flex;
+  text-align:center;
+  font-size:2.1vh;
+     
+}
+#pcbData{
+  margin-left:75rem!important;
+  width:3rem !important;
+   margin-top:-30rem; 
+}
+th ,td{
+  padding: 5px;
+
+}
+th{
+  border-bottom: 2px solid #7ebdc2;
+}
+td{
+  border-left: 1px dotted #7ebdc2;
+  border-right: 1px dotted #7ebdc2;
+  text-align: center;
+}
+#memTable{
+  border:2px solid #7ebdc2;
+  background-color: #efe6dd;
+  color: #231f20;
+  height: 400px;
+  width:447px;
+  overflow-y: scroll;
+  display:block;
+}
+#memTable table tbody tr td:first-child{
+  font-weight: bold !important;
+}
+#diskTable{
+ 
+  height:300px;
+  color: black;
+  position: relative;
+}
+#diskTable thead{
+  position: sticky;
+  top: 0;
+  height:2rem;
+  
+}
+.discGroup{
+  
+  overflow-y: scroll;
+  /* overflow-x:scroll; */
+  font-size:.7rem;
+  height:500px;
+  width: 1000px !important;
+}
+
+#dataHeader{
+  width:4rem !important;
+}
+
+#diskTable tr{
+  background-color: #7ebdc2;
+  border: 3px solid darkred;
+}
+#diskTable tr td{
+  border: 3px dotted darkred;
+  text-align:left;
+}
+#diskTable tr th{
+  background-color:#3e6063;
+  color:lightgray;
+  border: 3px solid darkred;
+  font-weight: bold;
+}
+
+
+#last{
+  border-right: 3px solid white;
+  
+    margin: 0 auto;
+   
+   animation:
+    blink-caret .85s step-end infinite;
+}
+@keyframes blink-caret {
+  from, to { border-color: transparent }
+  50% { border-color: white; }
+}
+#title{
+  font-family: monospace;
+  font-size:4rem;
+}
+#dispHead{
+  background-color:rgb(19, 32, 32);
+  font-family: 'Courier Prime', monospace !important;
+  text-align:left;
+}
+
+#pcbRecords{
+  overflow-y:scroll;
+  overflow-x:hidden;
+  height:300px;
 }

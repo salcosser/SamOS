@@ -10,17 +10,57 @@
 //
 // Global CONSTANTS (TypeScript 1.5 introduced const. Very cool.)
 //
-const APP_NAME = "SamOS"; // 'cause Bob and I were at a loss for a better name.
-const APP_VERSION = "0.09"; // What did you expect?
+const APP_NAME = "TSOS"; // 'cause Bob and I were at a loss for a better name.
+const APP_VERSION = "0.51"; // What did you expect?
 const CPU_CLOCK_INTERVAL = 100; // This is in ms (milliseconds) so 1000 = 1 second.
 const TIMER_IRQ = 0; // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
 // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
 const KEYBOARD_IRQ = 1;
+const END_PROC_IRQ = 3;
+const KILL_PROC_IRQ = 9;
+const PRINT_YREG_IRQ = 4;
+const PRINT_FROM_MEM_IRQ = 5;
+const FINISHED_PROC_QUEUE = 6;
+const MEM_BOUNDS_ERR_R = 32;
+const MEM_BOUNDS_ERR_W = 33;
+const DISK_UPDATE = 423;
+const DSK_FORMAT = 4040;
+const MEM_LIMIT = 768;
+//used in the mem mgr
+const NOT_ALLOCATED = -2;
+const ALLOC_AWAITING_PID = -1;
+//sched algos
+const RR = 13;
+const FCFS = 33;
+const PRI = 44;
+const DEFAULT_PRIORITY = 5;
+//states
+const RESIDENT = 0;
+const READY = 1;
+const RUNNING = 2;
+const TERMINATED = 3;
+const ON_DISK = 22;
+const IN_MEM = 33;
+//used for hard disk
+const TRACK_COUNT = 4;
+const SECT_COUNT = 8;
+const BLOCK_COUNT = 8;
+const RR_QUANT = 6;
+const FCFS_QUANT = Number.POSITIVE_INFINITY;
 //
 // Global Variables
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
 //
 var _CPU; // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
+var _Memory;
+var _MemoryAccessor;
+var _CurrentSeg = 0;
+var _Scheduler;
+var _MemoryManager = null;
+var _Dispatcher;
+var _HardDisk;
+var _FileSystem;
+var _DSDD;
 var _OSclock = 0; // Page 23.
 var _Mode = 0; // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
 var _Canvas; // Initialized in Control.hostInit().

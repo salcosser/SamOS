@@ -69,6 +69,10 @@ var TSOS;
             // ... Create and initialize the CPU (because it's part of the hardware)  ...
             _CPU = new TSOS.Cpu(); // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
             _CPU.init(); //       There's more to do, like dealing with scheduling and such, but this would be a start. Pretty cool.
+            _Memory = new TSOS.Memory();
+            _Memory.init();
+            _MemoryAccessor = new TSOS.MemoryAccessor();
+            _Scheduler = new TSOS.Scheduler();
             // ... then set the host clock pulse ...
             _hardwareClockID = setInterval(TSOS.Devices.hostClockPulse, CPU_CLOCK_INTERVAL);
             // .. and call the OS Kernel Bootstrap routine.
@@ -84,9 +88,18 @@ var TSOS;
             clearInterval(_hardwareClockID);
             // TODO: Is there anything else we need to do here?
         }
+        static HostHaltOS() {
+            Control.hostLog("Emergency halt", "host");
+            Control.hostLog("Attempting Kernel shutdown.", "host");
+            // Call the OS shutdown routine.
+            _Kernel.krnShutdown();
+            // Stop the interval that's simulating our clock pulse.
+            clearInterval(_hardwareClockID);
+            // TODO: Is there anything else we need to do here?
+        }
         static hostBtnReset_click(btn) {
             // The easiest and most thorough way to do this is to reload (not refresh) the document.
-            location.reload(true);
+            location.reload();
             // That boolean parameter is the 'forceget' flag. When it is true it causes the page to always
             // be reloaded from the server. If it is false or not specified the browser may reload the
             // page from its cache, which is not what we want.

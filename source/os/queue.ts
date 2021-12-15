@@ -23,6 +23,7 @@ module TSOS {
 
         public enqueue(element) {
             this.q.push(element);
+           
         }
 
         public dequeue() {
@@ -30,6 +31,7 @@ module TSOS {
             if (this.q.length > 0) {
                 retVal = this.q.shift();
             }
+          
             return retVal;
         }
 

@@ -11,22 +11,73 @@
 //
 // Global CONSTANTS (TypeScript 1.5 introduced const. Very cool.)
 //
-const APP_NAME: string    = "SamOS";   // 'cause Bob and I were at a loss for a better name.
-const APP_VERSION: string = "0.09";   // What did you expect?
+const APP_NAME: string    = "TSOS";   // 'cause Bob and I were at a loss for a better name.
+const APP_VERSION: string = "0.51";   // What did you expect?
 
 const CPU_CLOCK_INTERVAL: number = 100;   // This is in ms (milliseconds) so 1000 = 1 second.
 
 const TIMER_IRQ: number = 0;  // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
                               // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
 const KEYBOARD_IRQ: number = 1;
+const END_PROC_IRQ: number = 3;
+const KILL_PROC_IRQ: number = 9;
+const PRINT_YREG_IRQ: number = 4;
+const PRINT_FROM_MEM_IRQ: number = 5;
+const FINISHED_PROC_QUEUE: number = 6;
+const MEM_BOUNDS_ERR_R: number = 32;
+const MEM_BOUNDS_ERR_W: number = 33;
+const DISK_UPDATE: number = 423;
+const DSK_FORMAT: number = 4040;
+const MEM_LIMIT = 768;
 
+//used in the mem mgr
+const NOT_ALLOCATED = -2;
+const ALLOC_AWAITING_PID = -1;
+
+
+//sched algos
+const RR = 13;
+const FCFS = 33;
+const PRI = 44;
+
+const DEFAULT_PRIORITY = 5;
+
+
+//states
+const RESIDENT = 0;
+const READY = 1;
+const RUNNING = 2;
+const TERMINATED = 3;
+
+const ON_DISK = 22;
+const IN_MEM = 33;
+
+//used for hard disk
+const TRACK_COUNT = 4;
+const SECT_COUNT = 8;
+const BLOCK_COUNT = 8;
+
+
+
+const RR_QUANT = 6;
+const FCFS_QUANT = Number.POSITIVE_INFINITY;
 
 //
 // Global Variables
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
 //
 var _CPU: TSOS.Cpu;  // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
+var _Memory: TSOS.Memory;
+var _MemoryAccessor: TSOS.MemoryAccessor;
+var _CurrentSeg: number = 0;
+var _Scheduler: TSOS.Scheduler;
+var _MemoryManager: any = null;
+var _Dispatcher: TSOS.Dispatcher;
 
+
+var _HardDisk: TSOS.HardDisk;
+var _FileSystem: TSOS.FileSystem;
+var _DSDD: TSOS.DSDD;
 var _OSclock: number = 0;  // Page 23.
 
 var _Mode: number = 0;     // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
@@ -38,6 +89,12 @@ var _DefaultFontSize: number = 13;
 var _FontHeightMargin: number = 4;       // Additional space added to font size when advancing a line.
 
 var _Trace: boolean = true;              // Default the OS trace to be on.
+
+
+
+
+
+
 
 // The OS Kernel and its queues.
 var _Kernel: TSOS.Kernel;
