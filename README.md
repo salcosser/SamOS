@@ -8,7 +8,7 @@ For each project due, check the corresponding branch, for example, for <code>iPr
 <h3>Other Bits</h3>
 My special command is executed using <code>whereistheufo</code>. It will "find" the nearest UFO orbiting earth using "Complex Machinery".
 
-version 1.0 availible in master branch
+version 1.0 available  in master branch
 ======================================
 
 
