@@ -7,7 +7,18 @@ Documentation Specific to SamOS
 For each project due, check the corresponding branch, for example, for <code>iProject1</code>, check the branch named <code>iProject1</code>.
 <h3>Features Include:</h3>
 <ul>
-  <li>a basic CLI</li>
+  <li>a basic CLI and CLI commands</li>
+  <ul>
+    <li>ls</li>
+    <li>cat &lt;filename&gt; </li>
+    <li>ps</li>
+    <li><kbd>ctrl + c</kbd> to kill the running program</li>
+    <li>ver</li>
+    <li>kill / killall</li>
+    <li>run &lt;pid&gt; / runall</li>
+    <li>and more ...</li>
+  </ul>
+    
   <li>customizable status</li>
   <li>running user programs written in 6502(a) assembly</li>
   <li>multiprogramming support</li>
