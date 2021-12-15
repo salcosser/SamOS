@@ -8,14 +8,10 @@ For each project due, check the corresponding branch, for example, for <code>iPr
 <h3>Other Bits</h3>
 My special command is executed using <code>whereistheufo</code>. It will "find" the nearest UFO orbiting earth using "Complex Machinery".
 
-Check Branch iProject1
-======================
+version 1.0 availible in master branch
+======================================
 
-This is Alan's Operating Systems class initial project.
-See https://www.labouseur.com/courses/os/ for details.
-It was originally developed by Alan and then enhanced by alums Bob Nisco and Rebecca Murphy over the years.
-Clone this into your own private repository. Better yet, download it as a ZIP file and use it to initialize your own repository for this class. 
-Then add Alan (userid *Labouseur*) as a collaborator.
+
 
 Setup TypeScript
 ================
