@@ -5,17 +5,27 @@ Documentation Specific to SamOS
 ===============================
 
 For each project due, check the corresponding branch, for example, for <code>iProject1</code>, check the branch named <code>iProject1</code>.
-<h3>Other Bits</h3>
-My special command is executed using <code>whereistheufo</code>. It will "find" the nearest UFO orbiting earth using "Complex Machinery".
+<h3>Features Include:</h3>
+<ul>
+  <li>a basic CLI</li>
+  <li>customizable status</li>
+  <li>running user programs written in 6502(a) assembly</li>
+  <li>multiprogramming support</li>
+  <li>selectable CPU scheduling algorithms</li>
+  <ul>
+    <li>First Come, First Served</li>
+    <li>Round Robin</li>
+    <li>Non-Preemptive Priority</li>
+  </ul>
+  <li>User File Support</li>
+  <li>Memory Swap Files</li>
+ </ul>
 
-Check Branch iProject1
-======================
 
-This is Alan's Operating Systems class initial project.
-See https://www.labouseur.com/courses/os/ for details.
-It was originally developed by Alan and then enhanced by alums Bob Nisco and Rebecca Murphy over the years.
-Clone this into your own private repository. Better yet, download it as a ZIP file and use it to initialize your own repository for this class. 
-Then add Alan (userid *Labouseur*) as a collaborator.
+version 1.0 available  in master branch
+======================================
+
+
 
 Setup TypeScript
 ================
