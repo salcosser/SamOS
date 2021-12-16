@@ -782,6 +782,11 @@ var TSOS;
         }
         delete(fname) {
             if (_DSDD.isFormatted) {
+                if (fname[0].substr(0, 1) == ".") {
+                    _StdOut.putText("Cannot delete files that begin with a \'.\'");
+                    _StdOut.advanceLine();
+                    return;
+                }
                 let resp = _FileSystem.deleteFile(fname[0]);
                 if (resp) {
                     _StdOut.putText(`${fname[0]}.txt has been deleted.`);
