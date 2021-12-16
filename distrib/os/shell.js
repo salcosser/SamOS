@@ -765,9 +765,15 @@ var TSOS;
             _StdOut.putText("Disk has been formatted.");
             _StdOut.advanceLine();
         }
-        ls() {
+        ls(flag) {
             if (_DSDD.isFormatted) {
-                let fNames = _FileSystem.listFiles();
+                let fNames = [];
+                if (flag[0] == "-l") {
+                    fNames = _FileSystem.listAllFiles();
+                }
+                else {
+                    fNames = _FileSystem.listFiles();
+                }
                 // _StdOut.putText("User created files on disk:");
                 // _StdOut.advanceLine();
                 for (let f of fNames) {

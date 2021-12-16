@@ -172,6 +172,23 @@ module TSOS{
     }
 
 
+    public listAllFiles():string[]{
+        let files = [];
+        for(let i = 0;i<_HardDisk.dirRecs.length;i++){
+            let blk = _DSDD.readBlock(DSDD.strToArr(_HardDisk.dirRecs[i]));
+            if(blk.substr(7,2) != "00"){
+                
+                
+                let fName = FileSystem.hexToStr(blk.substr(8));
+               
+                    files[files.length] = fName;
+                
+            }
+        }
+        return files;
+    }
+
+
     public makeSwapFile(inputCode, pid: number): boolean{ // generate a swap file for memory swap
         let fName = "."+ (++this.swpCnt).toString();
         //console.log("original sqp data");
