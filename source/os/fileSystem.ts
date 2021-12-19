@@ -59,6 +59,15 @@ module TSOS{
          }else if(data == "" || data == null){
             return true;
          }else{
+            if(!rawData){
+                let cData = this.readFromFile(fname, false);
+                if(cData.length > 0){
+                    
+                }
+            }
+            
+            
+            
             let fStart = _DSDD.writeData(data, rawData);
             if(FileSystem.validAddr(fStart)){
                 
