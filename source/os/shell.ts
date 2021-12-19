@@ -510,9 +510,9 @@ module TSOS {
                         _StdOut.putText("formats the disk for proper use.");
                         break;
                     case "ls":
-                        _StdOut.putText("usage: ls");
+                        _StdOut.putText("usage: ls <-l>");
                         _StdOut.advanceLine();
-                        _StdOut.putText("lists out all user created files.");
+                        _StdOut.putText("lists out all user created files, or use -l to list all files including swap files.");
                         break;
                     case "delete":
                         _StdOut.putText("usage: delete <filename>");
@@ -885,7 +885,11 @@ module TSOS {
     //fWrite
     public fWrite(fStuff: string[]){
         if(_DSDD.isFormatted){
-       
+            if(fStuff[0].substr(0,1) == "."){
+                _StdOut.putText("Cannot write to files that begin with a \'.\'");
+                _StdOut.advanceLine();
+                return;
+            }
             const fname = fStuff[0];
             let data = fStuff[1];
             if(fStuff.length > 2){
@@ -925,7 +929,11 @@ module TSOS {
 
     public fRead(fName: string[]){
         if(_DSDD.isFormatted){
-       
+            if(fName[0].substr(0,1) == "."){
+                _StdOut.putText("Cannot read files that begin with a \'.\'");
+                _StdOut.advanceLine();
+                return;
+            }
             let fData = _FileSystem.readFromFile(fName[0], false);
             if(fData != "--"){
                 _StdOut.putText(`        ${fName[0]}.txt`);
@@ -953,9 +961,15 @@ module TSOS {
         _StdOut.advanceLine();
     }
 
-    public ls(){
+    public ls(flag){
         if(_DSDD.isFormatted){
-            let fNames = _FileSystem.listFiles();
+           let fNames = [];
+            if(flag[0] == "-l"){
+                fNames = _FileSystem.listAllFiles();
+            }else{
+                fNames = _FileSystem.listFiles();
+            }
+             
             // _StdOut.putText("User created files on disk:");
             // _StdOut.advanceLine();
             for(let f of fNames){
@@ -970,6 +984,11 @@ module TSOS {
 
     public delete(fname){
         if(_DSDD.isFormatted){
+            if(fname[0].substr(0,1) == "."){
+                _StdOut.putText("Cannot delete files that begin with a \'.\'");
+                _StdOut.advanceLine();
+                return;
+            }
            let resp = _FileSystem.deleteFile(fname[0], true);
            if(resp){
             _StdOut.putText(`${fname[0]}.txt has been deleted.`);
@@ -1044,6 +1063,8 @@ module TSOS {
 
         }
     }
+
+
 
 
     }
