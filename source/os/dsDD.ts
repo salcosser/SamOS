@@ -52,13 +52,15 @@ module TSOS{
 
 
 
-            public writeData(data, rawData, startPlace): number[]{
+            public writeData(data, rawData, startPlace:number[]): number[]{
                 
                 
                 let start = "";
-                if(startPlace != []){
+                if(startPlace[0] != null){
+                   
                     start = DSDD.arrToString(startPlace);
                 }else{
+                   
                     start = this.findOpenSpace();
                 } 
                 if(start === ""){

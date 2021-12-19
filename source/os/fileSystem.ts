@@ -59,16 +59,21 @@ module TSOS{
          }else if(data == "" || data == null){
             return true;
          }else{
-            if(!rawData){
+            
                 let cData = this.readFromFile(fname, false);
+                let fStart = [];
                 if(cData.length > 0){
-                    
+                    fStart =  this.overWriteFile(fname, data, rawData);
+                   
+                }else{
+                    fStart = _DSDD.writeData(data, rawData, []);
+                     
                 }
-            }
             
             
             
-            let fStart = _DSDD.writeData(data, rawData);
+            
+            
             if(FileSystem.validAddr(fStart)){
                 
                 this.setFileStart(fname, fStart);
@@ -80,7 +85,7 @@ module TSOS{
          }
      }
     
-     public deleteFile(fname): boolean{
+     public deleteFile(fname, fullClear): boolean{
         let dirStartAddr =  this.findFileDirRecord(fname);
         if(!FileSystem.validAddr(dirStartAddr)){
             return false;
@@ -100,13 +105,34 @@ module TSOS{
                 //set a new clBlock
 
             }
+           
+           if(fullClear){
             _DSDD.clearBlock(dirStartAddr);
+           }
+           
             _KernelInterruptQueue.enqueue(new TSOS.Interrupt(DISK_UPDATE, []));
             return true;
         }
      }
 
+     public overWriteFile(fname, data, rawData){
+        let dirListing=  this.findFileDirRecord(fname);
+        let dirData = _DSDD.readBlock(dirListing);
+        let startBlock = DSDD.strToArr(dirData.substr(0,6));
+        let isDel =   this.deleteFile(fname, false);
+        if(isDel){
+            let isOvr = _DSDD.writeData(data,rawData, startBlock);
+            if(isOvr != []){
+                return startBlock;
+            }else{
+                return [];
+            }
+        }else{
+            return [];
+        }
 
+
+     }
     public readFromFile(fName, rawData): string{ // iterativley reading out file contents from all blocks
         let fListing = this.findFileDirRecord(fName);
        // //console.log("got to fs");
@@ -216,7 +242,7 @@ module TSOS{
         if(isSwappedOut){
 
             let newData = this.readFromFile(this.swpMap.get(nPcb.pid), true);
-            let del = this.deleteFile(this.swpMap.get(nPcb.pid));
+            let del = this.deleteFile(this.swpMap.get(nPcb.pid),true);
             this.swpMap.delete(nPcb.pid);
             if(!del){
                 return false;
@@ -236,7 +262,7 @@ module TSOS{
 
     public onlySwapIn(nPcb:TSOS.PCB, segPlace: number):boolean{ // used at the start of processes to simply grab something from storage
         let newData = this.readFromFile(this.swpMap.get(nPcb.pid), true);
-        let del = this.deleteFile(this.swpMap.get(nPcb.pid));
+        let del = this.deleteFile(this.swpMap.get(nPcb.pid), true);
         this.swpMap.delete(nPcb.pid);
         if(!del){
             return false;
@@ -252,7 +278,7 @@ module TSOS{
     }
 
     public deleteSwpFile(pid: number){
-        this.deleteFile(this.swpMap.get(pid));
+        this.deleteFile(this.swpMap.get(pid), true);
     }
     public static validAddr(arr):boolean{
         return ((arr[0] + arr[1] + arr[2]) > -1);
