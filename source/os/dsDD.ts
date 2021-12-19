@@ -47,8 +47,22 @@ module TSOS{
             public deleteBlock(blkAddr){
                 _HardDisk.clearRef(blkAddr[0],blkAddr[1],blkAddr[2]);
             }
-            public writeData(data, rawData): number[]{
-                let start = this.findOpenSpace();
+
+
+
+
+
+            public writeData(data, rawData, startPlace:number[]): number[]{
+                
+                
+                let start = "";
+                if(startPlace[0] != null){
+                   
+                    start = DSDD.arrToString(startPlace);
+                }else{
+                   
+                    start = this.findOpenSpace();
+                } 
                 if(start === ""){
                     return [];
                 }
@@ -163,7 +177,12 @@ module TSOS{
                 let b = parseInt(str.substr(4,2));
                 return (t+":"+s+":"+b);
             }
-
+            public static arrToLabel(arr):string{
+                let t = arr[0];
+                let s = arr[1];
+                let b = arr[2];
+                return (t+":"+s+":"+b);
+            }
             public static strToArr(str): number[]{
                 let arr = [];
                 arr[arr.length] = parseInt(str.substr(0,2));

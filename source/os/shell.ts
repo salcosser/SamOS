@@ -970,7 +970,7 @@ module TSOS {
 
     public delete(fname){
         if(_DSDD.isFormatted){
-           let resp = _FileSystem.deleteFile(fname[0]);
+           let resp = _FileSystem.deleteFile(fname[0], true);
            if(resp){
             _StdOut.putText(`${fname[0]}.txt has been deleted.`);
             _StdOut.advanceLine();
