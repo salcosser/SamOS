@@ -31,6 +31,12 @@ module TSOS{
         
     }
      public initFile(fname): boolean{ // creating the file listing
+        let pList = this.listFiles();
+        if(pList.indexOf(fname)!= -1){
+            return false;
+        }
+
+
         let location = [];
         for(let l of _HardDisk.dirRecs){
             if(_DSDD.readBlock(DSDD.labelToArr(l)) ==DSDD.blankBlock){

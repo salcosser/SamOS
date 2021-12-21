@@ -683,6 +683,11 @@ var TSOS;
                 return;
             }
             let valid = _FileSystem.initFile(nFname);
+            if (!valid) {
+                _StdOut.putText("Unable to create file. Use the ls command and ensure you are not creating a file with a duplicate name.");
+                _StdOut.advanceLine();
+                return;
+            }
             if (_DSDD.isFormatted) {
                 if (valid) {
                     _StdOut.putText("file created.");
